@@ -8,7 +8,7 @@
 
 ```
 Agent X Lab/
-├── README.md                Lab 总览
+├── README.md                项目总览（Agent X Lab 产品介绍）
 ├── CHANGELOG.md             变更记录
 ├── STRUCTURE.md             本文件：仓库规范
 │
