@@ -1,0 +1,1470 @@
+[
+  {
+    "name_en": "Mathematics",
+    "name_zh": "数学",
+    "openalex_id": "fields/26",
+    "works_count": 4600478,
+    "children": [
+      {
+        "name_en": "Algebra and Number Theory",
+        "name_zh": "代数与数论",
+        "openalex_id": "subfields/2602"
+      },
+      {
+        "name_en": "Applied Mathematics",
+        "name_zh": "应用数学",
+        "openalex_id": "subfields/2604"
+      },
+      {
+        "name_en": "Computational Mathematics",
+        "name_zh": "计算数学",
+        "openalex_id": "subfields/2605"
+      },
+      {
+        "name_en": "Discrete Mathematics and Combinatorics",
+        "name_zh": "离散数学与组合数学",
+        "openalex_id": "subfields/2607"
+      },
+      {
+        "name_en": "Geometry and Topology",
+        "name_zh": "几何与拓扑",
+        "openalex_id": "subfields/2608"
+      },
+      {
+        "name_en": "Mathematical Physics",
+        "name_zh": "数学物理",
+        "openalex_id": "subfields/2610"
+      },
+      {
+        "name_en": "Modeling and Simulation",
+        "name_zh": "建模与仿真",
+        "openalex_id": "subfields/2611"
+      },
+      {
+        "name_en": "Numerical Analysis",
+        "name_zh": "数值分析",
+        "openalex_id": "subfields/2612"
+      },
+      {
+        "name_en": "Statistics and Probability",
+        "name_zh": "统计与概率",
+        "openalex_id": "subfields/2613"
+      },
+      {
+        "name_en": "Theoretical Computer Science",
+        "name_zh": "理论计算机科学",
+        "openalex_id": "subfields/2614"
+      }
+    ]
+  },
+  {
+    "name_en": "Physics and Astronomy",
+    "name_zh": "物理学与天文学",
+    "openalex_id": "fields/31",
+    "works_count": 24848201,
+    "children": [
+      {
+        "name_en": "Acoustics and Ultrasonics",
+        "name_zh": "声学与超声学",
+        "openalex_id": "subfields/3102"
+      },
+      {
+        "name_en": "Astronomy and Astrophysics",
+        "name_zh": "天文学与天体物理",
+        "openalex_id": "subfields/3103"
+      },
+      {
+        "name_en": "Atomic and Molecular Physics, and Optics",
+        "name_zh": "原子分子物理与光学",
+        "openalex_id": "subfields/3107"
+      },
+      {
+        "name_en": "Condensed Matter Physics",
+        "name_zh": "凝聚态物理",
+        "openalex_id": "subfields/3104"
+      },
+      {
+        "name_en": "Instrumentation",
+        "name_zh": "仪器科学",
+        "openalex_id": "subfields/3105"
+      },
+      {
+        "name_en": "Nuclear and High Energy Physics",
+        "name_zh": "核物理与高能物理",
+        "openalex_id": "subfields/3106"
+      },
+      {
+        "name_en": "Radiation",
+        "name_zh": "辐射学",
+        "openalex_id": "subfields/3108"
+      },
+      {
+        "name_en": "Statistical and Nonlinear Physics",
+        "name_zh": "统计与非线性物理",
+        "openalex_id": "subfields/3109"
+      }
+    ]
+  },
+  {
+    "name_en": "Chemistry",
+    "name_zh": "化学",
+    "openalex_id": "fields/16",
+    "works_count": 7062938,
+    "children": [
+      {
+        "name_en": "Analytical Chemistry",
+        "name_zh": "分析化学",
+        "openalex_id": "subfields/1602"
+      },
+      {
+        "name_en": "Electrochemistry",
+        "name_zh": "电化学",
+        "openalex_id": "subfields/1603"
+      },
+      {
+        "name_en": "Inorganic Chemistry",
+        "name_zh": "无机化学",
+        "openalex_id": "subfields/1604"
+      },
+      {
+        "name_en": "Organic Chemistry",
+        "name_zh": "有机化学",
+        "openalex_id": "subfields/1605"
+      },
+      {
+        "name_en": "Physical and Theoretical Chemistry",
+        "name_zh": "物理与理论化学",
+        "openalex_id": "subfields/1606"
+      },
+      {
+        "name_en": "Spectroscopy",
+        "name_zh": "光谱学",
+        "openalex_id": "subfields/1607"
+      }
+    ]
+  },
+  {
+    "name_en": "Earth and Planetary Sciences",
+    "name_zh": "地球与行星科学",
+    "openalex_id": "fields/19",
+    "works_count": 7825628,
+    "children": [
+      {
+        "name_en": "Atmospheric Science",
+        "name_zh": "大气科学",
+        "openalex_id": "subfields/1902"
+      },
+      {
+        "name_en": "Earth-Surface Processes",
+        "name_zh": "地表过程",
+        "openalex_id": "subfields/1904"
+      },
+      {
+        "name_en": "Geochemistry and Petrology",
+        "name_zh": "地球化学与岩石学",
+        "openalex_id": "subfields/1906"
+      },
+      {
+        "name_en": "Geology",
+        "name_zh": "地质学",
+        "openalex_id": "subfields/1907"
+      },
+      {
+        "name_en": "Geophysics",
+        "name_zh": "地球物理学",
+        "openalex_id": "subfields/1908"
+      },
+      {
+        "name_en": "Oceanography",
+        "name_zh": "海洋学",
+        "openalex_id": "subfields/1910"
+      },
+      {
+        "name_en": "Paleontology",
+        "name_zh": "古生物学",
+        "openalex_id": "subfields/1911"
+      },
+      {
+        "name_en": "Space and Planetary Science",
+        "name_zh": "空间与行星科学",
+        "openalex_id": "subfields/1912"
+      }
+    ]
+  },
+  {
+    "name_en": "Environmental Science",
+    "name_zh": "环境科学",
+    "openalex_id": "fields/23",
+    "works_count": 17748405,
+    "children": [
+      {
+        "name_en": "Ecological Modeling",
+        "name_zh": "生态建模",
+        "openalex_id": "subfields/2302"
+      },
+      {
+        "name_en": "Ecology",
+        "name_zh": "生态学",
+        "openalex_id": "subfields/2303"
+      },
+      {
+        "name_en": "Environmental Chemistry",
+        "name_zh": "环境化学",
+        "openalex_id": "subfields/2304"
+      },
+      {
+        "name_en": "Environmental Engineering",
+        "name_zh": "环境工程",
+        "openalex_id": "subfields/2305"
+      },
+      {
+        "name_en": "Global and Planetary Change",
+        "name_zh": "全球与行星变化",
+        "openalex_id": "subfields/2306"
+      },
+      {
+        "name_en": "Health, Toxicology and Mutagenesis",
+        "name_zh": "健康、毒理学与致突变",
+        "openalex_id": "subfields/2307"
+      },
+      {
+        "name_en": "Industrial and Manufacturing Engineering",
+        "name_zh": "工业与制造工程",
+        "openalex_id": "subfields/2311"
+      },
+      {
+        "name_en": "Management, Monitoring, Policy and Law",
+        "name_zh": "管理、监测、政策与法律",
+        "openalex_id": "subfields/2308"
+      },
+      {
+        "name_en": "Nature and Landscape Conservation",
+        "name_zh": "自然与景观保护",
+        "openalex_id": "subfields/2309"
+      },
+      {
+        "name_en": "Pollution",
+        "name_zh": "污染研究",
+        "openalex_id": "subfields/2310"
+      },
+      {
+        "name_en": "Water Science and Technology",
+        "name_zh": "水科学与技术",
+        "openalex_id": "subfields/2312"
+      }
+    ]
+  },
+  {
+    "name_en": "Agricultural and Biological Sciences",
+    "name_zh": "农业与生物科学",
+    "openalex_id": "fields/11",
+    "works_count": 22116859,
+    "children": [
+      {
+        "name_en": "Agronomy and Crop Science",
+        "name_zh": "农学与作物科学",
+        "openalex_id": "subfields/1102"
+      },
+      {
+        "name_en": "Animal Science and Zoology",
+        "name_zh": "动物科学与动物学",
+        "openalex_id": "subfields/1103"
+      },
+      {
+        "name_en": "Aquatic Science",
+        "name_zh": "水产科学",
+        "openalex_id": "subfields/1104"
+      },
+      {
+        "name_en": "Ecology, Evolution, Behavior and Systematics",
+        "name_zh": "生态学、进化与系统学",
+        "openalex_id": "subfields/1105"
+      },
+      {
+        "name_en": "Food Science",
+        "name_zh": "食品科学",
+        "openalex_id": "subfields/1106"
+      },
+      {
+        "name_en": "Forestry",
+        "name_zh": "林学",
+        "openalex_id": "subfields/1107"
+      },
+      {
+        "name_en": "General Agricultural and Biological Sciences",
+        "name_zh": "综合农业与生物科学",
+        "openalex_id": "subfields/1100"
+      },
+      {
+        "name_en": "Horticulture",
+        "name_zh": "园艺学",
+        "openalex_id": "subfields/1108"
+      },
+      {
+        "name_en": "Insect Science",
+        "name_zh": "昆虫学",
+        "openalex_id": "subfields/1109"
+      },
+      {
+        "name_en": "Plant Science",
+        "name_zh": "植物科学",
+        "openalex_id": "subfields/1110"
+      },
+      {
+        "name_en": "Soil Science",
+        "name_zh": "土壤科学",
+        "openalex_id": "subfields/1111"
+      }
+    ]
+  },
+  {
+    "name_en": "Biochemistry, Genetics and Molecular Biology",
+    "name_zh": "生物化学、遗传学与分子生物学",
+    "openalex_id": "fields/13",
+    "works_count": 20808436,
+    "children": [
+      {
+        "name_en": "Aging",
+        "name_zh": "衰老",
+        "openalex_id": "subfields/1302"
+      },
+      {
+        "name_en": "Biochemistry",
+        "name_zh": "生物化学",
+        "openalex_id": "subfields/1303"
+      },
+      {
+        "name_en": "Biophysics",
+        "name_zh": "生物物理学",
+        "openalex_id": "subfields/1304"
+      },
+      {
+        "name_en": "Biotechnology",
+        "name_zh": "生物技术",
+        "openalex_id": "subfields/1305"
+      },
+      {
+        "name_en": "Cancer Research",
+        "name_zh": "癌症研究",
+        "openalex_id": "subfields/1306"
+      },
+      {
+        "name_en": "Cell Biology",
+        "name_zh": "细胞生物学",
+        "openalex_id": "subfields/1307"
+      },
+      {
+        "name_en": "Clinical Biochemistry",
+        "name_zh": "临床生物化学",
+        "openalex_id": "subfields/1308"
+      },
+      {
+        "name_en": "Developmental Biology",
+        "name_zh": "发育生物学",
+        "openalex_id": "subfields/1309"
+      },
+      {
+        "name_en": "Endocrinology",
+        "name_zh": "内分泌学",
+        "openalex_id": "subfields/1310"
+      },
+      {
+        "name_en": "Genetics",
+        "name_zh": "遗传学",
+        "openalex_id": "subfields/1311"
+      },
+      {
+        "name_en": "Molecular Biology",
+        "name_zh": "分子生物学",
+        "openalex_id": "subfields/1312"
+      },
+      {
+        "name_en": "Molecular Medicine",
+        "name_zh": "分子医学",
+        "openalex_id": "subfields/1313"
+      },
+      {
+        "name_en": "Physiology",
+        "name_zh": "生理学",
+        "openalex_id": "subfields/1314"
+      },
+      {
+        "name_en": "Structural Biology",
+        "name_zh": "结构生物学",
+        "openalex_id": "subfields/1315"
+      }
+    ]
+  },
+  {
+    "name_en": "Immunology and Microbiology",
+    "name_zh": "免疫学与微生物学",
+    "openalex_id": "fields/24",
+    "works_count": 2850873,
+    "children": [
+      {
+        "name_en": "Applied Microbiology and Biotechnology",
+        "name_zh": "应用微生物学与生物技术",
+        "openalex_id": "subfields/2402"
+      },
+      {
+        "name_en": "Immunology",
+        "name_zh": "免疫学",
+        "openalex_id": "subfields/2403"
+      },
+      {
+        "name_en": "Microbiology",
+        "name_zh": "微生物学",
+        "openalex_id": "subfields/2404"
+      },
+      {
+        "name_en": "Parasitology",
+        "name_zh": "寄生虫学",
+        "openalex_id": "subfields/2405"
+      },
+      {
+        "name_en": "Virology",
+        "name_zh": "病毒学",
+        "openalex_id": "subfields/2406"
+      }
+    ]
+  },
+  {
+    "name_en": "Neuroscience",
+    "name_zh": "神经科学",
+    "openalex_id": "fields/28",
+    "works_count": 4405333,
+    "children": [
+      {
+        "name_en": "Behavioral Neuroscience",
+        "name_zh": "行为神经科学",
+        "openalex_id": "subfields/2802"
+      },
+      {
+        "name_en": "Biological Psychiatry",
+        "name_zh": "生物精神医学",
+        "openalex_id": "subfields/2803"
+      },
+      {
+        "name_en": "Cellular and Molecular Neuroscience",
+        "name_zh": "细胞与分子神经科学",
+        "openalex_id": "subfields/2804"
+      },
+      {
+        "name_en": "Cognitive Neuroscience",
+        "name_zh": "认知神经科学",
+        "openalex_id": "subfields/2805"
+      },
+      {
+        "name_en": "Developmental Neuroscience",
+        "name_zh": "发育神经科学",
+        "openalex_id": "subfields/2806"
+      },
+      {
+        "name_en": "Endocrine and Autonomic Systems",
+        "name_zh": "内分泌与自主神经系统",
+        "openalex_id": "subfields/2807"
+      },
+      {
+        "name_en": "Neurology",
+        "name_zh": "神经病学",
+        "openalex_id": "subfields/2808"
+      },
+      {
+        "name_en": "Sensory Systems",
+        "name_zh": "感觉系统",
+        "openalex_id": "subfields/2809"
+      }
+    ]
+  },
+  {
+    "name_en": "Engineering",
+    "name_zh": "工程学",
+    "openalex_id": "fields/22",
+    "works_count": 62822553,
+    "children": [
+      {
+        "name_en": "Aerospace Engineering",
+        "name_zh": "航空航天工程",
+        "openalex_id": "subfields/2202"
+      },
+      {
+        "name_en": "Architecture",
+        "name_zh": "建筑学",
+        "openalex_id": "subfields/2216"
+      },
+      {
+        "name_en": "Automotive Engineering",
+        "name_zh": "汽车工程",
+        "openalex_id": "subfields/2203"
+      },
+      {
+        "name_en": "Biomedical Engineering",
+        "name_zh": "生物医学工程",
+        "openalex_id": "subfields/2204"
+      },
+      {
+        "name_en": "Building and Construction",
+        "name_zh": "建筑与施工",
+        "openalex_id": "subfields/2215"
+      },
+      {
+        "name_en": "Civil and Structural Engineering",
+        "name_zh": "土木与结构工程",
+        "openalex_id": "subfields/2205"
+      },
+      {
+        "name_en": "Computational Mechanics",
+        "name_zh": "计算力学",
+        "openalex_id": "subfields/2206"
+      },
+      {
+        "name_en": "Control and Systems Engineering",
+        "name_zh": "控制与系统工程",
+        "openalex_id": "subfields/2207"
+      },
+      {
+        "name_en": "Electrical and Electronic Engineering",
+        "name_zh": "电气与电子工程",
+        "openalex_id": "subfields/2208"
+      },
+      {
+        "name_en": "General Engineering",
+        "name_zh": "综合工程",
+        "openalex_id": "subfields/2200"
+      },
+      {
+        "name_en": "Industrial and Manufacturing Engineering",
+        "name_zh": "工业与制造工程",
+        "openalex_id": "subfields/2209"
+      },
+      {
+        "name_en": "Mechanical Engineering",
+        "name_zh": "机械工程",
+        "openalex_id": "subfields/2210"
+      },
+      {
+        "name_en": "Mechanics of Materials",
+        "name_zh": "材料力学",
+        "openalex_id": "subfields/2211"
+      },
+      {
+        "name_en": "Media Technology",
+        "name_zh": "媒体技术",
+        "openalex_id": "subfields/2214"
+      },
+      {
+        "name_en": "Ocean Engineering",
+        "name_zh": "海洋工程",
+        "openalex_id": "subfields/2212"
+      },
+      {
+        "name_en": "Safety, Risk, Reliability and Quality",
+        "name_zh": "安全、风险与质量",
+        "openalex_id": "subfields/2213"
+      }
+    ]
+  },
+  {
+    "name_en": "Chemical Engineering",
+    "name_zh": "化学工程",
+    "openalex_id": "fields/15",
+    "works_count": 911238,
+    "children": [
+      {
+        "name_en": "Bioengineering",
+        "name_zh": "生物工程",
+        "openalex_id": "subfields/1502"
+      },
+      {
+        "name_en": "Catalysis",
+        "name_zh": "催化",
+        "openalex_id": "subfields/1503"
+      },
+      {
+        "name_en": "Chemical Health and Safety",
+        "name_zh": "化学健康与安全",
+        "openalex_id": "subfields/1504"
+      },
+      {
+        "name_en": "Filtration and Separation",
+        "name_zh": "过滤与分离",
+        "openalex_id": "subfields/1506"
+      },
+      {
+        "name_en": "Fluid Flow and Transfer Processes",
+        "name_zh": "流体流动与传递过程",
+        "openalex_id": "subfields/1507"
+      },
+      {
+        "name_en": "Process Chemistry and Technology",
+        "name_zh": "工艺化学与技术",
+        "openalex_id": "subfields/1508"
+      }
+    ]
+  },
+  {
+    "name_en": "Materials Science",
+    "name_zh": "材料科学",
+    "openalex_id": "fields/25",
+    "works_count": 9696755,
+    "children": [
+      {
+        "name_en": "Biomaterials",
+        "name_zh": "生物材料",
+        "openalex_id": "subfields/2502"
+      },
+      {
+        "name_en": "Ceramics and Composites",
+        "name_zh": "陶瓷与复合材料",
+        "openalex_id": "subfields/2503"
+      },
+      {
+        "name_en": "Electronic, Optical and Magnetic Materials",
+        "name_zh": "电子光学与磁性材料",
+        "openalex_id": "subfields/2504"
+      },
+      {
+        "name_en": "General Materials Science",
+        "name_zh": "综合材料科学",
+        "openalex_id": "subfields/2500"
+      },
+      {
+        "name_en": "Materials Chemistry",
+        "name_zh": "材料化学",
+        "openalex_id": "subfields/2505"
+      },
+      {
+        "name_en": "Metals and Alloys",
+        "name_zh": "金属与合金",
+        "openalex_id": "subfields/2506"
+      },
+      {
+        "name_en": "Polymers and Plastics",
+        "name_zh": "聚合物与塑料",
+        "openalex_id": "subfields/2507"
+      },
+      {
+        "name_en": "Surfaces, Coatings and Films",
+        "name_zh": "表面、涂层与薄膜",
+        "openalex_id": "subfields/2508"
+      }
+    ]
+  },
+  {
+    "name_en": "Computer Science",
+    "name_zh": "计算机科学",
+    "openalex_id": "fields/17",
+    "works_count": 23212882,
+    "children": [
+      {
+        "name_en": "Artificial Intelligence",
+        "name_zh": "人工智能",
+        "openalex_id": "subfields/1702"
+      },
+      {
+        "name_en": "Computational Theory and Mathematics",
+        "name_zh": "计算理论与数学",
+        "openalex_id": "subfields/1703"
+      },
+      {
+        "name_en": "Computer Graphics and Computer-Aided Design",
+        "name_zh": "计算机图形学与CAD",
+        "openalex_id": "subfields/1704"
+      },
+      {
+        "name_en": "Computer Networks and Communications",
+        "name_zh": "计算机网络与通信",
+        "openalex_id": "subfields/1705"
+      },
+      {
+        "name_en": "Computer Science Applications",
+        "name_zh": "计算机科学应用",
+        "openalex_id": "subfields/1706"
+      },
+      {
+        "name_en": "Computer Vision and Pattern Recognition",
+        "name_zh": "计算机视觉与模式识别",
+        "openalex_id": "subfields/1707"
+      },
+      {
+        "name_en": "Hardware and Architecture",
+        "name_zh": "硬件与架构",
+        "openalex_id": "subfields/1708"
+      },
+      {
+        "name_en": "Human-Computer Interaction",
+        "name_zh": "人机交互",
+        "openalex_id": "subfields/1709"
+      },
+      {
+        "name_en": "Information Systems",
+        "name_zh": "信息系统",
+        "openalex_id": "subfields/1710"
+      },
+      {
+        "name_en": "Signal Processing",
+        "name_zh": "信号处理",
+        "openalex_id": "subfields/1711"
+      },
+      {
+        "name_en": "Software",
+        "name_zh": "软件工程",
+        "openalex_id": "subfields/1712"
+      }
+    ]
+  },
+  {
+    "name_en": "Energy",
+    "name_zh": "能源",
+    "openalex_id": "fields/21",
+    "works_count": 1882706,
+    "children": [
+      {
+        "name_en": "Energy Engineering and Power Technology",
+        "name_zh": "能源工程与动力技术",
+        "openalex_id": "subfields/2102"
+      },
+      {
+        "name_en": "Fuel Technology",
+        "name_zh": "燃料技术",
+        "openalex_id": "subfields/2103"
+      },
+      {
+        "name_en": "General Energy",
+        "name_zh": "综合能源",
+        "openalex_id": "subfields/2100"
+      },
+      {
+        "name_en": "Nuclear Energy and Engineering",
+        "name_zh": "核能与核工程",
+        "openalex_id": "subfields/2104"
+      },
+      {
+        "name_en": "Renewable Energy, Sustainability and the Environment",
+        "name_zh": "可再生能源与可持续发展",
+        "openalex_id": "subfields/2105"
+      }
+    ]
+  },
+  {
+    "name_en": "Medicine",
+    "name_zh": "医学",
+    "openalex_id": "fields/27",
+    "works_count": 52599700,
+    "children": [
+      {
+        "name_en": "Anatomy",
+        "name_zh": "解剖学",
+        "openalex_id": "subfields/2702"
+      },
+      {
+        "name_en": "Anesthesiology and Pain Medicine",
+        "name_zh": "麻醉学与疼痛医学",
+        "openalex_id": "subfields/2703"
+      },
+      {
+        "name_en": "Biochemistry",
+        "name_zh": "生物化学",
+        "openalex_id": "subfields/2704"
+      },
+      {
+        "name_en": "Cardiology and Cardiovascular Medicine",
+        "name_zh": "心脏病学与心血管医学",
+        "openalex_id": "subfields/2705"
+      },
+      {
+        "name_en": "Complementary and alternative medicine",
+        "name_zh": "补充与替代医学",
+        "openalex_id": "subfields/2707"
+      },
+      {
+        "name_en": "Critical Care and Intensive Care Medicine",
+        "name_zh": "重症医学",
+        "openalex_id": "subfields/2706"
+      },
+      {
+        "name_en": "Dermatology",
+        "name_zh": "皮肤科学",
+        "openalex_id": "subfields/2708"
+      },
+      {
+        "name_en": "Emergency Medicine",
+        "name_zh": "急诊医学",
+        "openalex_id": "subfields/2711"
+      },
+      {
+        "name_en": "Endocrinology, Diabetes and Metabolism",
+        "name_zh": "内分泌学",
+        "openalex_id": "subfields/2712"
+      },
+      {
+        "name_en": "Epidemiology",
+        "name_zh": "流行病学",
+        "openalex_id": "subfields/2713"
+      },
+      {
+        "name_en": "Family Practice",
+        "name_zh": "家庭医学",
+        "openalex_id": "subfields/2714"
+      },
+      {
+        "name_en": "Gastroenterology",
+        "name_zh": "消化病学",
+        "openalex_id": "subfields/2715"
+      },
+      {
+        "name_en": "Genetics",
+        "name_zh": "遗传学",
+        "openalex_id": "subfields/2716"
+      },
+      {
+        "name_en": "Geriatrics and Gerontology",
+        "name_zh": "老年医学",
+        "openalex_id": "subfields/2717"
+      },
+      {
+        "name_en": "Health Informatics",
+        "name_zh": "健康信息学",
+        "openalex_id": "subfields/2718"
+      },
+      {
+        "name_en": "Hematology",
+        "name_zh": "血液学",
+        "openalex_id": "subfields/2720"
+      },
+      {
+        "name_en": "Hepatology",
+        "name_zh": "肝脏病学",
+        "openalex_id": "subfields/2721"
+      },
+      {
+        "name_en": "Immunology and Allergy",
+        "name_zh": "免疫学与过敏学",
+        "openalex_id": "subfields/2723"
+      },
+      {
+        "name_en": "Infectious Diseases",
+        "name_zh": "传染病学",
+        "openalex_id": "subfields/2725"
+      },
+      {
+        "name_en": "Internal Medicine",
+        "name_zh": "内科学",
+        "openalex_id": "subfields/2724"
+      },
+      {
+        "name_en": "Microbiology",
+        "name_zh": "微生物学",
+        "openalex_id": "subfields/2726"
+      },
+      {
+        "name_en": "Nephrology",
+        "name_zh": "肾脏病学",
+        "openalex_id": "subfields/2727"
+      },
+      {
+        "name_en": "Neurology",
+        "name_zh": "神经病学",
+        "openalex_id": "subfields/2728"
+      },
+      {
+        "name_en": "Obstetrics and Gynecology",
+        "name_zh": "妇产科学",
+        "openalex_id": "subfields/2729"
+      },
+      {
+        "name_en": "Oncology",
+        "name_zh": "肿瘤学",
+        "openalex_id": "subfields/2730"
+      },
+      {
+        "name_en": "Ophthalmology",
+        "name_zh": "眼科学",
+        "openalex_id": "subfields/2731"
+      },
+      {
+        "name_en": "Orthopedics and Sports Medicine",
+        "name_zh": "骨科与运动医学",
+        "openalex_id": "subfields/2732"
+      },
+      {
+        "name_en": "Otorhinolaryngology",
+        "name_zh": "耳鼻喉科学",
+        "openalex_id": "subfields/2733"
+      },
+      {
+        "name_en": "Pathology and Forensic Medicine",
+        "name_zh": "病理学与法医学",
+        "openalex_id": "subfields/2734"
+      },
+      {
+        "name_en": "Pediatrics, Perinatology and Child Health",
+        "name_zh": "儿科学",
+        "openalex_id": "subfields/2735"
+      },
+      {
+        "name_en": "Pharmacology",
+        "name_zh": "药理学",
+        "openalex_id": "subfields/2736"
+      },
+      {
+        "name_en": "Physiology",
+        "name_zh": "生理学",
+        "openalex_id": "subfields/2737"
+      },
+      {
+        "name_en": "Psychiatry and Mental health",
+        "name_zh": "精神病学与心理健康",
+        "openalex_id": "subfields/2738"
+      },
+      {
+        "name_en": "Public Health, Environmental and Occupational Health",
+        "name_zh": "公共卫生",
+        "openalex_id": "subfields/2739"
+      },
+      {
+        "name_en": "Pulmonary and Respiratory Medicine",
+        "name_zh": "肺病与呼吸医学",
+        "openalex_id": "subfields/2740"
+      },
+      {
+        "name_en": "Radiology, Nuclear Medicine and Imaging",
+        "name_zh": "放射学与影像学",
+        "openalex_id": "subfields/2741"
+      },
+      {
+        "name_en": "Rehabilitation",
+        "name_zh": "康复医学",
+        "openalex_id": "subfields/2742"
+      },
+      {
+        "name_en": "Reproductive Medicine",
+        "name_zh": "生殖医学",
+        "openalex_id": "subfields/2743"
+      },
+      {
+        "name_en": "Rheumatology",
+        "name_zh": "风湿病学",
+        "openalex_id": "subfields/2745"
+      },
+      {
+        "name_en": "Surgery",
+        "name_zh": "外科学",
+        "openalex_id": "subfields/2746"
+      },
+      {
+        "name_en": "Transplantation",
+        "name_zh": "移植学",
+        "openalex_id": "subfields/2747"
+      },
+      {
+        "name_en": "Urology",
+        "name_zh": "泌尿科学",
+        "openalex_id": "subfields/2748"
+      }
+    ]
+  },
+  {
+    "name_en": "Pharmacology, Toxicology and Pharmaceutics",
+    "name_zh": "药理学、毒理学与药学",
+    "openalex_id": "fields/30",
+    "works_count": 1169698,
+    "children": [
+      {
+        "name_en": "Drug Discovery",
+        "name_zh": "药物发现",
+        "openalex_id": "subfields/3002"
+      },
+      {
+        "name_en": "Pharmaceutical Science",
+        "name_zh": "药物科学",
+        "openalex_id": "subfields/3003"
+      },
+      {
+        "name_en": "Pharmacology",
+        "name_zh": "药理学",
+        "openalex_id": "subfields/3004"
+      },
+      {
+        "name_en": "Toxicology",
+        "name_zh": "毒理学",
+        "openalex_id": "subfields/3005"
+      }
+    ]
+  },
+  {
+    "name_en": "Nursing",
+    "name_zh": "护理学",
+    "openalex_id": "fields/29",
+    "works_count": 1359310,
+    "children": [
+      {
+        "name_en": "Issues, ethics and legal aspects",
+        "name_zh": "议题、伦理与法律问题",
+        "openalex_id": "subfields/2910"
+      },
+      {
+        "name_en": "Leadership and Management",
+        "name_zh": "领导力与管理",
+        "openalex_id": "subfields/2911"
+      },
+      {
+        "name_en": "Nutrition and Dietetics",
+        "name_zh": "营养与饮食学",
+        "openalex_id": "subfields/2916"
+      },
+      {
+        "name_en": "Research and Theory",
+        "name_zh": "研究与理论",
+        "openalex_id": "subfields/2922"
+      }
+    ]
+  },
+  {
+    "name_en": "Health Professions",
+    "name_zh": "健康专业",
+    "openalex_id": "fields/36",
+    "works_count": 7890678,
+    "children": [
+      {
+        "name_en": "Complementary and Manual Therapy",
+        "name_zh": "补充与手法治疗",
+        "openalex_id": "subfields/3603"
+      },
+      {
+        "name_en": "Emergency Medical Services",
+        "name_zh": "急救服务",
+        "openalex_id": "subfields/3604"
+      },
+      {
+        "name_en": "General Health Professions",
+        "name_zh": "综合健康专业",
+        "openalex_id": "subfields/3600"
+      },
+      {
+        "name_en": "Health Information Management",
+        "name_zh": "健康信息管理",
+        "openalex_id": "subfields/3605"
+      },
+      {
+        "name_en": "Medical Laboratory Technology",
+        "name_zh": "医学检验技术",
+        "openalex_id": "subfields/3607"
+      },
+      {
+        "name_en": "Medical Terminology",
+        "name_zh": "医学术语",
+        "openalex_id": "subfields/3608"
+      },
+      {
+        "name_en": "Occupational Therapy",
+        "name_zh": "职业治疗",
+        "openalex_id": "subfields/3609"
+      },
+      {
+        "name_en": "Pharmacy",
+        "name_zh": "药房学",
+        "openalex_id": "subfields/3611"
+      },
+      {
+        "name_en": "Physical Therapy, Sports Therapy and Rehabilitation",
+        "name_zh": "物理治疗与康复",
+        "openalex_id": "subfields/3612"
+      },
+      {
+        "name_en": "Radiological and Ultrasound Technology",
+        "name_zh": "放射与超声技术",
+        "openalex_id": "subfields/3614"
+      },
+      {
+        "name_en": "Speech and Hearing",
+        "name_zh": "言语与听力",
+        "openalex_id": "subfields/3616"
+      }
+    ]
+  },
+  {
+    "name_en": "Dentistry",
+    "name_zh": "牙科学",
+    "openalex_id": "fields/35",
+    "works_count": 1005589,
+    "children": [
+      {
+        "name_en": "General Dentistry",
+        "name_zh": "综合牙科学",
+        "openalex_id": "subfields/3500"
+      },
+      {
+        "name_en": "Oral Surgery",
+        "name_zh": "口腔外科",
+        "openalex_id": "subfields/3504"
+      },
+      {
+        "name_en": "Orthodontics",
+        "name_zh": "正畸学",
+        "openalex_id": "subfields/3505"
+      },
+      {
+        "name_en": "Periodontics",
+        "name_zh": "牙周病学",
+        "openalex_id": "subfields/3506"
+      }
+    ]
+  },
+  {
+    "name_en": "Veterinary",
+    "name_zh": "兽医学",
+    "openalex_id": "fields/34",
+    "works_count": 515244,
+    "children": [
+      {
+        "name_en": "Equine",
+        "name_zh": "马科动物",
+        "openalex_id": "subfields/3402"
+      },
+      {
+        "name_en": "Small Animals",
+        "name_zh": "小型动物",
+        "openalex_id": "subfields/3404"
+      }
+    ]
+  },
+  {
+    "name_en": "Psychology",
+    "name_zh": "心理学",
+    "openalex_id": "fields/32",
+    "works_count": 8965087,
+    "children": [
+      {
+        "name_en": "Applied Psychology",
+        "name_zh": "应用心理学",
+        "openalex_id": "subfields/3202"
+      },
+      {
+        "name_en": "Clinical Psychology",
+        "name_zh": "临床心理学",
+        "openalex_id": "subfields/3203"
+      },
+      {
+        "name_en": "Developmental and Educational Psychology",
+        "name_zh": "发展与教育心理学",
+        "openalex_id": "subfields/3204"
+      },
+      {
+        "name_en": "Experimental and Cognitive Psychology",
+        "name_zh": "实验与认知心理学",
+        "openalex_id": "subfields/3205"
+      },
+      {
+        "name_en": "General Psychology",
+        "name_zh": "综合心理学",
+        "openalex_id": "subfields/3200"
+      },
+      {
+        "name_en": "Neuropsychology and Physiological Psychology",
+        "name_zh": "神经心理学与生理心理学",
+        "openalex_id": "subfields/3206"
+      },
+      {
+        "name_en": "Social Psychology",
+        "name_zh": "社会心理学",
+        "openalex_id": "subfields/3207"
+      }
+    ]
+  },
+  {
+    "name_en": "Social Sciences",
+    "name_zh": "社会科学",
+    "openalex_id": "fields/33",
+    "works_count": 52788109,
+    "children": [
+      {
+        "name_en": "Anthropology",
+        "name_zh": "人类学",
+        "openalex_id": "subfields/3314"
+      },
+      {
+        "name_en": "Archeology",
+        "name_zh": "考古学",
+        "openalex_id": "subfields/3302"
+      },
+      {
+        "name_en": "Communication",
+        "name_zh": "传播学",
+        "openalex_id": "subfields/3315"
+      },
+      {
+        "name_en": "Cultural Studies",
+        "name_zh": "文化研究",
+        "openalex_id": "subfields/3316"
+      },
+      {
+        "name_en": "Demography",
+        "name_zh": "人口学",
+        "openalex_id": "subfields/3317"
+      },
+      {
+        "name_en": "Development",
+        "name_zh": "发展研究",
+        "openalex_id": "subfields/3303"
+      },
+      {
+        "name_en": "Education",
+        "name_zh": "教育学",
+        "openalex_id": "subfields/3304"
+      },
+      {
+        "name_en": "Gender Studies",
+        "name_zh": "性别研究",
+        "openalex_id": "subfields/3318"
+      },
+      {
+        "name_en": "General Social Sciences",
+        "name_zh": "综合社会科学",
+        "openalex_id": "subfields/3300"
+      },
+      {
+        "name_en": "Geography, Planning and Development",
+        "name_zh": "地理、规划与发展",
+        "openalex_id": "subfields/3305"
+      },
+      {
+        "name_en": "Health",
+        "name_zh": "健康（社会科学）",
+        "openalex_id": "subfields/3306"
+      },
+      {
+        "name_en": "Human Factors and Ergonomics",
+        "name_zh": "人因工程学",
+        "openalex_id": "subfields/3307"
+      },
+      {
+        "name_en": "Law",
+        "name_zh": "法学",
+        "openalex_id": "subfields/3308"
+      },
+      {
+        "name_en": "Library and Information Sciences",
+        "name_zh": "图书馆与信息科学",
+        "openalex_id": "subfields/3309"
+      },
+      {
+        "name_en": "Life-span and Life-course Studies",
+        "name_zh": "生命历程研究",
+        "openalex_id": "subfields/3319"
+      },
+      {
+        "name_en": "Linguistics and Language",
+        "name_zh": "语言学与语言",
+        "openalex_id": "subfields/3310"
+      },
+      {
+        "name_en": "Political Science and International Relations",
+        "name_zh": "政治学与国际关系",
+        "openalex_id": "subfields/3320"
+      },
+      {
+        "name_en": "Public Administration",
+        "name_zh": "公共管理",
+        "openalex_id": "subfields/3321"
+      },
+      {
+        "name_en": "Safety Research",
+        "name_zh": "安全研究",
+        "openalex_id": "subfields/3311"
+      },
+      {
+        "name_en": "Sociology and Political Science",
+        "name_zh": "社会学与政治学",
+        "openalex_id": "subfields/3312"
+      },
+      {
+        "name_en": "Transportation",
+        "name_zh": "交通运输",
+        "openalex_id": "subfields/3313"
+      },
+      {
+        "name_en": "Urban Studies",
+        "name_zh": "城市研究",
+        "openalex_id": "subfields/3322"
+      }
+    ]
+  },
+  {
+    "name_en": "Economics, Econometrics and Finance",
+    "name_zh": "经济学、计量经济学与金融学",
+    "openalex_id": "fields/20",
+    "works_count": 13058279,
+    "children": [
+      {
+        "name_en": "Economics and Econometrics",
+        "name_zh": "经济学与计量经济学",
+        "openalex_id": "subfields/2002"
+      },
+      {
+        "name_en": "Finance",
+        "name_zh": "金融学",
+        "openalex_id": "subfields/2003"
+      },
+      {
+        "name_en": "General Economics, Econometrics and Finance",
+        "name_zh": "综合经济与金融",
+        "openalex_id": "subfields/2000"
+      }
+    ]
+  },
+  {
+    "name_en": "Business, Management and Accounting",
+    "name_zh": "商学、管理学与会计学",
+    "openalex_id": "fields/14",
+    "works_count": 9284357,
+    "children": [
+      {
+        "name_en": "Accounting",
+        "name_zh": "会计学",
+        "openalex_id": "subfields/1402"
+      },
+      {
+        "name_en": "Business and International Management",
+        "name_zh": "商务与国际管理",
+        "openalex_id": "subfields/1403"
+      },
+      {
+        "name_en": "Industrial relations",
+        "name_zh": "劳资关系",
+        "openalex_id": "subfields/1410"
+      },
+      {
+        "name_en": "Management Information Systems",
+        "name_zh": "管理信息系统",
+        "openalex_id": "subfields/1404"
+      },
+      {
+        "name_en": "Management of Technology and Innovation",
+        "name_zh": "技术与创新管理",
+        "openalex_id": "subfields/1405"
+      },
+      {
+        "name_en": "Marketing",
+        "name_zh": "市场营销",
+        "openalex_id": "subfields/1406"
+      },
+      {
+        "name_en": "Organizational Behavior and Human Resource Management",
+        "name_zh": "组织行为与人力资源管理",
+        "openalex_id": "subfields/1407"
+      },
+      {
+        "name_en": "Strategy and Management",
+        "name_zh": "战略与管理",
+        "openalex_id": "subfields/1408"
+      },
+      {
+        "name_en": "Tourism, Leisure and Hospitality Management",
+        "name_zh": "旅游休闲管理",
+        "openalex_id": "subfields/1409"
+      }
+    ]
+  },
+  {
+    "name_en": "Decision Sciences",
+    "name_zh": "决策科学",
+    "openalex_id": "fields/18",
+    "works_count": 3559696,
+    "children": [
+      {
+        "name_en": "General Decision Sciences",
+        "name_zh": "综合决策科学",
+        "openalex_id": "subfields/1800"
+      },
+      {
+        "name_en": "Information Systems and Management",
+        "name_zh": "信息系统与管理",
+        "openalex_id": "subfields/1802"
+      },
+      {
+        "name_en": "Management Science and Operations Research",
+        "name_zh": "管理科学与运筹学",
+        "openalex_id": "subfields/1803"
+      },
+      {
+        "name_en": "Statistics, Probability and Uncertainty",
+        "name_zh": "统计、概率与不确定性",
+        "openalex_id": "subfields/1804"
+      }
+    ]
+  },
+  {
+    "name_en": "Arts and Humanities",
+    "name_zh": "艺术与人文",
+    "openalex_id": "fields/12",
+    "works_count": 27585482,
+    "children": [
+      {
+        "name_en": "Archeology",
+        "name_zh": "考古学",
+        "openalex_id": "subfields/1204"
+      },
+      {
+        "name_en": "Classics",
+        "name_zh": "古典学",
+        "openalex_id": "subfields/1205"
+      },
+      {
+        "name_en": "Conservation",
+        "name_zh": "文物保护",
+        "openalex_id": "subfields/1206"
+      },
+      {
+        "name_en": "General Arts and Humanities",
+        "name_zh": "综合艺术与人文",
+        "openalex_id": "subfields/1200"
+      },
+      {
+        "name_en": "History",
+        "name_zh": "历史学",
+        "openalex_id": "subfields/1202"
+      },
+      {
+        "name_en": "History and Philosophy of Science",
+        "name_zh": "科学史与科学哲学",
+        "openalex_id": "subfields/1207"
+      },
+      {
+        "name_en": "Language and Linguistics",
+        "name_zh": "语言与语言学",
+        "openalex_id": "subfields/1203"
+      },
+      {
+        "name_en": "Literature and Literary Theory",
+        "name_zh": "文学与文学理论",
+        "openalex_id": "subfields/1208"
+      },
+      {
+        "name_en": "Museology",
+        "name_zh": "博物馆学",
+        "openalex_id": "subfields/1209"
+      },
+      {
+        "name_en": "Music",
+        "name_zh": "音乐",
+        "openalex_id": "subfields/1210"
+      },
+      {
+        "name_en": "Philosophy",
+        "name_zh": "哲学",
+        "openalex_id": "subfields/1211"
+      },
+      {
+        "name_en": "Religious studies",
+        "name_zh": "宗教学",
+        "openalex_id": "subfields/1212"
+      },
+      {
+        "name_en": "Visual Arts and Performing Arts",
+        "name_zh": "视觉艺术与表演艺术",
+        "openalex_id": "subfields/1213"
+      }
+    ]
+  }
+]

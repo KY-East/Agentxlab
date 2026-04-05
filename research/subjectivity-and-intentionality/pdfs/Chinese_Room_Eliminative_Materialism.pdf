@@ -1,0 +1,558 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Not found - PhilArchive</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta http-equiv="content-language" content="en">
+<link rel="canonical" href="https://philpapers.org/archive/DADTCR">
+<link rel="alternate" type="application/rss+xml" title="Recent additions to PhilArchive" href="https://philarchive.org/recent.html?format=rss" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" integrity="sha384-Um5gpz1odJg5Z4HAmzPtgZKdTBHZdw8S29IecapCSB31ligYPhHQZMIlWLYQGVoc" crossorigin="anonymous">
+
+
+<!--
+require.js breaks if katex.js is loaded after. require.js is used only on the login page, for the philwidget.
+https://requirejs.org/docs/errors.html#mismatch
+-->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js" integrity="sha384-YNHdsYkH6gMx9y3mRkmcJ2mFUjTd0qNQQvY9VYZgQd7DcN7env35GzlmFaZ23JGp" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js" integrity="sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl" crossorigin="anonymous" onload="renderMathInElement(document.body, { displayMode: false});"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<!-- BOOTSTRAP -->
+<link rel='stylesheet' type="text/css" href="/assets/raw/vendor/css/bootstrap.min.css"> 
+<link rel='stylesheet' type="text/css" href="/assets/raw/vendor/css/bootstrap-tour.min.css"> 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+<link rel='stylesheet' type="text/css" href="/assets/raw/vendor/css/bulma.css"> 
+
+  <meta property="og:title" content="Not found - PhilArchive" />
+
+
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://philarchive.org/assets/raw/philpeople250.png" />
+
+
+
+<link rel="icon" type="image/gif" href="/assets/raw/icons/favicon-ppl.gif?">
+<link rel="stylesheet" type="text/css" href="/dynamic-assets/philarchive/style.a962a3ca255d72ce9340514621702156.css">
+
+<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>-->
+<script type='text/javascript' src='/dynamic-assets/philarchive/xpapers.3a330e53f78d35774faa762909b29a54.js'></script>
+
+<link rel="image_src" href="https://philarchive.org/assets/raw/logo.jpg" / >
+
+</head>
+
+<script type="text/javascript">
+var pageDesc="Not found";
+var BASE_URL="/";
+var SERVER="";
+</script>
+<!--
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+-->
+<script type="text/javascript" src="https://widgets.philpapers.org//init.js" async defer></script>
+<!-- YUI -->
+<script type="text/javascript" src="/dynamic-assets/philarchive/yui.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+  var $j = jQuery.noConflict();
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript">$j(document).ready(prototypeBootstrapCompatibility());</script>
+
+<!--[if gte IE 9]><!-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tour/0.12.0/js/bootstrap-tour-standalone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
+<!--<![endif]-->
+<script type="text/javascript">$j(document).ready(ppTour.initialize());</script>
+
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/assets/raw/vendor/js/respond.min.js"></script>
+<![endif]-->  
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-6029851-5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-6029851-5');
+</script>
+
+<body class='yui-skin-sam' id='mainBody'>
+
+
+
+<div id='all' class='ppskin clearfix'>
+
+<div id="banner" class="navbar navbar-fixed-top">
+
+    <div class="no-padding-md container">
+
+
+        <div id='headlinks'>
+
+            <span>
+        <a href="https://auth.philpapers.org/login?service=https://philarchive.org/cas.pl&gateway=1"><i class="fa fa-sign-in"></i> Sign in</a> | <a href="/login?action=registration">Create an account</a>
+            </span>
+
+
+        </div>
+        <div class="philx">
+  <div class="top_banner--links top_banner--links--archive">
+    <a href="http://philpapers.org"><span class="philxbtn">PhilPapers</span></a>
+    <a href="http://philpeople.org"><span class="philxbtn">PhilPeople</span></a>
+    <span class="philxbtn philxbtnsel philarchivebtnsel"><b>PhilArchive</b></span>
+    <a href="http://philevents.org"><span class="philxbtn">PhilEvents</span></a>
+    <a href="http://philjobs.org"><span class="philxbtn">PhilJobs</span></a>
+  </div>
+</div>
+
+    </div>
+
+</div>
+
+    <div id='head' class="navbar navbar-default navbar-fixed-top panel panel-default">
+        <div class="no-padding-md container">
+
+            <div class="navbar-header">
+
+                <div id="logo" class='nav-left'>
+                    <a class="navbar-brand" title="PhilArchive home" rel="home" href="https://philarchive.org">
+                        <img alt="PhilArchive home" src="/assets/raw/pp_logo.svg">
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="visible-xs visible-sm">
+
+                <div class="navbar-form navbar-right btn-group" style="margin-left: -25px !important; margin-right: 5px !important; z-index: 6;">
+                    <button type="button" class="navbar-toggle collapsed nav-right" data-toggle="collapse" data-target="#main-nav" aria-expanded="false" aria-controls="main-nav">
+                        <i class='fa fa-bars'></i>
+                    </button>
+
+                    <button id="profile-dropdown-button" type="button" class="navbar-toggle collapsed nav-right" data-toggle="collapse" data-target="#profile-dropdown" aria-expanded="false" aria-controls="main-nav">
+                        <i style='font-size:16px' class='glyphicon glyphicon-user'></i>
+                    </button>
+                </div>
+
+                <form class="navbar-form-alt" onsubmit="if ($j(this).find('input').val().length < 3) { alert('You must specify a search query of three or more characters')} else {window.location='/s/'+encodeURIComponent($j(this).find('input').val());} return false;" method=GET action="/autosense.pl" onSubmit="">
+
+<div class="input-group topSearch-container">
+
+<input id="topSearch" autocomplete='off' class="topSearch form-control input-lg" type="text" name="searchStr" style="color:black" onfocus="if (this.value == 'search for..') {this.value = '';this.style.color='black'}" value="" placeholder="Search PhilArchive">
+
+<span class="input-group-btn search-help">
+
+    <div class='dropdown topSearch-dropdown'>
+        <a href='#' class="topSearch-dropdown-btn dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown"><i class="fa fa-sort-desc dropdown-toggle" aria-hidden="true"></i>
+        </a> 
+
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="/help/search.html">Syntax</a></li>
+            <li><a href="/advanced.html">Advanced Search</a></li>
+        </ul>
+    </div>
+</span>
+
+</div>
+
+</form>
+
+            </div>
+
+            <div id="main-nav" class="navbar-collapse collapse">
+                <div class="navbar-form navbar-right btn-group primary-links" >
+                    
+<script type="text/javascript">
+    $j(document).ready(function() {
+        initializeToggles();
+    });
+</script>
+
+<ul class="navbar-nav nav">
+    <li><a href="/edit">Submit</a></li>
+    <li class="dropdown with-submenu" id="nav-browse">
+        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Browse</a>
+		<ul class="dropdown-menu" role="menu">
+            <li><a href="/browse/all">All Categories</a></li>
+<li class=' dropdown-submenu' id='nav-10'><a href='#nav-10' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Metaphysics and Epistemology</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/metaphysics-and-epistemology'>Metaphysics and Epistemology</a></li><li><a href='/browse/epistemology'>Epistemology</a></li>
+<li><a href='/browse/metaphilosophy'>Metaphilosophy</a></li>
+<li><a href='/browse/metaphysics'>Metaphysics</a></li>
+<li><a href='/browse/philosophy-of-action'>Philosophy of Action</a></li>
+<li><a href='/browse/philosophy-of-language'>Philosophy of Language</a></li>
+<li><a href='/browse/philosophy-of-mind'>Philosophy of Mind</a></li>
+<li><a href='/browse/philosophy-of-religion'>Philosophy of Religion</a></li>
+<li><a href='/browse/me-misc'>M&E, Misc</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-24'><a href='#nav-24' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Value Theory</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/value-theory'>Value Theory</a></li><li><a href='/browse/aesthetics'>Aesthetics</a></li>
+<li><a href='/browse/applied-ethics'>Applied Ethics</a></li>
+<li><a href='/browse/meta-ethics'>Meta-Ethics</a></li>
+<li><a href='/browse/normative-ethics'>Normative Ethics</a></li>
+<li><a href='/browse/philosophy-of-gender-race-and-sexuality'>Philosophy of Gender, Race, and Sexuality</a></li>
+<li><a href='/browse/philosophy-of-law'>Philosophy of Law</a></li>
+<li><a href='/browse/social-and-political-philosophy'>Social and Political Philosophy</a></li>
+<li><a href='/browse/value-theory-miscellaneous'>Value Theory, Miscellaneous</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-36'><a href='#nav-36' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Science, Logic, and Mathematics</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/science-logic-and-mathematics'>Science, Logic, and Mathematics</a></li><li><a href='/browse/logic-and-philosophy-of-logic'>Logic and Philosophy of Logic</a></li>
+<li><a href='/browse/philosophy-of-biology'>Philosophy of Biology</a></li>
+<li><a href='/browse/philosophy-of-cognitive-science'>Philosophy of Cognitive Science</a></li>
+<li><a href='/browse/philosophy-of-computing-and-information'>Philosophy of Computing and Information</a></li>
+<li><a href='/browse/philosophy-of-mathematics'>Philosophy of Mathematics</a></li>
+<li><a href='/browse/philosophy-of-physical-science'>Philosophy of Physical Science</a></li>
+<li><a href='/browse/philosophy-of-social-science'>Philosophy of Social Science</a></li>
+<li><a href='/browse/philosophy-of-probability'>Philosophy of Probability</a></li>
+<li><a href='/browse/general-philosophy-of-science'>General Philosophy of Science</a></li>
+<li><a href='/browse/philosophy-of-science-misc'>Philosophy of Science, Misc</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-51'><a href='#nav-51' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>History of Western Philosophy</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/history-of-western-philosophy'>History of Western Philosophy</a></li><li><a href='/browse/ancient-greek-and-roman-philosophy'>Ancient Greek and Roman Philosophy</a></li>
+<li><a href='/browse/medieval-and-renaissance-philosophy'>Medieval and Renaissance Philosophy</a></li>
+<li><a href='/browse/17th18th-century-philosophy'>17th/18th Century Philosophy</a></li>
+<li><a href='/browse/19th-century-philosophy'>19th Century Philosophy</a></li>
+<li><a href='/browse/20th-century-philosophy'>20th Century Philosophy</a></li>
+<li><a href='/browse/history-of-western-philosophy-misc'>History of Western Philosophy, Misc</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-58'><a href='#nav-58' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Philosophical Traditions</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/philosophical-traditions'>Philosophical Traditions</a></li><li><a href='/browse/africanafricana-philosophy'>African/Africana Philosophy</a></li>
+<li><a href='/browse/asian-philosophy'>Asian Philosophy</a></li>
+<li><a href='/browse/continental-philosophy'>Continental Philosophy</a></li>
+<li><a href='/browse/european-philosophy'>European Philosophy</a></li>
+<li><a href='/browse/philosophy-of-the-americas'>Philosophy of the Americas</a></li>
+<li><a href='/browse/philosophical-traditions-miscellaneous'>Philosophical Traditions, Miscellaneous</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-4'><a href='#nav-4' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Philosophy, Misc</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/philosophy-misc'>Philosophy, Misc</a></li><li><a href='/browse/philosophy-introductions-and-anthologies'>Philosophy, Introductions and Anthologies</a></li>
+<li><a href='/browse/philosophy-general-works'>Philosophy, General Works</a></li>
+<li><a href='/browse/teaching-philosophy'>Teaching Philosophy</a></li>
+<li><a href='/browse/philosophy-miscellaneous'>Philosophy, Miscellaneous</a></li>
+</ul>
+<li class=' dropdown-submenu' id='nav-70'><a href='#nav-70' class='dropdown-toggle submenu-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Other Academic Areas</a>
+<ul class="dropdown-menu" role='menu'>
+<li><a class='dir' href='/browse/other-academic-areas'>Other Academic Areas</a></li><li><a href='/browse/natural-sciences'>Natural Sciences</a></li>
+<li><a href='/browse/social-sciences'>Social Sciences</a></li>
+<li><a href='/browse/cognitive-sciences'>Cognitive Sciences</a></li>
+<li><a href='/browse/formal-sciences'>Formal Sciences</a></li>
+<li><a href='/browse/arts-and-humanities'>Arts and Humanities</a></li>
+<li><a href='/browse/professional-areas'>Professional Areas</a></li>
+<li><a href='/browse/other-academic-areas-misc'>Other Academic Areas, Misc</a></li>
+</ul>
+<li>
+</li>
+
+
+        </ul>
+    </li>
+    <li class='dropdown with-submenu' id="nav-help">
+        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">More</a>
+        <ul class="dropdown-menu pull-right">
+            <li><a href="/help/about.html">About PhilArchive</a></li>
+<li><a href="/help/faq.html">Frequently Asked Questions</a></li>
+<li><a href="/help/oai.html">OAI Handler</a></li>
+<li><a href="/alerts.html">Email alerts</a></li.
+<li><a href="/journals.html">Journal policies</a></li>
+<li><a href="/help/codeofconduct.html">Code of conduct</a></li>
+<li><a href="/help/contact.html">Contact us</a></li>
+
+        </ul>
+    </li>
+</ul>
+
+
+                </div>
+
+                <div class="hidden-xxs hidden-xs hidden-sm">
+                    <form class="navbar-form-alt" onsubmit="if ($j(this).find('input').val().length < 3) { alert('You must specify a search query of three or more characters')} else {window.location='/s/'+encodeURIComponent($j(this).find('input').val());} return false;" method=GET action="/autosense.pl" onSubmit="">
+
+<div class="input-group topSearch-container">
+
+<input id="topSearch" autocomplete='off' class="topSearch form-control input-lg" type="text" name="searchStr" style="color:black" onfocus="if (this.value == 'search for..') {this.value = '';this.style.color='black'}" value="" placeholder="Search PhilArchive">
+
+<span class="input-group-btn search-help">
+
+    <div class='dropdown topSearch-dropdown'>
+        <a href='#' class="topSearch-dropdown-btn dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="true" data-toggle="dropdown"><i class="fa fa-sort-desc dropdown-toggle" aria-hidden="true"></i>
+        </a> 
+
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="/help/search.html">Syntax</a></li>
+            <li><a href="/advanced.html">Advanced Search</a></li>
+        </ul>
+    </div>
+</span>
+
+</div>
+
+</form>
+
+                </div>
+            </div>
+
+            <div class="hidden-md hidden-lg">
+                <div id="profile-dropdown" class='navbar-collapse collapse'>
+                <div class="navbar-form navbar-right btn-group">
+                    <ul class="navbar-nav nav">
+<li><a href="/inoff.html">Sign in</a></li>
+<li><a href="/users/new.html">Create an account</a></li></li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<script type='text/javascript'>
+    $j(document).ready(ppTypeahead.initialize(".topSearch"));
+</script>
+
+<div id="contentContainer" class=" container panel panel-body panel-default">
+
+
+
+
+
+<div class='gh'>
+<h2>Sorry, the document you requested could not be found</h2>
+</div>
+<br><h3>PhilPapers categories</h3>        <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/metaphysics-and-epistemology'>Metaphysics and Epistemology</a><span class='hint'> (<b class='hint'>105,904</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/epistemology'>Epistemology</a><span class='hint'> (<b class='hint'>18,320</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/metaphilosophy'>Metaphilosophy</a><span class='hint'> (<b class='hint'>5,278</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/metaphysics'>Metaphysics</a><span class='hint'> (<b class='hint'>19,400</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-action'>Philosophy of Action</a><span class='hint'> (<b class='hint'>8,948</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-language'>Philosophy of Language</a><span class='hint'> (<b class='hint'>14,915</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-mind'>Philosophy of Mind</a><span class='hint'> (<b class='hint'>26,195</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-religion'>Philosophy of Religion</a><span class='hint'> (<b class='hint'>9,359</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/me-misc'>M&E, Misc</a><span class='hint'> (<b class='hint'>187</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/value-theory'>Value Theory</a><span class='hint'> (<b class='hint'>80,572</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/aesthetics'>Aesthetics</a><span class='hint'> (<b class='hint'>8,440</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/applied-ethics'>Applied Ethics</a><span class='hint'> (<b class='hint'>16,116</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/meta-ethics'>Meta-Ethics</a><span class='hint'> (<b class='hint'>7,567</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/normative-ethics'>Normative Ethics</a><span class='hint'> (<b class='hint'>10,774</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-gender-race-and-sexuality'>Philosophy of Gender, Race, and Sexuality</a><span class='hint'> (<b class='hint'>5,890</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-law'>Philosophy of Law</a><span class='hint'> (<b class='hint'>3,227</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/social-and-political-philosophy'>Social and Political Philosophy</a><span class='hint'> (<b class='hint'>22,716</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/value-theory-miscellaneous'>Value Theory, Miscellaneous</a><span class='hint'> (<b class='hint'>4,011</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/science-logic-and-mathematics'>Science, Logic, and Mathematics</a><span class='hint'> (<b class='hint'>71,895</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/logic-and-philosophy-of-logic'>Logic and Philosophy of Logic</a><span class='hint'> (<b class='hint'>6,210</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-biology'>Philosophy of Biology</a><span class='hint'> (<b class='hint'>6,066</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-cognitive-science'>Philosophy of Cognitive Science</a><span class='hint'> (<b class='hint'>18,261</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-computing-and-information'>Philosophy of Computing and Information</a><span class='hint'> (<b class='hint'>3,459</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-mathematics'>Philosophy of Mathematics</a><span class='hint'> (<b class='hint'>3,944</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-physical-science'>Philosophy of Physical Science</a><span class='hint'> (<b class='hint'>8,136</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-social-science'>Philosophy of Social Science</a><span class='hint'> (<b class='hint'>6,082</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-probability'>Philosophy of Probability</a><span class='hint'> (<b class='hint'>2,458</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/general-philosophy-of-science'>General Philosophy of Science</a><span class='hint'> (<b class='hint'>9,827</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-science-misc'>Philosophy of Science, Misc</a><span class='hint'> (<b class='hint'>3,498</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/history-of-western-philosophy'>History of Western Philosophy</a><span class='hint'> (<b class='hint'>37,481</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/ancient-greek-and-roman-philosophy'>Ancient Greek and Roman Philosophy</a><span class='hint'> (<b class='hint'>9,088</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/medieval-and-renaissance-philosophy'>Medieval and Renaissance Philosophy</a><span class='hint'> (<b class='hint'>2,525</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/17th18th-century-philosophy'>17th/18th Century Philosophy</a><span class='hint'> (<b class='hint'>11,335</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/19th-century-philosophy'>19th Century Philosophy</a><span class='hint'> (<b class='hint'>5,363</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/20th-century-philosophy'>20th Century Philosophy</a><span class='hint'> (<b class='hint'>6,581</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/history-of-western-philosophy-misc'>History of Western Philosophy, Misc</a><span class='hint'> (<b class='hint'>866</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/philosophical-traditions'>Philosophical Traditions</a><span class='hint'> (<b class='hint'>18,808</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/africanafricana-philosophy'>African/Africana Philosophy</a><span class='hint'> (<b class='hint'>819</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/asian-philosophy'>Asian Philosophy</a><span class='hint'> (<b class='hint'>3,031</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/continental-philosophy'>Continental Philosophy</a><span class='hint'> (<b class='hint'>8,978</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/european-philosophy'>European Philosophy</a><span class='hint'> (<b class='hint'>1,851</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-of-the-americas'>Philosophy of the Americas</a><span class='hint'> (<b class='hint'>1,130</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophical-traditions-miscellaneous'>Philosophical Traditions, Miscellaneous</a><span class='hint'> (<b class='hint'>958</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/philosophy-misc'>Philosophy, Misc</a><span class='hint'> (<b class='hint'>11,682</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-introductions-and-anthologies'>Philosophy, Introductions and Anthologies</a><span class='hint'> (<b class='hint'>379</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-general-works'>Philosophy, General Works</a><span class='hint'> (<b class='hint'>2,521</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/teaching-philosophy'>Teaching Philosophy</a><span class='hint'> (<b class='hint'>1,186</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/philosophy-miscellaneous'>Philosophy, Miscellaneous</a><span class='hint'> (<b class='hint'>1,899</b>)</span>
+    </div>
+</div></div>
+    <div class="cat cat2">
+    
+    <a rel='section' class='tocCatName catName3' href='/browse/other-academic-areas'>Other Academic Areas</a><span class='hint'> (<b class='hint'>25,874</b>)</span>
+    <div class="catContent">    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/natural-sciences'>Natural Sciences</a><span class='hint'> (<b class='hint'>1,454</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/social-sciences'>Social Sciences</a><span class='hint'> (<b class='hint'>7,467</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/cognitive-sciences'>Cognitive Sciences</a><span class='hint'> (<b class='hint'>2,998</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/formal-sciences'>Formal Sciences</a><span class='hint'> (<b class='hint'>1,204</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/arts-and-humanities'>Arts and Humanities</a><span class='hint'> (<b class='hint'>4,039</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/professional-areas'>Professional Areas</a><span class='hint'> (<b class='hint'>4,080</b>)</span>
+    </div>
+    <div class="cat cat3">
+    
+    <a rel='section' class='tocCatName catName4' href='/browse/other-academic-areas-misc'>Other Academic Areas, Misc</a><span class='hint'> (<b class='hint'>917</b>)</span>
+    </div>
+</div></div>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e49a7af2e0bc4c6',t:'MTc3NDkwMDM0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

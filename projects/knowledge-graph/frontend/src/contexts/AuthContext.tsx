@@ -1,0 +1,94 @@
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  display_name: string;
+  avatar_url: string | null;
+  did_address: string | null;
+  points: number;
+  role: string;
+}
+
+interface AuthContextValue {
+  user: AuthUser | null;
+  token: string | null;
+  loading: boolean;
+  login: (credential: string) => Promise<void>;
+  logout: () => void;
+  refreshUser: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+const TOKEN_KEY = "axl_token";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(
+    () => localStorage.getItem(TOKEN_KEY),
+  );
+  const [loading, setLoading] = useState(!!localStorage.getItem(TOKEN_KEY));
+
+  const fetchMe = useCallback(async (t: string) => {
+    const res = await fetch(`${API_BASE}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${t}` },
+    });
+    if (!res.ok) {
+      localStorage.removeItem(TOKEN_KEY);
+      setToken(null);
+      setUser(null);
+      return;
+    }
+    setUser(await res.json());
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      fetchMe(token).finally(() => setLoading(false));
+    }
+  }, [token, fetchMe]);
+
+  const login = useCallback(async (credential: string) => {
+    const res = await fetch(`${API_BASE}/api/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+    if (!res.ok) throw new Error("Login failed");
+    const data = await res.json();
+    localStorage.setItem(TOKEN_KEY, data.token);
+    setToken(data.token);
+    setUser(data.user);
+  }, []);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    if (token) await fetchMe(token);
+  }, [token, fetchMe]);
+
+  return (
+    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+  return ctx;
+}
