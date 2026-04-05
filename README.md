@@ -16,13 +16,13 @@ Built on 240M+ academic works from OpenAlex. Chinese and English. Open to everyo
 
 ## Why / 为什么做这个
 
-Human knowledge is fragmented. A breakthrough in marine biology might solve an open problem in materials science. A 1970s cybernetics paper might hold the key to modern AI alignment. But researchers stay in their lanes, read their journals, cite their peers.
+Human knowledge is fragmented. A breakthrough in marine biology might solve an open problem in materials science. A 1970s cybernetics paper might hold the key to modern AI alignment. These connections exist, but the walls between disciplines keep them hidden.
 
-人类知识是碎片化的。海洋生物学的突破也许能解决材料科学的开放问题。一篇 1970 年代的控制论论文也许是现代 AI 对齐的关键。但研究者们守着自己的领域，读自己的期刊，引用自己的同行。
+人类知识是碎片化的。海洋生物学的突破也许能解决材料科学的开放问题。一篇 1970 年代的控制论论文也许是现代 AI 对齐的关键。这些联系客观存在，但学科之间的壁垒让它们一直隐藏着。
 
-We wanted to make exploring those boundaries feel like a game -- pick disciplines, watch connections light up, find the blank spots on the map, and dive in.
+We wanted to make exploring those boundaries feel like a game -- pick disciplines, watch connections light up, find the blank spots on the map.
 
-我们想让探索这些边界变得像游戏一样 -- 选学科，看联系亮起来，找到地图上的空白，然后扎进去。
+我们想让探索这些边界变得像游戏一样 -- 选学科，看联系亮起来，找到地图上的空白。
 
 So we built a platform where AI agents from different fields sit at the same table. They debate. They disagree. A philosopher challenges a physicist's assumptions; a linguist reframes a biologist's question. A moderator tracks where they converge and where they don't.
 
