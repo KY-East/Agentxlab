@@ -1,36 +1,40 @@
 # Agent X Lab
 
-> What if AI could discover the next great research breakthrough -- by finding the connections scientists haven't seen yet?
+> Academic research should be exciting. We're making it that way.
 
-> 如果 AI 能帮助发现下一个重大研究突破 -- 通过找到科学家们尚未看见的联系？
+> 学术研究本应令人兴奋。我们正在让它变成那样。
 
-Agent X Lab is an interdisciplinary research platform where AI agents debate across academic boundaries, uncover hidden connections between fields, and help you write the papers that bridge them.
+Agent X Lab is an AI-powered interdisciplinary research platform. Pick any combination of disciplines, see how they connect through real publication data, discover the gaps no one has explored, and let AI agents from different fields debate your research questions.
 
-Agent X Lab 是一个跨学科研究平台。AI 智能体跨越学科边界展开辩论，发掘领域之间隐藏的联系，帮你写出连接它们的论文。
+Agent X Lab 是一个 AI 驱动的跨学科研究平台。任意组合学科，看它们如何通过真实论文数据互相关联，发现无人涉足的研究空白，让来自不同领域的 AI 智能体围绕你的问题展开辩论。
 
-Built on real academic data. Powered by multi-agent intelligence. Research exploration that feels like discovery.
+Built on 240M+ academic works from OpenAlex. Chinese and English. Open to everyone.
 
-基于真实学术数据构建。由多智能体驱动。让研究探索回归发现的兴奋感。
+基于 OpenAlex 的 2.4 亿+ 学术论文构建。中英双语。向所有人开放。
 
 ---
 
-## The Idea / 核心理念
+## Why / 为什么做这个
 
 Human knowledge is fragmented. A breakthrough in marine biology might solve an open problem in materials science. A 1970s cybernetics paper might hold the key to modern AI alignment. But researchers stay in their lanes, read their journals, cite their peers.
 
 人类知识是碎片化的。海洋生物学的突破也许能解决材料科学的开放问题。一篇 1970 年代的控制论论文也许是现代 AI 对齐的关键。但研究者们守着自己的领域，读自己的期刊，引用自己的同行。
 
-Agent X Lab breaks those walls down.
+We wanted to make exploring those boundaries feel like a game -- pick disciplines, watch connections light up, find the blank spots on the map, and dive in.
 
-Agent X Lab 打破这些墙。
+我们想让探索这些边界变得像游戏一样 -- 选学科，看联系亮起来，找到地图上的空白，然后扎进去。
 
-You pick disciplines -- any combination, from Quantum Mechanics to Philosophy of Language to Cancer Research. The platform shows you what exists at their intersection: shared publications, known tensions, open questions. And where nothing exists? That's where it gets interesting.
+So we built a platform where AI agents from different fields sit at the same table. They debate. They disagree. A philosopher challenges a physicist's assumptions; a linguist reframes a biologist's question. A moderator tracks where they converge and where they don't.
 
-你选学科 -- 任意组合，从量子力学到语言哲学到癌症研究。平台展示它们交叉处已有的东西：共有论文、已知张力、开放问题。而那些什么都没有的地方？那才是有意思的开始。
+所以我们搭了一个平台，让来自不同领域的 AI 智能体坐在同一张桌子旁。它们辩论，它们争执。哲学家质疑物理学家的假设；语言学家重新构架生物学家的问题。主持人追踪它们在哪里达成共识，在哪里无法调和。
 
-AI agents -- each representing a different discipline, each with a distinct persona and expertise -- engage in structured academic debate over your research question. They argue, challenge, synthesize. A moderator distills the insights. And from that collision of perspectives, new hypotheses emerge.
+And something interesting happens. From the friction between perspectives, ideas emerge that none of them would have produced alone. Original research directions. Hypotheses that connect fields in ways nobody has tried.
 
-AI 智能体 -- 每个代表不同学科，每个有独特的人格和专长 -- 围绕你的研究问题展开结构化学术辩论。它们争论、质疑、综合。主持人提炼洞见。在视角的碰撞中，新的假设诞生。
+然后有趣的事情发生了。从视角的摩擦中，涌现出它们任何一个都无法独自产生的想法。原创的研究方向。以前没人尝试过的方式连接各领域的假设。
+
+The longer we watched this happen, the more it looked like something bigger than a research tool. It looked like a path toward **AI that can genuinely create** -- through the collision of multiple minds, multiple traditions, multiple ways of seeing.
+
+我们观察这件事发生得越久，就越觉得它远不止一个研究工具。它看起来像是一条通往 **AI 真正拥有创造力**的路径 -- 通过多种思维、多种传统、多种视角的碰撞。
 
 ---
 
@@ -70,11 +74,15 @@ The AI understands context: what's selected, what's been discussed, what hypothe
 
 AI 理解上下文：当前选中了什么，讨论了什么，已经生成了哪些假设。
 
-### Generate Research Papers / 生成研究论文
+### From Insight to Paper / 从洞见到论文
 
-From debate summaries and confirmed hypotheses, generate structured academic paper outlines. The pipeline is conversational -- discuss, refine, iterate with AI before committing to a structure.
+When a debate produces something worth pursuing, the platform helps you capture it. Debate summaries, confirmed hypotheses, and open questions flow into a conversational paper drafting pipeline -- discuss the structure with AI, iterate, then output.
 
-从辩论摘要和已确认的假设出发，生成结构化学术论文大纲。整个过程是对话式的 -- 先讨论、完善、迭代，再确定结构。
+当辩论产生了值得深入的东西，平台帮你把它留住。辩论摘要、已确认的假设、开放问题汇入对话式论文起草流程 -- 和 AI 讨论结构，反复迭代，最终输出。
+
+The paper is a byproduct. The real output is the creative leap -- the research direction that didn't exist before the collision.
+
+论文是副产物。真正的产出是那个创造性跳跃 -- 碰撞之前根本不存在的研究方向。
 
 ### Join the Community / 加入社区
 
