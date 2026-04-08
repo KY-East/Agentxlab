@@ -112,6 +112,23 @@ export interface D3Edge {
   core_tension: string | null;
 }
 
+export interface TopicCrossPair {
+  topic_a_id: number;
+  topic_a_name: string;
+  topic_b_id: number;
+  topic_b_name: string;
+  shared_papers: number;
+}
+
+export interface EdgeDetail {
+  subfield_a_id: number;
+  subfield_a_name: string;
+  subfield_b_id: number;
+  subfield_b_name: string;
+  total_papers: number;
+  topic_pairs: TopicCrossPair[];
+}
+
 // ── Debate types ──
 
 export interface DebateAgent {

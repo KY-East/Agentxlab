@@ -12,6 +12,8 @@ from app.schemas import (
     HypothesisRequest,
     ChatHypothesisRequest,
     ChatHypothesisResponse,
+    EdgeChatRequest,
+    CanvasChatRequest,
 )
 from app.services.ai_provider import generate_hypothesis, chat_hypothesis
 
@@ -147,6 +149,91 @@ async def chat_hypothesis_endpoint(
         db.add(hyp)
         db.commit()
 
+    return ChatHypothesisResponse(
+        reply=result["reply"],
+        hypothesis=result.get("hypothesis"),
+        suggestions=result.get("suggestions", []),
+    )
+
+
+@router.post("/edge-chat", response_model=ChatHypothesisResponse)
+async def edge_chat_endpoint(
+    body: EdgeChatRequest,
+    db: Session = Depends(get_db),
+):
+    """Chat about a cross-subfield connection without requiring an intersection."""
+    disc_a = db.query(Discipline).filter(Discipline.id == body.subfield_a_id).first()
+    disc_b = db.query(Discipline).filter(Discipline.id == body.subfield_b_id).first()
+    if not disc_a or not disc_b:
+        raise HTTPException(404, "Discipline not found")
+
+    lang = body.language if body.language in ("zh", "en") else "zh"
+    name_a = (disc_a.name_zh or disc_a.name_en) if lang == "zh" else disc_a.name_en
+    name_b = (disc_b.name_zh or disc_b.name_en) if lang == "zh" else disc_b.name_en
+
+    from app.models import paper_discipline
+    from sqlalchemy import select, func
+
+    shared_count_q = (
+        select(func.count())
+        .select_from(
+            select(paper_discipline.c.paper_id)
+            .where(paper_discipline.c.discipline_id == disc_a.id)
+            .intersect(
+                select(paper_discipline.c.paper_id)
+                .where(paper_discipline.c.discipline_id == disc_b.id)
+            )
+            .subquery()
+        )
+    )
+    shared_count = db.execute(shared_count_q).scalar() or 0
+
+    if lang == "zh":
+        context = f"这两个领域之间有 {shared_count} 篇共享论文。"
+    else:
+        context = f"These two fields share {shared_count} papers."
+
+    result = await chat_hypothesis(
+        discipline_names=[name_a, name_b],
+        context_text=context,
+        user_message=body.message,
+        history=body.history,
+        language=lang,
+    )
+
+    return ChatHypothesisResponse(
+        reply=result["reply"],
+        hypothesis=result.get("hypothesis"),
+        suggestions=result.get("suggestions", []),
+    )
+
+
+@router.post("/canvas-chat", response_model=ChatHypothesisResponse)
+async def canvas_chat_endpoint(
+    body: CanvasChatRequest,
+    db: Session = Depends(get_db),
+):
+    """Chat about the disciplines currently visible on the canvas."""
+    unique_ids = list(dict.fromkeys(body.discipline_ids))
+    discs = db.query(Discipline).filter(Discipline.id.in_(unique_ids)).all()
+    if not discs:
+        raise HTTPException(400, "No valid disciplines")
+
+    lang = body.language if body.language in ("zh", "en") else "zh"
+    names = [(d.name_zh or d.name_en) if lang == "zh" else d.name_en for d in discs]
+
+    if lang == "zh":
+        ctx = f"用户画布上选中了 {len(names)} 个学科：{', '.join(names)}。"
+    else:
+        ctx = f"User has {len(names)} disciplines on canvas: {', '.join(names)}."
+
+    result = await chat_hypothesis(
+        discipline_names=names,
+        context_text=ctx,
+        user_message=body.message,
+        history=body.history,
+        language=lang,
+    )
     return ChatHypothesisResponse(
         reply=result["reply"],
         hypothesis=result.get("hypothesis"),

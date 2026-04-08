@@ -14,10 +14,13 @@ router = APIRouter(prefix="/api/disciplines", tags=["disciplines"])
 
 
 def _build_tree(disciplines: list[Discipline], parent_id: int | None = None) -> list[DisciplineOut]:
-    nodes = []
+    children_map: dict[int | None, list[Discipline]] = {}
     for d in disciplines:
-        if d.parent_id == parent_id:
-            children = _build_tree(disciplines, d.id)
+        children_map.setdefault(d.parent_id, []).append(d)
+
+    def _recurse(pid: int | None) -> list[DisciplineOut]:
+        nodes = []
+        for d in children_map.get(pid, []):
             nodes.append(
                 DisciplineOut(
                     id=d.id,
@@ -25,12 +28,15 @@ def _build_tree(disciplines: list[Discipline], parent_id: int | None = None) -> 
                     name_zh=d.name_zh,
                     parent_id=d.parent_id,
                     depth=d.depth,
-                    children=children,
+                    works_count=d.works_count,
+                    children=_recurse(d.id),
                     is_custom=d.is_custom,
                     created_by=d.created_by,
                 )
             )
-    return nodes
+        return nodes
+
+    return _recurse(parent_id)
 
 
 @router.get("", response_model=list[DisciplineOut])
@@ -38,7 +44,7 @@ def get_discipline_tree(
     db: Session = Depends(get_db),
     user_id: int | None = Query(None),
 ):
-    query = db.query(Discipline)
+    query = db.query(Discipline).filter(Discipline.depth <= 1)
     if user_id:
         query = query.filter(
             (Discipline.is_custom == False) | (Discipline.created_by == user_id)

@@ -36,6 +36,7 @@ interface Props {
   data: GraphData;
   onNodeClick?: (nodeId: number) => void;
   onEdgeClick?: (intersectionId: number) => void;
+  onEvidenceEdgeClick?: (sourceId: number, targetId: number) => void;
   selectedNodes?: Set<number>;
 }
 
@@ -43,6 +44,7 @@ export default function ForceGraph({
   data,
   onNodeClick,
   onEdgeClick,
+  onEvidenceEdgeClick,
   selectedNodes,
 }: Props) {
   const { i18n } = useTranslation();
@@ -131,9 +133,15 @@ export default function ForceGraph({
         if (d.paper_count > 3) return 0.6;
         return 0.45;
       })
-      .style("cursor", (d) => (d.intersection_id ? "pointer" : "default"))
+      .style("cursor", (d) =>
+        d.intersection_id || d.paper_count > 0 ? "pointer" : "default"
+      )
       .on("click", (_event, d) => {
-        if (d.intersection_id) onEdgeClick?.(d.intersection_id);
+        if (d.intersection_id) {
+          onEdgeClick?.(d.intersection_id);
+        } else if (d.paper_count > 0) {
+          onEvidenceEdgeClick?.(d.source.id, d.target.id);
+        }
       });
 
     const tooltip = d3
@@ -146,18 +154,16 @@ export default function ForceGraph({
 
     link
       .on("mouseenter", (event, d) => {
-        const parts: string[] = [d.title];
+        let text = "";
         if (d.status === "gap") {
-          parts.push("[RESEARCH GAP]");
+          text = "RESEARCH GAP";
         } else if (d.paper_count > 0) {
-          parts.push(`${d.paper_count} papers`);
+          text = `${d.paper_count} papers`;
         }
-        if (d.core_tension) {
-          parts.push(`"${d.core_tension}"`);
-        }
+        if (!text) return;
         tooltip
           .style("opacity", "1")
-          .html(parts.join("<br>"))
+          .text(text)
           .style("left", `${event.offsetX + 10}px`)
           .style("top", `${event.offsetY - 20}px`);
       })
@@ -264,7 +270,7 @@ export default function ForceGraph({
       simulation.stop();
       tooltip.remove();
     };
-  }, [data, onNodeClick, onEdgeClick, selectedNodes, isZh]);
+  }, [data, onNodeClick, onEdgeClick, onEvidenceEdgeClick, selectedNodes, isZh]);
 
   useEffect(() => {
     const cleanup = render();

@@ -147,28 +147,26 @@ async def chat_hypothesis(
 
     joined = " x ".join(discipline_names)
     if lang == "zh":
-        context_msg = (
-            f"交叉学科：{joined}\n\n"
-            f"背景信息：\n{context_text}\n\n"
-            "请先分析这个交叉领域，给出 2-3 个可探索的研究角度。"
-        )
+        context_block = f"交叉学科：{joined}\n背景信息：{context_text}"
     else:
-        context_msg = (
-            f"Disciplines at intersection: {joined}\n\n"
-            f"Context:\n{context_text}\n\n"
-            "Please analyze this intersection and suggest 2-3 research angles to explore."
-        )
+        context_block = f"Disciplines: {joined}\nContext: {context_text}"
 
     messages: list[dict] = [{"role": "system", "content": system}]
 
     if history:
         messages.extend(history)
+        if user_message:
+            messages.append({"role": "user", "content": user_message})
+    elif user_message:
+        messages.append({"role": "user", "content": f"{context_block}\n\n{user_message}"})
     else:
-        messages.append({"role": "user", "content": context_msg})
+        if lang == "zh":
+            messages.append({"role": "user", "content": f"{context_block}\n\n请分析这个交叉领域，给出 2-3 个可探索的研究角度。"})
+        else:
+            messages.append({"role": "user", "content": f"{context_block}\n\nPlease analyze this intersection and suggest 2-3 research angles."})
 
-    if user_message:
-        messages.append({"role": "user", "content": user_message})
-
+    import logging as _log
+    _log.getLogger(__name__).info("chat_hypothesis messages: %s", [{"role": m["role"], "content": m["content"][:200]} for m in messages])
     raw = await chat_completion(messages=messages, temperature=0.6, max_tokens=2000)
 
     try:

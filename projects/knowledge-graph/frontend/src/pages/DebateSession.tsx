@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Play, Square, ArrowLeft, BookOpen } from "lucide-react";
+import { Loader2, Play, Square, ArrowLeft, BookOpen, Share2, FlaskConical } from "lucide-react";
 import { api } from "../api/client";
 import type { Debate, DebateAgent, DebateMessage, DraftBrief, Spark, SparkStats } from "../types";
 import PaperChat from "../components/PaperChat/PaperChat";
@@ -58,6 +58,10 @@ export default function DebateSession() {
   const [existingDrafts, setExistingDrafts] = useState<DraftBrief[]>([]);
   const [sparks, setSparks] = useState<Spark[]>([]);
   const [sparkStats, setSparkStats] = useState<SparkStats | null>(null);
+
+  const [sharedPostId, setSharedPostId] = useState<number | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const [experimentRequested, setExperimentRequested] = useState<Set<number>>(new Set());
 
   const load = useCallback(async () => {
     if (!debateId) return;
@@ -213,6 +217,30 @@ export default function DebateSession() {
       setError(err instanceof Error ? err.message : t("debateSession.summaryFailed"));
     } finally {
       setSummarizing(false);
+    }
+  };
+
+  const handleShareToForum = async () => {
+    if (!debate) return;
+    setSharing(true);
+    try {
+      const res = await api.shareDebateToForum(debate.id);
+      setSharedPostId(res.post_id);
+    } catch {
+      setError("Failed to share to community");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleRequestExperiment = async (sparkId: number) => {
+    if (!debate) return;
+    try {
+      const res = await api.requestExperiment(debate.id, sparkId);
+      setExperimentRequested((prev) => new Set(prev).add(sparkId));
+      navigate(`/forum/${res.post_id}`);
+    } catch {
+      setError("Failed to create experiment request");
     }
   };
 
@@ -400,7 +428,13 @@ export default function DebateSession() {
 
           {/* Sparks */}
           {debate.status === "completed" && (sparks.length > 0 || sparkStats) && (
-            <SparkBlock sparks={sparks} stats={sparkStats} agents={debate.agents} />
+            <SparkBlock
+              sparks={sparks}
+              stats={sparkStats}
+              agents={debate.agents}
+              experimentRequested={experimentRequested}
+              onRequestExperiment={handleRequestExperiment}
+            />
           )}
 
           {/* Existing drafts */}
@@ -477,13 +511,35 @@ export default function DebateSession() {
               )}
             </>
           )}
-          {debate.status === "completed" && !showPaperChat && (
-            <button
-              onClick={() => setShowPaperChat(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-cyan-300 transition-colors"
-            >
-              {t("debateSession.generateOutline").toUpperCase()}
-            </button>
+          {debate.status === "completed" && (
+            <>
+              {!showPaperChat && (
+                <button
+                  onClick={() => setShowPaperChat(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-cyan-300 transition-colors"
+                >
+                  {t("debateSession.generateOutline").toUpperCase()}
+                </button>
+              )}
+              {sharedPostId ? (
+                <button
+                  onClick={() => navigate(`/forum/${sharedPostId}`)}
+                  className="flex items-center gap-2 px-4 py-2 border border-green-500/50 text-green-400 font-mono text-xs uppercase tracking-wider hover:border-green-400 transition-colors"
+                >
+                  <Share2 size={12} />
+                  {i18n.language?.startsWith("zh") ? "查看帖子" : "VIEW POST"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleShareToForum}
+                  disabled={sharing}
+                  className="flex items-center gap-2 px-4 py-2 border border-neutral-700 text-neutral-400 font-mono text-xs uppercase tracking-wider hover:border-cyan-400 hover:text-white disabled:opacity-40 transition-colors"
+                >
+                  {sharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
+                  {i18n.language?.startsWith("zh") ? "分享到社区" : "SHARE TO COMMUNITY"}
+                </button>
+              )}
+            </>
           )}
         </div>
       </main>
@@ -612,12 +668,17 @@ function SparkBlock({
   sparks,
   stats,
   agents,
+  experimentRequested,
+  onRequestExperiment,
 }: {
   sparks: Spark[];
   stats: SparkStats | null;
   agents: DebateAgent[];
+  experimentRequested: Set<number>;
+  onRequestExperiment: (sparkId: number) => void;
 }) {
   const { t } = useTranslation();
+  const isZh = i18n.language?.startsWith("zh");
   const agentMap = new Map(agents.map((a) => [a.id, a]));
 
   return (
@@ -648,6 +709,7 @@ function SparkBlock({
           {sparks.map((spark) => {
             const agent = spark.agent_id ? agentMap.get(spark.agent_id) : undefined;
             const typeMeta = NOVELTY_TYPE_META[spark.novelty_type] || { label: "SPARK", color: "text-neutral-500" };
+            const requested = experimentRequested.has(spark.id);
             return (
               <div
                 key={spark.id}
@@ -665,6 +727,21 @@ function SparkBlock({
                       {agent.agent_name}
                     </span>
                   )}
+                  <span className="flex-1" />
+                  <button
+                    onClick={() => onRequestExperiment(spark.id)}
+                    disabled={requested}
+                    className={`flex items-center gap-1 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider transition-colors ${
+                      requested
+                        ? "border border-green-500/40 text-green-500 cursor-default"
+                        : "border border-neutral-700 text-neutral-500 hover:border-cyan-400 hover:text-cyan-400"
+                    }`}
+                  >
+                    <FlaskConical size={10} />
+                    {requested
+                      ? (isZh ? "已发起" : "SENT")
+                      : (isZh ? "发起实验" : "REQUEST EXP")}
+                  </button>
                 </div>
                 <p className="text-xs text-neutral-400 leading-relaxed">
                   {spark.content}

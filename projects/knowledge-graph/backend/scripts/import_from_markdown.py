@@ -36,6 +36,244 @@ from app.models import (
 TAXONOMY_PATH = Path(__file__).resolve().parent.parent / "app" / "data" / "openalex_taxonomy.json"
 
 # ---------------------------------------------------------------------------
+# Name alias table: maps old seed-data discipline names to their best match
+# in the current OpenAlex taxonomy (subfield or topic name_en).
+# Used by _build_disc_resolver() to heal name mismatches after the topics
+# migration replaced hand-curated depth-2 nodes with official OpenAlex topics.
+# ---------------------------------------------------------------------------
+
+_NAME_ALIASES: dict[str, str] = {
+    # Philosophy
+    "Philosophy of Mind": "Philosophy",
+    "Philosophy of Language": "Philosophy",
+    "Epistemology": "Epistemology, Ethics, and Metaphysics",
+    "Metaphysics": "Epistemology, Ethics, and Metaphysics",
+    "Ethics": "Epistemology, Ethics, and Metaphysics",
+    "Aesthetics": "Ethics, Aesthetics, and Art",
+    "Phenomenology": "Phenomenology and Existential Philosophy",
+    "Eastern Philosophy": "Philosophy",
+    "Philosophy of Science": "History and Philosophy of Science",
+    "Philosophy of Religion": "Study and Philosophy of Religion",
+    "Political Philosophy": "Political Philosophy and Ethics",
+    "Greek Philosophy": "Philosophy",
+    # History
+    "Cultural History": "Cultural History and Identity Formation",
+    "Art History": "Architecture and Art History Studies",
+    "Social History": "Architecture, Design, and Social History",
+    "Intellectual History": "History",
+    "History of Science and Technology": "History and Philosophy of Science",
+    "Digital History": "History",
+    # Linguistics
+    "Pragmatics": "Linguistics",
+    "Sociolinguistics": "Linguistics",
+    "Narratology": "Literature",
+    "Formal Semantics": "Linguistics",
+    "Cognitive Linguistics": "Linguistics",
+    "Computational Linguistics": "Linguistics",
+    "Psycholinguistics": "Psycholinguistics and Behavioral Studies",
+    "Historical Linguistics": "Historical Linguistics and Language Studies",
+    # Psychology
+    "Cognitive Psychology": "Experimental and Cognitive Psychology",
+    "Developmental Psychology": "Developmental and Educational Psychology",
+    "Narrative Psychology": "Psychology",
+    "Trauma Psychology": "Psychology",
+    "Adolescent Psychology": "Psychology",
+    "Psychology of Creativity": "Psychology",
+    # Neuroscience
+    "Affective Neuroscience": "Neuroscience",
+    "Neuroaesthetics": "Neuroscience",
+    "Neuroeconomics": "Neuroscience",
+    # Computer Science / AI
+    "Machine Learning": "Artificial Intelligence",
+    "Deep Learning": "Artificial Intelligence",
+    "Natural Language Processing": "Artificial Intelligence",
+    "Reinforcement Learning from Human Feedback": "Artificial Intelligence",
+    "Mechanistic Interpretability": "Artificial Intelligence",
+    "Social Computing": "Human-Computer Interaction",
+    "Data Science": "Artificial Intelligence",
+    "Robotics": "Mechanical Engineering",
+    "Online Learning": "Online Learning Methods and Innovations",
+    # Physics
+    "Quantum Mechanics": "Nuclear and High Energy Physics",
+    "Quantum Field Theory": "Nuclear and High Energy Physics",
+    "Quantum Materials": "Condensed Matter Physics",
+    "Classical Mechanics": "Applied Mathematics",
+    "Thermodynamics": "Mechanical Engineering",
+    "Gravitational Physics": "Astronomy and Astrophysics",
+    "Particle Physics": "Nuclear and High Energy Physics",
+    "Semiconductor Physics": "Condensed Matter Physics",
+    "Cosmology": "Astronomy and Astrophysics",
+    # Biology / Ecology
+    "Evolutionary Biology": "Ecology, Evolution, Behavior and Systematics",
+    "Marine Biology": "Aquatic Science",
+    "Deep Sea Ecology": "Ecology",
+    "Climate Change Ecology": "Ecology",
+    "Phylogenetics": "Genetics",
+    "Mathematical Biology": "Applied Mathematics",
+    # Economics
+    "Behavioral Economics": "Economics and Econometrics",
+    "Financial Economics": "Economics and Econometrics",
+    "Computational Economics": "Economics and Econometrics",
+    "Microeconomics": "Economics and Econometrics",
+    "Political Economy": "Economics and Econometrics",
+    "Environmental Economics": "Economics and Econometrics",
+    "Development Economics": "Development",
+    # Music
+    "Music Cognition": "Music",
+    "Ethnomusicology": "Music",
+    "Music Technology": "Music",
+    "Musicology": "Music",
+    # Sociology / Anthropology
+    "Cultural Anthropology": "Anthropology",
+    "Linguistic Anthropology": "Anthropology",
+    "Digital Anthropology": "Anthropology",
+    "Sociology of Knowledge": "Sociology and Political Science",
+    "Sociology of Religion": "Sociology and Political Science",
+    "Urban Sociology": "Sociology and Political Science",
+    "Digital Sociology": "Sociology and Political Science",
+    "Group Dynamics": "Social Psychology",
+    "Ethnomethodology": "Sociology and Political Science",
+    # Other
+    "Semiotics": "Linguistics",
+    "Logic": "Applied Mathematics",
+    "Mathematical Logic": "Applied Mathematics",
+    "Modal Logic": "Applied Mathematics",
+    "Bayesian Statistics": "Statistics, Probability and Uncertainty",
+    "Comparative Politics": "Political Science and International Relations",
+    "Identity Politics": "Political Science and International Relations",
+    "Educational Technology": "Education",
+    "Critical Pedagogy": "Education",
+    "Learning Sciences": "Education",
+    "Cognitive Poetics": "Literature",
+    "Digital Art": "Visual Arts and Performing Arts",
+    "Clinical Decision Support": "Health Informatics",
+    "Neural Engineering": "Biomedical Engineering",
+    "Psychotherapy": "Clinical Psychology",
+    "Memory and Learning": "Experimental and Cognitive Psychology",
+    "Science and Technology Studies": "History and Philosophy of Science",
+    "Social Construction of Technology": "History and Philosophy of Science",
+    "Theology": "Religious Studies",
+    "First-Order Cybernetics": "Sociology and Political Science",
+    "Second-Order Cybernetics": "Sociology and Political Science",
+    "Organizational Cybernetics": "Sociology and Political Science",
+    # ── Round 2: remaining 88 names ──
+    # AI / CS
+    "AI Alignment": "Artificial Intelligence",
+    "AI and Law": "Artificial Intelligence",
+    "AI in Healthcare": "Artificial Intelligence",
+    "Generative AI": "Artificial Intelligence",
+    "Computer Vision": "Computer Vision and Pattern Recognition",
+    "Knowledge Representation": "Artificial Intelligence",
+    "Speech Processing": "Artificial Intelligence",
+    "Information Theory": "Computer Science Applications",
+    "Interaction Design": "Human-Computer Interaction",
+    "User Experience Design": "Human-Computer Interaction",
+    # Linguistics / Literature
+    "Cognitive Linguistics": "Linguistics and Language",
+    "Computational Linguistics": "Linguistics and Language",
+    "Cognitive Poetics": "Literature and Literary Theory",
+    "Narratology": "Literature and Literary Theory",
+    "Pragmatics": "Linguistics and Language",
+    "Sociolinguistics": "Linguistics and Language",
+    "Formal Semantics": "Linguistics and Language",
+    "Semiotics": "Linguistics and Language",
+    "Rhetoric": "Linguistics and Language",
+    "Argumentation Theory": "Linguistics and Language",
+    "Comparative Literature": "Literature and Literary Theory",
+    "Postcolonial Literature": "Literature and Literary Theory",
+    "Russian Formalism": "Literature and Literary Theory",
+    "Dialogism": "Literature and Literary Theory",
+    "Postmodernism": "Literature and Literary Theory",
+    "Film Studies": "Visual Arts and Performing Arts",
+    "Sound Studies": "Music",
+    "Media Studies": "Communication",
+    "Journalism": "Communication",
+    "Digital Communication": "Communication",
+    "Digital Culture": "Communication",
+    "Digital Humanities": "Library and Information Sciences",
+    # Sociology
+    "Symbolic Interactionism": "Sociology and Political Science",
+    "Dramaturgical Approach": "Sociology and Political Science",
+    "Actor-Network Theory": "Sociology and Political Science",
+    "Field Theory": "Sociology and Political Science",
+    "Social Cognition": "Social Psychology",
+    "Social Stratification": "Sociology and Political Science",
+    "Prejudice and Discrimination": "Social Psychology",
+    "Persuasion and Influence": "Social Psychology",
+    # Psychology
+    "Attention and Perception": "Experimental and Cognitive Psychology",
+    "Child Development": "Developmental and Educational Psychology",
+    "Dual Process Theory": "Experimental and Cognitive Psychology",
+    "Embodied Cognition": "Experimental and Cognitive Psychology",
+    "Decision Making": "Experimental and Cognitive Psychology",
+    "Consciousness Studies": "Experimental and Cognitive Psychology",
+    "Computational Theory of Mind": "Experimental and Cognitive Psychology",
+    "Conceptual Metaphor Theory": "Experimental and Cognitive Psychology",
+    "Addiction Medicine": "Psychiatry and Mental health",
+    # Philosophy / Religion
+    "Existentialism": "Philosophy",
+    "Comparative Religion": "Religious studies",
+    "Theology": "Religious studies",
+    "Buddhism Studies": "Religious studies",
+    # Political Science / Law / Policy
+    "Comparative Politics": "Political Science and International Relations",
+    "International Relations Theory": "Political Science and International Relations",
+    "Constitutional Law": "Law",
+    "Human Rights Law": "Law",
+    "International Law": "Law",
+    "Intellectual Property": "Law",
+    "Public Policy": "Political Science and International Relations",
+    "Health Policy": "Public Health, Environmental and Occupational Health",
+    "Global Health": "Public Health, Environmental and Occupational Health",
+    "Social Determinants of Health": "Public Health, Environmental and Occupational Health",
+    # Economics / Business
+    "Game Theory": "Economics and Econometrics",
+    "Quantitative Finance": "Finance",
+    "Fintech": "Finance",
+    "Risk Management": "Finance",
+    "Entrepreneurship": "Business and International Management",
+    "Strategic Management": "Strategy and Management",
+    "Innovation Management": "Strategy and Management",
+    "Organizational Theory": "Organizational Behavior and Human Resource Management",
+    # Education
+    "Higher Education": "Education",
+    "Curriculum Studies": "Education",
+    # Physics
+    "String Theory": "Nuclear and High Energy Physics",
+    "Superconductivity": "Condensed Matter Physics",
+    "Dynamical Systems": "Applied Mathematics",
+    "Complex Systems": "Applied Mathematics",
+    "Optimization": "Applied Mathematics",
+    "Causal Inference": "Statistics, Probability and Uncertainty",
+    # Environment / Energy
+    "Biodiversity": "Ecology",
+    "Ocean Circulation": "Oceanography",
+    "Climate Modeling": "Atmospheric Science",
+    "Carbon Capture": "Environmental Engineering",
+    "Solar Energy": "Renewable Energy, Sustainability and the Environment",
+    "Green Hydrogen": "Renewable Energy, Sustainability and the Environment",
+    "Energy Storage": "Renewable Energy, Sustainability and the Environment",
+    "Circular Economy": "Management, Monitoring, Policy and Law",
+    "Exoplanets": "Astronomy and Astrophysics",
+    # Feminist studies
+    "Feminist Technoscience": "Gender Studies",
+}
+
+
+def _build_disc_resolver(db: Session) -> dict[str, "Discipline"]:
+    """Build a name->Discipline dict with exact match + alias fallback + substring search."""
+    all_discs = db.query(Discipline).all()
+    exact: dict[str, Discipline] = {d.name_en: d for d in all_discs}
+
+    resolver: dict[str, Discipline] = dict(exact)
+
+    for old_name, new_name in _NAME_ALIASES.items():
+        if old_name not in resolver and new_name in exact:
+            resolver[old_name] = exact[new_name]
+
+    return resolver
+
+# ---------------------------------------------------------------------------
 # 1. Custom 3rd-level extensions (parent subfield name -> list of (en, zh))
 # ---------------------------------------------------------------------------
 
@@ -1597,10 +1835,11 @@ CROSSROADS = [
 
 
 def insert_openalex_taxonomy(db: Session) -> None:
-    """Load the two-level OpenAlex taxonomy from JSON and insert as depth 0/1."""
+    """Load the three-level OpenAlex taxonomy from JSON and insert as depth 0/1/2."""
     with open(TAXONOMY_PATH, encoding="utf-8") as f:
         fields = json.load(f)
 
+    topic_count = 0
     for field in fields:
         f_disc = Discipline(
             name_en=field["name_en"],
@@ -1625,7 +1864,24 @@ def insert_openalex_taxonomy(db: Session) -> None:
                 is_custom=False,
             )
             db.add(sf_disc)
+            db.flush()
+
+            for topic in child.get("children", []):
+                t_disc = Discipline(
+                    name_en=topic["name_en"],
+                    openalex_id=topic["openalex_id"],
+                    works_count=topic.get("works_count"),
+                    parent_id=sf_disc.id,
+                    depth=2,
+                    level="topic",
+                    is_custom=False,
+                )
+                db.add(t_disc)
+                topic_count += 1
+
         db.flush()
+
+    print(f"  Inserted {topic_count} topics (depth=2)")
 
 
 def insert_custom_extensions(db: Session) -> None:
@@ -1652,9 +1908,9 @@ def insert_custom_extensions(db: Session) -> None:
 
 
 def insert_scholars(db: Session) -> None:
-    disc_cache: dict[str, Discipline] = {}
-    for d in db.query(Discipline).all():
-        disc_cache[d.name_en] = d
+    disc_cache = _build_disc_resolver(db)
+    resolved = 0
+    missed = set()
 
     for name, disc_names in SCHOLARS:
         s = Scholar(name=name)
@@ -1667,7 +1923,12 @@ def insert_scholars(db: Session) -> None:
                         scholar_id=s.id, discipline_id=disc_cache[dn].id
                     )
                 )
+                resolved += 1
+            else:
+                missed.add(dn)
     db.flush()
+    if missed:
+        print(f"  [scholars] {resolved} links resolved, {len(missed)} names still unresolved: {sorted(missed)[:10]}")
 
 
 def insert_papers(db: Session) -> None:
@@ -1720,13 +1981,14 @@ def insert_papers(db: Session) -> None:
 
 
 def insert_intersections(db: Session) -> None:
-    disc_cache: dict[str, Discipline] = {}
-    for d in db.query(Discipline).all():
-        disc_cache[d.name_en] = d
+    disc_cache = _build_disc_resolver(db)
 
     scholar_cache: dict[str, Scholar] = {}
     for s in db.query(Scholar).all():
         scholar_cache[s.name] = s
+
+    resolved = 0
+    missed = set()
 
     for cr in CROSSROADS:
         ix = Intersection(
@@ -1737,13 +1999,20 @@ def insert_intersections(db: Session) -> None:
         )
         db.add(ix)
         db.flush()
+        linked_disc_ids: set[int] = set()
         for dn in cr["disciplines"]:
             if dn in disc_cache:
-                db.execute(
-                    intersection_discipline.insert().values(
-                        intersection_id=ix.id, discipline_id=disc_cache[dn].id
+                did = disc_cache[dn].id
+                if did not in linked_disc_ids:
+                    db.execute(
+                        intersection_discipline.insert().values(
+                            intersection_id=ix.id, discipline_id=did
+                        )
                     )
-                )
+                    linked_disc_ids.add(did)
+                resolved += 1
+            else:
+                missed.add(dn)
         for sn in cr["scholars"]:
             if sn in scholar_cache:
                 db.execute(
@@ -1752,6 +2021,8 @@ def insert_intersections(db: Session) -> None:
                     )
                 )
     db.flush()
+    if missed:
+        print(f"  [intersections] {resolved} links resolved, {len(missed)} names still unresolved: {sorted(missed)[:10]}")
 
 
 # ---------------------------------------------------------------------------

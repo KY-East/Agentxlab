@@ -151,8 +151,8 @@ def _full_openalex_url(short_id: str) -> str:
     return f"https://openalex.org/{short_id}"
 
 
-def _build_subfield_cache(db: Session) -> dict[str, int]:
-    """Map OpenAlex subfield URL to local discipline ID."""
+def _build_disc_cache(db: Session) -> dict[str, int]:
+    """Map OpenAlex full URL -> local discipline ID for all levels (field/subfield/topic)."""
     cache: dict[str, int] = {}
     for d in db.query(Discipline).filter(Discipline.openalex_id.isnot(None)).all():
         full_url = _full_openalex_url(d.openalex_id)
@@ -160,13 +160,71 @@ def _build_subfield_cache(db: Session) -> dict[str, int]:
     return cache
 
 
+def _upsert_paper(db: Session, w: dict, stats: dict[str, int]) -> Paper:
+    """Insert or retrieve a paper from an OpenAlex work record."""
+    oa_id = _openalex_short_id(w["id"])
+    existing = db.query(Paper).filter_by(openalex_id=oa_id).first()
+    if existing:
+        stats["skipped"] += 1
+        return existing
+
+    paper = Paper(
+        title=w.get("title", "Untitled")[:500],
+        year=w.get("publication_year"),
+        published_year=w.get("publication_year"),
+        openalex_id=oa_id,
+        doi=w.get("doi"),
+        citation_count=w.get("cited_by_count"),
+        paper_type="frontier" if (w.get("publication_year") or 0) >= 2020 else "classic",
+        abstract=_reconstruct_abstract(w.get("abstract_inverted_index")),
+    )
+    db.add(paper)
+    db.flush()
+    stats["added"] += 1
+    return paper
+
+
+def _tag_paper_disciplines(
+    db: Session, paper: Paper, topics: list[dict],
+    disc_cache: dict[str, int], stats: dict[str, int],
+) -> None:
+    """Tag a paper with all matching discipline IDs (subfield + topic levels)."""
+    existing_disc_ids = {
+        row.discipline_id
+        for row in db.execute(
+            paper_discipline.select().where(paper_discipline.c.paper_id == paper.id)
+        ).fetchall()
+    }
+
+    for topic in topics:
+        score = int((topic.get("score", 0) or 0) * 100)
+
+        sf_url = topic.get("subfield", {}).get("id", "")
+        sf_disc_id = disc_cache.get(sf_url)
+        if sf_disc_id and sf_disc_id not in existing_disc_ids:
+            db.execute(paper_discipline.insert().values(
+                paper_id=paper.id, discipline_id=sf_disc_id, score=score,
+            ))
+            existing_disc_ids.add(sf_disc_id)
+            stats["tags"] += 1
+
+        topic_url = topic.get("id", "")
+        topic_disc_id = disc_cache.get(topic_url)
+        if topic_disc_id and topic_disc_id not in existing_disc_ids:
+            db.execute(paper_discipline.insert().values(
+                paper_id=paper.id, discipline_id=topic_disc_id, score=score,
+            ))
+            existing_disc_ids.add(topic_disc_id)
+            stats["tags"] += 1
+
+
 def sync_works(db: Session, subfield_openalex_id: str, limit: int = 50) -> dict[str, int]:
     """Pull top-cited works for a given subfield from OpenAlex.
 
-    For each paper, also stores all subfield tags into paper_discipline.
+    For each paper, tags both subfield-level and topic-level disciplines.
     """
     stats = {"added": 0, "skipped": 0, "tags": 0}
-    sf_cache = _build_subfield_cache(db)
+    disc_cache = _build_disc_cache(db)
 
     short_id = subfield_openalex_id.replace("https://openalex.org/", "")
     data = _get("/works", {
@@ -176,47 +234,44 @@ def sync_works(db: Session, subfield_openalex_id: str, limit: int = 50) -> dict[
     })
 
     for w in data.get("results", []):
-        oa_id = _openalex_short_id(w["id"])
-        existing = db.query(Paper).filter_by(openalex_id=oa_id).first()
-
-        if existing:
-            stats["skipped"] += 1
-            paper = existing
-        else:
-            paper = Paper(
-                title=w.get("title", "Untitled")[:500],
-                year=w.get("publication_year"),
-                published_year=w.get("publication_year"),
-                openalex_id=oa_id,
-                doi=w.get("doi"),
-                citation_count=w.get("cited_by_count"),
-                paper_type="frontier" if (w.get("publication_year") or 0) >= 2020 else "classic",
-                abstract=_reconstruct_abstract(w.get("abstract_inverted_index")),
-            )
-            db.add(paper)
-            db.flush()
-            stats["added"] += 1
-
-        existing_disc_ids = {
-            row.discipline_id
-            for row in db.execute(
-                paper_discipline.select().where(paper_discipline.c.paper_id == paper.id)
-            ).fetchall()
-        }
-
-        for topic in w.get("topics", []):
-            sf_url = topic.get("subfield", {}).get("id", "")
-            disc_id = sf_cache.get(sf_url)
-            if disc_id and disc_id not in existing_disc_ids:
-                score = int((topic.get("score", 0) or 0) * 100)
-                db.execute(paper_discipline.insert().values(
-                    paper_id=paper.id, discipline_id=disc_id, score=score,
-                ))
-                existing_disc_ids.add(disc_id)
-                stats["tags"] += 1
+        paper = _upsert_paper(db, w, stats)
+        _tag_paper_disciplines(db, paper, w.get("topics", []), disc_cache, stats)
 
     db.commit()
     logger.info("Works sync for %s: %s", subfield_openalex_id, stats)
+    return stats
+
+
+def sync_topic_works(
+    db: Session,
+    topic_openalex_id: str,
+    limit: int = 15,
+    disc_cache: dict[str, int] | None = None,
+) -> dict[str, int]:
+    """Pull top-cited works for a specific topic from OpenAlex.
+
+    Uses topics.id filter for precise topic-level paper retrieval.
+    Tags papers with all subfield + topic disciplines found on each work.
+    Pass disc_cache to avoid rebuilding on every call during batch sync.
+    """
+    stats = {"added": 0, "skipped": 0, "tags": 0}
+    if disc_cache is None:
+        disc_cache = _build_disc_cache(db)
+
+    short_id = topic_openalex_id.replace("https://openalex.org/", "")
+    oa_topic_id = short_id.replace("topics/", "T")
+    data = _get("/works", {
+        "filter": f"topics.id:{oa_topic_id}",
+        "sort": "cited_by_count:desc",
+        "per_page": min(limit, PER_PAGE),
+    })
+
+    for w in data.get("results", []):
+        paper = _upsert_paper(db, w, stats)
+        _tag_paper_disciplines(db, paper, w.get("topics", []), disc_cache, stats)
+
+    db.commit()
+    logger.info("Topic works sync for %s: %s", topic_openalex_id, stats)
     return stats
 
 

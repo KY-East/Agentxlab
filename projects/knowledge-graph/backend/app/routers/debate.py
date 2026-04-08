@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.models import Discipline, Intersection
 from app.models.debate import Debate, DebateAgent
+from app.models.forum import ForumPost
+from app.models.spark import Spark
 from app.schemas import (
     DebateBrief,
     DebateCreate,
@@ -25,6 +27,7 @@ from app.services.debate_engine import (
     run_round_stream,
     suggest_mode,
 )
+from app.services.forum_auto import auto_create_debate_post
 
 router = APIRouter(prefix="/api/debates", tags=["debates"])
 
@@ -221,3 +224,62 @@ async def api_suggest_mode(body: SuggestModeRequest):
         raise HTTPException(400, "At least 2 discipline names required")
     result = await suggest_mode(body.discipline_names)
     return ModeSuggestion(**result)
+
+
+@router.post("/{debate_id}/share-to-forum")
+def share_debate_to_forum(debate_id: int, db: Session = Depends(get_db)):
+    """Manually trigger (or retrieve) the forum post linked to a completed debate."""
+    debate = _load_debate(debate_id, db)
+    if debate.status != "completed":
+        raise HTTPException(400, "Debate must be completed before sharing")
+
+    post = auto_create_debate_post(debate, db)
+    db.commit()
+    if not post:
+        raise HTTPException(500, "Failed to create forum post")
+    return {"post_id": post.id, "title": post.title}
+
+
+@router.post("/{debate_id}/sparks/{spark_id}/request-experiment")
+def request_experiment(debate_id: int, spark_id: int, db: Session = Depends(get_db)):
+    """Create an experiment-request forum post from a spark."""
+    debate = _load_debate(debate_id, db)
+    spark = db.query(Spark).filter(Spark.id == spark_id, Spark.debate_id == debate_id).first()
+    if not spark:
+        raise HTTPException(404, "Spark not found")
+
+    existing = (
+        db.query(ForumPost)
+        .filter(ForumPost.spark_id == spark.id, ForumPost.post_type == "experiment_request")
+        .first()
+    )
+    if existing:
+        return {"post_id": existing.id, "title": existing.title, "already_exists": True}
+
+    disc_names = [d.name_zh or d.name_en for d in debate.disciplines]
+    title = f"[Experiment] {spark.content[:80]}{'...' if len(spark.content) > 80 else ''}"
+    content = (
+        f"**Novelty Type:** {spark.novelty_type}\n"
+        f"**Score:** {spark.novelty_score:.2f}\n\n"
+        f"{spark.content}\n\n"
+    )
+    if spark.reasoning:
+        content += f"**Reasoning:** {spark.reasoning}\n\n"
+    content += f"---\n\n*From debate: {debate.title}*"
+
+    post = ForumPost(
+        user_id=None,
+        title=title,
+        content=content,
+        zone="ai_generated",
+        post_type="experiment_request",
+        status="open",
+        debate_id=debate_id,
+        spark_id=spark.id,
+        is_pinned=False,
+        discipline_tags=_json.dumps(disc_names),
+    )
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return {"post_id": post.id, "title": post.title, "already_exists": False}

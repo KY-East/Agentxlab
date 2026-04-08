@@ -15,6 +15,7 @@ import DisciplineTree from "../components/DisciplinePanel/DisciplineTree";
 import ForceGraph from "../components/GraphCanvas/ForceGraph";
 import DetailPanel from "../components/DetailPanel/DetailPanel";
 import type { AgentAction } from "../components/DetailPanel/DetailPanel";
+import EdgeDetailPanel from "../components/EdgeDetailPanel/EdgeDetailPanel";
 import DiscoveryPanel from "../components/DiscoveryPanel/DiscoveryPanel";
 import { useDisciplines } from "../hooks/useDisciplines";
 import { useAuth } from "../contexts/AuthContext";
@@ -55,6 +56,7 @@ export default function Canvas() {
   const [graphLoading, setGraphLoading] = useState(false);
   const [graphError, setGraphError] = useState<string | null>(null);
   const [activeIntersection, setActiveIntersection] = useState<number | null>(null);
+  const [activeEdgePair, setActiveEdgePair] = useState<[number, number] | null>(null);
   const [generating, setGenerating] = useState(false);
   const [leftOpen, setLeftOpen] = useState(true);
   const [rightOpen, setRightOpen] = useState(true);
@@ -165,7 +167,10 @@ export default function Canvas() {
         if (node) {
           const leaves = collectLeaves([node]);
           if (leaves.length > 0) {
-            setSelectedNodes(new Set(leaves.slice(0, 8).map((d) => d.id)));
+            const sorted = [...leaves].sort(
+              (a, b) => (b.works_count ?? 0) - (a.works_count ?? 0),
+            );
+            setSelectedNodes(new Set(sorted.slice(0, 15).map((d) => d.id)));
           } else {
             setSelectedNodes(new Set([id]));
           }
@@ -216,6 +221,7 @@ export default function Canvas() {
     setSelectedNodes(new Set(ids));
     setDiscoveryResult(null);
     setActiveIntersection(null);
+    setActiveEdgePair(null);
   }, []);
 
   const handleDiscoverHypothesis = useCallback(
@@ -250,7 +256,14 @@ export default function Canvas() {
   }, []);
 
   const handleEdgeClick = useCallback((intersectionId: number) => {
+    setActiveEdgePair(null);
     setActiveIntersection(intersectionId);
+    setRightOpen(true);
+  }, []);
+
+  const handleEvidenceEdgeClick = useCallback((sourceId: number, targetId: number) => {
+    setActiveIntersection(null);
+    setActiveEdgePair([sourceId, targetId]);
     setRightOpen(true);
   }, []);
 
@@ -386,6 +399,7 @@ export default function Canvas() {
         setSelectedNodes(new Set());
         setDiscoveryResult(null);
         setActiveIntersection(null);
+        setActiveEdgePair(null);
       }
     },
     [allLeaves, selectedNodes, showToast, user, findBestParent, refreshTree],
@@ -531,6 +545,7 @@ export default function Canvas() {
                   setSelectedNodes(new Set());
                   setDiscoveryResult(null);
                   setActiveIntersection(null);
+                  setActiveEdgePair(null);
                 }}
                 className="px-2 py-1 bg-white/5 hover:bg-white/10 text-xs text-gray-400 rounded-lg transition-colors"
               >
@@ -561,6 +576,7 @@ export default function Canvas() {
             data={graphData}
             onNodeClick={handleNodeClick}
             onEdgeClick={handleEdgeClick}
+            onEvidenceEdgeClick={handleEvidenceEdgeClick}
             selectedNodes={selectedNodes}
           />
         ) : !graphLoading && !graphError && (
@@ -624,12 +640,19 @@ export default function Canvas() {
             onSelectCombo={handleDiscoverSelectCombo}
             onGenerateHypothesis={handleDiscoverHypothesis}
           />
+        ) : activeEdgePair ? (
+          <EdgeDetailPanel
+            sourceId={activeEdgePair[0]}
+            targetId={activeEdgePair[1]}
+            onClose={() => setActiveEdgePair(null)}
+          />
         ) : (
           <DetailPanel
             intersectionId={activeIntersection}
             onClose={() => setActiveIntersection(null)}
             onAgentAction={handleAgentAction}
             selectedDisciplineNames={selectedDisciplineNames()}
+            selectedNodeIds={[...selectedNodes]}
           />
         )}
       </aside>

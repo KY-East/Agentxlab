@@ -9,7 +9,6 @@ import {
   BookOpen,
   User,
   AlertCircle,
-  MessageSquare,
   Send,
   Check,
   Terminal,
@@ -37,6 +36,7 @@ interface Props {
   onClose: () => void;
   onAgentAction?: (action: AgentAction) => void;
   selectedDisciplineNames?: string[];
+  selectedNodeIds?: number[];
 }
 
 export default function DetailPanel({
@@ -44,6 +44,7 @@ export default function DetailPanel({
   onClose,
   onAgentAction,
   selectedDisciplineNames = [],
+  selectedNodeIds = [],
 }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -177,32 +178,39 @@ export default function DetailPanel({
 
       setLastUserDirection(text.trim());
 
-      if (!intersectionId) {
+      if (!intersectionId && selectedNodeIds.length === 0) {
         setChatMessages((prev) => [
           ...prev,
           {
             role: "assistant",
             content: lang() === "zh"
-              ? "当前没有选中交叉点。你可以用自然语言操作画布：\n- \"去掉 XX\" 移除学科\n- \"加上 XX\" 添加学科\n- \"发起辩论\" 创建辩论\n- \"清除\" 清空画布"
-              : "No intersection selected. You can control the canvas with natural language:\n- \"remove XX\" to deselect\n- \"add XX\" to select\n- \"start debate\" to create one\n- \"clear\" to reset",
+              ? "画布上还没有选中学科。你可以用自然语言操作画布：\n- \"加上 XX\" 添加学科\n- \"清除\" 清空画布"
+              : "No disciplines on canvas. Use natural language:\n- \"add XX\" to select\n- \"clear\" to reset",
           },
         ]);
         return;
       }
 
       setChatLoading(true);
-      const newHistory = [
-        ...chatHistory,
-        { role: "user" as const, content: text },
-      ];
 
       try {
-        const res: ChatHypothesisResponse = await api.chatHypothesis({
-          intersection_id: intersectionId,
-          message: text,
-          history: newHistory,
-          language: lang(),
-        });
+        let res: ChatHypothesisResponse;
+
+        if (intersectionId) {
+          res = await api.chatHypothesis({
+            intersection_id: intersectionId,
+            message: text,
+            history: [...chatHistory, { role: "user" as const, content: text }],
+            language: lang(),
+          });
+        } else {
+          res = await api.canvasChat({
+            discipline_ids: selectedNodeIds,
+            message: text,
+            history: chatHistory,
+            language: lang(),
+          });
+        }
         const assistantMsg: ChatMessage = {
           role: "assistant",
           content: res.reply,
@@ -210,8 +218,9 @@ export default function DetailPanel({
           hypothesis: res.hypothesis,
         };
         setChatMessages((prev) => [...prev, assistantMsg]);
-        setChatHistory([
-          ...newHistory,
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "user", content: text },
           { role: "assistant", content: JSON.stringify(res) },
         ]);
 
@@ -230,7 +239,7 @@ export default function DetailPanel({
         setChatLoading(false);
       }
     },
-    [intersectionId, chatHistory, lang, t, parseAgentIntent, onAgentAction],
+    [intersectionId, selectedNodeIds, chatHistory, lang, t, parseAgentIntent, onAgentAction],
   );
 
   const startExplore = useCallback(async () => {
@@ -557,8 +566,16 @@ export default function DetailPanel({
           {chatMessages.length === 0 && (
             <p className="text-[10px] text-neutral-600 font-mono text-center py-4">
               {lang() === "zh"
-                ? "输入指令或问题，如「去掉XX」「加上XX」「发起辩论」"
-                : "Type a command or question, e.g. \"remove XX\", \"add XX\", \"start debate\""}
+                ? (intersectionId
+                    ? "输入指令或问题，如「去掉XX」「加上XX」「发起辩论」"
+                    : selectedNodeIds.length > 0
+                      ? `画布上有 ${selectedNodeIds.length} 个学科，直接提问即可`
+                      : "先在左侧选择学科，然后可以对话探索")
+                : (intersectionId
+                    ? "Type a command or question, e.g. \"remove XX\", \"add XX\", \"start debate\""
+                    : selectedNodeIds.length > 0
+                      ? `${selectedNodeIds.length} disciplines on canvas. Ask anything.`
+                      : "Select disciplines first, then chat to explore")}
             </p>
           )}
           {chatMessages.map((msg, i) => (

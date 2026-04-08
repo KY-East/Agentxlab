@@ -126,6 +126,21 @@ class ChatHypothesisResponse(BaseModel):
     suggestions: list[str] = []
 
 
+class EdgeChatRequest(BaseModel):
+    subfield_a_id: int
+    subfield_b_id: int
+    message: str
+    history: list[dict] = []
+    language: str = "zh"
+
+
+class CanvasChatRequest(BaseModel):
+    discipline_ids: list[int]
+    message: str
+    history: list[dict] = []
+    language: str = "zh"
+
+
 class IntersectionQuery(BaseModel):
     discipline_ids: list[int]
 
@@ -153,6 +168,23 @@ class GraphEdge(BaseModel):
 class GraphData(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+
+
+class TopicCrossPair(BaseModel):
+    topic_a_id: int
+    topic_a_name: str
+    topic_b_id: int
+    topic_b_name: str
+    shared_papers: int
+
+
+class EdgeDetail(BaseModel):
+    subfield_a_id: int
+    subfield_a_name: str
+    subfield_b_id: int
+    subfield_b_name: str
+    total_papers: int
+    topic_pairs: list[TopicCrossPair]
 
 
 # ── Debate schemas ──

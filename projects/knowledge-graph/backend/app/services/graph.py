@@ -140,9 +140,9 @@ def build_graph(db: Session, *, discipline_ids: list[int] | None = None) -> Grap
                     ix_edge_map[(a, b)] = ix
 
     # --- Edge source 2: shared papers (paper_discipline cross-count) ---
-    # Custom L2/L3 leaves have no openalex_id, so no paper_discipline rows.
-    # Map each selected disc to its nearest ancestor that has papers.
-    # (disc_by_id already built above for ancestor_chain)
+    # Map each selected disc to its nearest ancestor that has papers (openalex_id).
+    # Official topics (depth=2) have their own openalex_id and paper tags.
+    # User-created custom nodes fall back to their parent's proxy.
 
     def _paper_proxy(d: Discipline) -> int | None:
         """Walk up until we find an ancestor with openalex_id (has papers)."""

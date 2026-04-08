@@ -56,6 +56,9 @@ export const api = {
       ids && ids.length > 0 ? `/api/graph?ids=${ids.join(",")}` : "/api/graph"
     ),
 
+  getEdgeDetail: (a: number, b: number) =>
+    request<import("../types").EdgeDetail>(`/api/graph/edge-detail?a=${a}&b=${b}`),
+
   getScholar: (id: number) =>
     request<import("../types").Scholar>(`/api/scholars/${id}`),
 
@@ -75,6 +78,29 @@ export const api = {
     language?: string;
   }) =>
     request<import("../types").ChatHypothesisResponse>("/api/ai/chat-hypothesis", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  edgeChat: (payload: {
+    subfield_a_id: number;
+    subfield_b_id: number;
+    message: string;
+    history?: { role: string; content: string }[];
+    language?: string;
+  }) =>
+    request<import("../types").ChatHypothesisResponse>("/api/ai/edge-chat", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  canvasChat: (payload: {
+    discipline_ids: number[];
+    message: string;
+    history?: { role: string; content: string }[];
+    language?: string;
+  }) =>
+    request<import("../types").ChatHypothesisResponse>("/api/ai/canvas-chat", {
       method: "POST",
       body: JSON.stringify(payload),
     }),
@@ -125,6 +151,17 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ discipline_names: disciplineNames }),
     }),
+
+  shareDebateToForum: (debateId: number) =>
+    request<{ post_id: number; title: string }>(`/api/debates/${debateId}/share-to-forum`, {
+      method: "POST",
+    }),
+
+  requestExperiment: (debateId: number, sparkId: number) =>
+    request<{ post_id: number; title: string; already_exists: boolean }>(
+      `/api/debates/${debateId}/sparks/${sparkId}/request-experiment`,
+      { method: "POST" }
+    ),
 
   // ── Discovery API ──
 
