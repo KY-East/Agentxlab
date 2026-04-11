@@ -11,7 +11,7 @@ from sqlalchemy import desc, case
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.models.forum import ForumPost, ForumComment, ForumVote
+from app.models.forum import ForumPost, ForumComment, ForumVote, TranslationCache
 from app.models.user import User
 from app.schemas import (
     ForumPostCreate,
@@ -23,7 +23,7 @@ from app.schemas import (
     VoteRequest,
     VoteResponse,
 )
-from app.services.auth import get_current_user, get_optional_user
+from app.services.auth import get_current_user, get_optional_user, get_verified_user
 from app.services.points import award_points
 
 logger = logging.getLogger(__name__)
@@ -191,6 +191,8 @@ def list_posts(
     post_type: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     discipline_tag: Optional[str] = Query(None),
+    user_id: Optional[int] = Query(None),
+    debate_id: Optional[int] = Query(None),
     sort: str = Query("newest"),
     limit: int = Query(30, le=100),
     offset: int = Query(0),
@@ -203,6 +205,10 @@ def list_posts(
         q = q.filter(ForumPost.post_type == post_type)
     if status:
         q = q.filter(ForumPost.status == status)
+    if user_id is not None:
+        q = q.filter(ForumPost.user_id == user_id)
+    if debate_id is not None:
+        q = q.filter(ForumPost.debate_id == debate_id)
     if discipline_tag:
         exact_token = json.dumps(discipline_tag, ensure_ascii=False)
         q = q.filter(ForumPost.discipline_tags.contains(exact_token))
@@ -231,7 +237,7 @@ def get_post(post_id: int, db: Session = Depends(get_db)):
 @router.post("/posts", response_model=ForumPostOut)
 def create_post(
     body: ForumPostCreate,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     post = ForumPost(
@@ -255,7 +261,7 @@ def create_post(
 def update_post(
     post_id: int,
     body: ForumPostUpdate,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     post = db.query(ForumPost).get(post_id)
@@ -268,7 +274,7 @@ def update_post(
         post.title = body.title
     if body.content is not None:
         post.content = body.content
-    if body.status is not None:
+    if body.status is not None and user.role in ("moderator", "admin"):
         post.status = body.status
     if body.is_pinned is not None and user.role in ("moderator", "admin"):
         post.is_pinned = body.is_pinned
@@ -276,6 +282,34 @@ def update_post(
     db.commit()
     db.refresh(post)
     return _post_to_out(post, db)
+
+
+@router.delete("/posts/{post_id}")
+def delete_post(
+    post_id: int,
+    user: User = Depends(get_verified_user),
+    db: Session = Depends(get_db),
+):
+    post = db.query(ForumPost).get(post_id)
+    if not post:
+        raise HTTPException(404, "Post not found")
+    if post.user_id != user.id and user.role not in ("moderator", "admin"):
+        raise HTTPException(403, "Not allowed")
+
+    db.query(ForumVote).filter(
+        ForumVote.target_type == "post", ForumVote.target_id == post_id
+    ).delete(synchronize_session=False)
+
+    comment_ids = [c.id for c in db.query(ForumComment.id).filter(ForumComment.post_id == post_id).all()]
+    if comment_ids:
+        db.query(ForumVote).filter(
+            ForumVote.target_type == "comment", ForumVote.target_id.in_(comment_ids)
+        ).delete(synchronize_session=False)
+        db.query(ForumComment).filter(ForumComment.post_id == post_id).delete(synchronize_session=False)
+
+    db.delete(post)
+    db.commit()
+    return {"ok": True}
 
 
 # ── Comments ──
@@ -331,7 +365,7 @@ def list_comments(post_id: int, db: Session = Depends(get_db)):
 def create_comment(
     post_id: int,
     body: ForumCommentCreate,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     post = db.query(ForumPost).get(post_id)
@@ -354,8 +388,26 @@ def create_comment(
     post.comment_count = (post.comment_count or 0) + 1
     db.flush()
 
+    _EXPERIMENT_POST_TYPES = ("experiment_request", "experiment_result")
+
     if body.comment_type == "claim_experiment":
+        if post.post_type not in _EXPERIMENT_POST_TYPES:
+            raise HTTPException(400, "Can only claim experiments on experiment posts")
         award_points(user.id, "claim_experiment", db, ref_type="comment", ref_id=comment.id)
+        if post.status == "open":
+            post.status = "experimenting"
+    elif body.comment_type == "submit_result":
+        if post.post_type not in _EXPERIMENT_POST_TYPES:
+            raise HTTPException(400, "Can only submit results on experiment posts")
+        _VERDICT_MAP = {
+            "verified": ("verified", "submit_result_verified"),
+            "falsified_inspiring": ("falsified", "submit_result_falsified_inspiring"),
+            "inconclusive": ("open", "submit_result_inconclusive"),
+        }
+        verdict = body.result_verdict or "inconclusive"
+        new_status, action_key = _VERDICT_MAP.get(verdict, _VERDICT_MAP["inconclusive"])
+        post.status = new_status
+        award_points(user.id, action_key, db, ref_type="comment", ref_id=comment.id)
     else:
         award_points(user.id, "create_comment", db, ref_type="comment", ref_id=comment.id)
 
@@ -370,7 +422,7 @@ def create_comment(
 @router.post("/vote", response_model=VoteResponse)
 def vote(
     body: VoteRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(get_verified_user),
     db: Session = Depends(get_db),
 ):
     if body.vote_type not in (1, -1):
@@ -424,5 +476,97 @@ def vote(
             if owner_id and owner_id != user.id:
                 award_points(owner_id, "receive_upvote", db, ref_type=body.target_type, ref_id=body.target_id)
 
+        if (
+            body.target_type == "post"
+            and hasattr(target, "post_type")
+            and target.post_type == "debate_summary"
+            and target.vote_score >= 10
+            and (target.vote_score - body.vote_type) < 10
+            and target.user_id
+        ):
+            award_points(target.user_id, "debate_post_valued", db, ref_type="post", ref_id=target.id)
+
         db.commit()
         return VoteResponse(new_score=target.vote_score, user_vote=body.vote_type)
+
+
+# ── Translation ────────────────────────────────────────────────────────
+from pydantic import BaseModel as _BM
+
+
+class _TranslateReq(_BM):
+    content_type: str  # "post" | "comment"
+    content_id: int
+    fields: list[str]  # ["title", "content"]
+    target_lang: str    # "en" | "zh"
+
+
+class _TranslateRes(_BM):
+    translations: dict[str, str]  # field -> translated text
+
+
+@router.post("/translate", response_model=_TranslateRes)
+async def translate_content(body: _TranslateReq, db: Session = Depends(get_db)):
+    if body.content_type == "post":
+        obj = db.query(ForumPost).get(body.content_id)
+    elif body.content_type == "comment":
+        obj = db.query(ForumComment).get(body.content_id)
+    else:
+        raise HTTPException(400, "content_type must be 'post' or 'comment'")
+
+    if not obj:
+        raise HTTPException(404, "Content not found")
+
+    results: dict[str, str] = {}
+
+    for field in body.fields:
+        cached = (
+            db.query(TranslationCache)
+            .filter_by(
+                content_type=body.content_type,
+                content_id=body.content_id,
+                field=field,
+                target_lang=body.target_lang,
+            )
+            .first()
+        )
+        if cached:
+            results[field] = cached.translated_text
+            continue
+
+        source_text = getattr(obj, field, None)
+        if not source_text or not source_text.strip():
+            results[field] = ""
+            continue
+
+        from app.services.ai_provider import chat_completion
+
+        lang_name = "English" if body.target_lang == "en" else "Chinese"
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    f"You are a professional academic translator. "
+                    f"Translate the following text to {lang_name}. "
+                    f"Preserve all markdown formatting, code blocks, and special characters. "
+                    f"Output ONLY the translated text, nothing else."
+                ),
+            },
+            {"role": "user", "content": source_text},
+        ]
+        translated = await chat_completion(messages, temperature=0.3, max_tokens=4000)
+        translated = translated.strip()
+
+        db.add(
+            TranslationCache(
+                content_type=body.content_type,
+                content_id=body.content_id,
+                field=field,
+                target_lang=body.target_lang,
+                translated_text=translated,
+            )
+        )
+        db.commit()
+        results[field] = translated
+
+    return _TranslateRes(translations=results)

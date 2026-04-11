@@ -27,6 +27,8 @@ from app.services.debate_engine import (
     run_round_stream,
     suggest_mode,
 )
+from app.models.user import User
+from app.services.auth import get_current_user, get_optional_user, get_verified_user
 from app.services.forum_auto import auto_create_debate_post
 
 router = APIRouter(prefix="/api/debates", tags=["debates"])
@@ -48,7 +50,7 @@ def _load_debate(debate_id: int, db: Session) -> Debate:
 
 
 @router.post("", response_model=DebateOut)
-async def create_debate(body: DebateCreate, db: Session = Depends(get_db)):
+async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user: User | None = Depends(get_optional_user)):
     if body.mode not in ("free", "debate"):
         raise HTTPException(400, "mode must be 'free' or 'debate'")
     if body.mode == "debate" and not body.proposition:
@@ -94,6 +96,7 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db)):
         proposition=body.proposition,
         status="active",
         intersection_id=resolved_intersection_id,
+        created_by=user.id if user else None,
     )
     debate.disciplines = list(disciplines)
     db.add(debate)
@@ -115,11 +118,14 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db)):
 @router.get("", response_model=list[DebateBrief])
 def list_debates(
     status: str | None = Query(None),
+    created_by: int | None = Query(None),
     db: Session = Depends(get_db),
 ):
     q = db.query(Debate).order_by(Debate.created_at.desc())
     if status:
         q = q.filter(Debate.status == status)
+    if created_by is not None:
+        q = q.filter(Debate.created_by == created_by)
     return [DebateBrief.model_validate(d) for d in q.limit(50).all()]
 
 
@@ -227,7 +233,7 @@ async def api_suggest_mode(body: SuggestModeRequest):
 
 
 @router.post("/{debate_id}/share-to-forum")
-def share_debate_to_forum(debate_id: int, db: Session = Depends(get_db)):
+def share_debate_to_forum(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     """Manually trigger (or retrieve) the forum post linked to a completed debate."""
     debate = _load_debate(debate_id, db)
     if debate.status != "completed":
@@ -241,7 +247,7 @@ def share_debate_to_forum(debate_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{debate_id}/sparks/{spark_id}/request-experiment")
-def request_experiment(debate_id: int, spark_id: int, db: Session = Depends(get_db)):
+def request_experiment(debate_id: int, spark_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     """Create an experiment-request forum post from a spark."""
     debate = _load_debate(debate_id, db)
     spark = db.query(Spark).filter(Spark.id == spark_id, Spark.debate_id == debate_id).first()
@@ -268,7 +274,7 @@ def request_experiment(debate_id: int, spark_id: int, db: Session = Depends(get_
     content += f"---\n\n*From debate: {debate.title}*"
 
     post = ForumPost(
-        user_id=None,
+        user_id=user.id,
         title=title,
         content=content,
         zone="ai_generated",

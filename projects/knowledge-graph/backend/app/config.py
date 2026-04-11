@@ -19,6 +19,25 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     jwt_secret: str = "change-me-in-production"
 
+    # SMTP for email verification / password reset
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = ""
+    app_base_url: str = "http://localhost:5173"
+
+    # Stripe
+    stripe_secret_key: str = ""
+    stripe_publishable_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_pro_price_id: str = ""
+    stripe_lifetime_price_id: str = ""
+
+    # Crypto payment
+    crypto_wallet_address: str = ""
+    crypto_wallet_network: str = "TRC-20"
+
     # Legacy keys
     openai_api_key: str = ""
     anthropic_api_key: str = ""

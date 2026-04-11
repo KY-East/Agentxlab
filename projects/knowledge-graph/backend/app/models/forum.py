@@ -60,3 +60,18 @@ class ForumVote(Base):
     vote_type = Column(Integer, nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class TranslationCache(Base):
+    __tablename__ = "translation_cache"
+    __table_args__ = (
+        UniqueConstraint("content_type", "content_id", "field", "target_lang", name="uq_translation"),
+    )
+
+    id = Column(Integer, primary_key=True)
+    content_type = Column(String(20), nullable=False, index=True)
+    content_id = Column(Integer, nullable=False, index=True)
+    field = Column(String(20), nullable=False)
+    target_lang = Column(String(5), nullable=False)
+    translated_text = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

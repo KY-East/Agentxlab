@@ -1,9 +1,10 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
-import { GoogleLogin } from "@react-oauth/google";
+import { LogOut, UserPlus } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
+import AuthModal from "../AuthModal";
+import QuotaIndicator from "../QuotaIndicator";
 
 const NAV_ITEMS = [
   { to: "/", key: "discover" },
@@ -13,7 +14,7 @@ const NAV_ITEMS = [
 ] as const;
 
 export default function Layout() {
-  const { user, loading, login, logout } = useAuth();
+  const { user, loading, googleLogin, setAuthData, logout, showAuthModal, setShowAuthModal } = useAuth();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -82,7 +83,8 @@ export default function Layout() {
           </button>
 
           {!loading && (
-            <div className="relative" ref={menuRef}>
+            <div className="relative flex items-center gap-1.5" ref={menuRef}>
+              {user && <QuotaIndicator />}
               {user ? (
                 <>
                   <button
@@ -130,22 +132,38 @@ export default function Layout() {
                   )}
                 </>
               ) : (
-                <GoogleLogin
-                  onSuccess={(resp) => {
-                    if (resp.credential) login(resp.credential);
-                  }}
-                  size="small"
-                  shape="rectangular"
-                  theme="filled_black"
-                />
+                <button
+                  onClick={() => setShowAuthModal(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 border border-cyan-400 text-cyan-400 font-mono text-[11px] uppercase tracking-wider hover:bg-cyan-400/10 transition-colors"
+                >
+                  <UserPlus size={12} />
+                  {t("nav.signIn")}
+                </button>
               )}
             </div>
           )}
         </div>
       </header>
+      {user && user.email_verified === false && (
+        <div className="flex items-center justify-center gap-2 px-4 py-1.5 bg-yellow-900/30 border-b border-yellow-800/50">
+          <span className="font-mono text-[10px] text-yellow-500 uppercase tracking-wider">
+            {t("auth.verifyEmailBanner")}
+          </span>
+        </div>
+      )}
       <main className="flex-1 min-h-0 overflow-hidden">
         <Outlet />
       </main>
+
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLoginSuccess={(token, usr) => {
+          setAuthData(token, usr);
+          setShowAuthModal(false);
+        }}
+        onGoogleLogin={googleLogin}
+      />
     </div>
   );
 }

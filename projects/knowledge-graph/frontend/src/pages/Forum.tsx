@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 import { useAuth } from "../contexts/AuthContext";
 import type { ForumPost, LeaderboardEntry } from "../types";
-import { MessageSquare, ThumbsUp, Plus } from "lucide-react";
+import { MessageSquare, Plus, X, Loader2, FlaskConical } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   open: "text-neutral-500",
@@ -18,7 +18,7 @@ export default function Forum() {
   const { t, i18n } = useTranslation();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, setShowAuthModal } = useAuth();
 
   const ZONE_TABS = [
     { key: "ai_generated", label: t("forum.zoneAI") },
@@ -31,20 +31,13 @@ export default function Forum() {
     { key: "hot", label: t("forum.sortHottest") },
   ];
 
-  const STATUS_LABELS: Record<string, string> = {
-    open: t("forum.postStatus.open"),
-    theory_ready: t("forum.postStatus.theory_ready"),
-    experimenting: t("forum.postStatus.experimenting"),
-    verified: t("forum.postStatus.verified"),
-    falsified: t("forum.postStatus.falsified"),
-  };
-
   const zone = (params.get("zone") || "ai_generated") as "ai_generated" | "community";
   const [sort, setSort] = useState("newest");
-  const [statusFilter, setStatusFilter] = useState<string>("");
-  const [tagFilter, setTagFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>(params.get("status") || "");
+  const [tagFilter, setTagFilter] = useState<string>(params.get("discipline_tag") || "");
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [forumStats, setForumStats] = useState<{
     total_posts: number;
@@ -59,10 +52,14 @@ export default function Forum() {
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newType, setNewType] = useState("discussion");
+  const [newTags, setNewTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState("");
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const data = await api.listForumPosts({
         zone,
@@ -73,10 +70,11 @@ export default function Forum() {
       setPosts(data);
     } catch {
       setPosts([]);
+      setLoadError(t("forum.loadFailed"));
     } finally {
       setLoading(false);
     }
-  }, [zone, sort, statusFilter, tagFilter]);
+  }, [zone, sort, statusFilter, tagFilter, t]);
 
   useEffect(() => {
     fetchPosts();
@@ -89,10 +87,18 @@ export default function Forum() {
   }, []);
 
   const handleTabChange = (z: string) => {
+    setStatusFilter("");
+    setTagFilter("");
     setParams({ zone: z });
   };
 
-  const [postError, setPostError] = useState("");
+  const handleNewPostClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    setShowNewPost(true);
+  };
 
   const handleCreatePost = async () => {
     if (!newTitle.trim() || !newContent.trim()) return;
@@ -103,17 +109,28 @@ export default function Forum() {
         title: newTitle.trim(),
         content: newContent.trim(),
         post_type: newType,
+        discipline_tags: newTags.length > 0 ? newTags : undefined,
       });
       setShowNewPost(false);
       setNewTitle("");
       setNewContent("");
+      setNewTags([]);
+      setTagInput("");
       fetchPosts();
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : t("forum.publishFailed");
+      const msg = err instanceof Error ? err.message : t("forum.publishFailed");
       setPostError(msg);
     } finally {
       setPosting(false);
+    }
+  };
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      e.preventDefault();
+      const tag = tagInput.trim();
+      if (!newTags.includes(tag)) setNewTags((prev) => [...prev, tag]);
+      setTagInput("");
     }
   };
 
@@ -165,15 +182,15 @@ export default function Forum() {
             className="bg-transparent border border-neutral-800 px-2 py-1 font-mono text-[10px] text-neutral-400 uppercase tracking-wider focus:outline-none focus:border-cyan-400"
           >
             <option value="">{t("forum.allStatus")}</option>
-            {Object.entries(STATUS_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+            {(["open", "theory_ready", "experimenting", "verified", "falsified"] as const).map((k) => (
+              <option key={k} value={k}>{t(`forum.postStatus.${k}`)}</option>
             ))}
           </select>
 
           {/* New Post button */}
-          {zone === "community" && user && (
+          {zone === "community" && (
             <button
-              onClick={() => setShowNewPost(true)}
+              onClick={handleNewPostClick}
               className="flex items-center gap-1 px-3 py-1.5 bg-cyan-400 text-black font-mono text-[10px] font-bold uppercase tracking-wider hover:bg-cyan-300 transition-colors"
             >
               <Plus size={12} />
@@ -185,7 +202,9 @@ export default function Forum() {
         {/* Active tag filter */}
         {tagFilter && (
           <div className="px-6 py-2 flex items-center gap-2 border-b border-neutral-800 shrink-0">
-            <span className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider">Filter:</span>
+            <span className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider">
+              {t("forum.filter")}:
+            </span>
             <span className="font-mono text-[10px] px-2 py-0.5 bg-cyan-400/10 text-cyan-400 flex items-center gap-1">
               {tagFilter}
               <button onClick={() => setTagFilter("")} className="hover:text-white ml-1 text-xs">&times;</button>
@@ -196,8 +215,18 @@ export default function Forum() {
         {/* Post list */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="px-6 py-12 font-mono text-xs text-neutral-600 animate-blink">
-              [{t("common.loading")}]
+            <div className="flex justify-center py-12">
+              <Loader2 size={14} className="animate-spin text-neutral-600" />
+            </div>
+          ) : loadError ? (
+            <div className="px-6 py-12 space-y-2">
+              <p className="font-mono text-xs text-red-400">{loadError}</p>
+              <button
+                onClick={fetchPosts}
+                className="font-mono text-[10px] text-cyan-400 hover:text-white underline"
+              >
+                {t("common.retry", "Retry")}
+              </button>
             </div>
           ) : posts.length === 0 ? (
             <div className="px-6 py-12 font-mono text-xs text-neutral-600">
@@ -208,12 +237,7 @@ export default function Forum() {
           ) : (
             <div className="divide-y divide-neutral-800">
               {posts.map((post) => (
-                <PostRow
-                  key={post.id}
-                  post={post}
-                  navigate={navigate}
-                  statusLabels={STATUS_LABELS}
-                />
+                <PostRow key={post.id} post={post} navigate={navigate} t={t} i18n={i18n} />
               ))}
             </div>
           )}
@@ -232,36 +256,25 @@ export default function Forum() {
           ) : (
             <div className="divide-y divide-neutral-800/50">
               {leaderboard.map((entry, i) => (
-                <div
-                  key={entry.user_id}
-                  className="flex items-center gap-2 py-1.5 text-xs"
-                >
+                <div key={entry.user_id} className="flex items-center gap-2 py-1.5 text-xs">
                   <span
                     className={`font-mono w-4 text-right text-[10px] ${
-                      i === 0
-                        ? "text-cyan-400 font-bold"
-                        : i < 3
-                        ? "text-neutral-400"
-                        : "text-neutral-600"
+                      i === 0 ? "text-cyan-400 font-bold" : i < 3 ? "text-neutral-400" : "text-neutral-600"
                     }`}
                   >
                     {i + 1}
                   </span>
                   {entry.avatar_url ? (
-                    <img
-                      src={entry.avatar_url}
-                      alt=""
-                      className="w-4 h-4 rounded-sm"
-                    />
+                    <img src={entry.avatar_url} alt="" className="w-4 h-4" />
                   ) : (
-                    <div className="w-4 h-4 rounded-sm bg-neutral-800 flex items-center justify-center font-mono text-[8px] text-neutral-500">
+                    <div className="w-4 h-4 bg-neutral-800 flex items-center justify-center font-mono text-[8px] text-neutral-500">
                       {entry.display_name.charAt(0)}
                     </div>
                   )}
                   <span className="flex-1 truncate text-neutral-400 text-[11px]">
                     {entry.display_name}
                   </span>
-                  <span className="font-mono text-[10px] text-cyan-400">
+                  <span className="font-mono text-[10px] text-cyan-400 tabular-nums">
                     {entry.points.toLocaleString(i18n.language === "zh" ? "zh-CN" : "en-US")}
                   </span>
                 </div>
@@ -326,7 +339,9 @@ export default function Forum() {
             </h2>
 
             <div>
-              <label className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider block mb-1">Type</label>
+              <label className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider block mb-1">
+                {t("forum.type")}
+              </label>
               <select
                 value={newType}
                 onChange={(e) => setNewType(e.target.value)}
@@ -335,11 +350,14 @@ export default function Forum() {
                 <option value="discussion">{t("forum.postTypes.discussion")}</option>
                 <option value="question">{t("forum.postTypes.question")}</option>
                 <option value="experiment_result">{t("forum.postTypes.experiment_result")}</option>
+                <option value="resource">{t("forum.postTypes.resource")}</option>
               </select>
             </div>
 
             <div>
-              <label className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider block mb-1">Title</label>
+              <label className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider block mb-1">
+                {t("forum.title")}
+              </label>
               <input
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
@@ -361,12 +379,38 @@ export default function Forum() {
               />
             </div>
 
+            {/* Tag picker */}
+            <div>
+              <label className="font-mono text-[10px] text-neutral-600 uppercase tracking-wider block mb-1">
+                {t("forum.tags")}
+              </label>
+              {newTags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {newTags.map((tag) => (
+                    <span key={tag} className="font-mono text-[10px] px-2 py-0.5 bg-cyan-400/10 text-cyan-400 flex items-center gap-1">
+                      {tag}
+                      <button onClick={() => setNewTags((prev) => prev.filter((t) => t !== tag))} className="hover:text-white text-xs">
+                        <X size={8} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                placeholder={t("forum.tagsPlaceholder")}
+                className="w-full bg-transparent border border-neutral-800 px-3 py-2 font-mono text-xs text-white placeholder-neutral-700 focus:outline-none focus:border-cyan-400"
+              />
+            </div>
+
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowNewPost(false)}
+                onClick={() => { setShowNewPost(false); setPostError(""); }}
                 className="font-mono text-xs text-neutral-500 hover:text-white px-4 py-2 transition-colors"
               >
-                {t("common.cancel")}
+                {t("forum.cancel")}
               </button>
               <button
                 onClick={handleCreatePost}
@@ -389,24 +433,38 @@ export default function Forum() {
 function PostRow({
   post,
   navigate,
-  statusLabels,
+  t,
+  i18n,
 }: {
   post: ForumPost;
   navigate: (path: string) => void;
-  statusLabels: Record<string, string>;
+  t: (key: string, fallback?: string) => string;
+  i18n: { language: string };
 }) {
-  const { i18n } = useTranslation();
+  const isExp = post.post_type === "experiment_request" || post.post_type === "experiment_result";
+
   return (
     <button
       onClick={() => navigate(`/forum/${post.id}`)}
-      className="w-full text-left px-6 py-3 hover:bg-neutral-900/50 transition-colors group flex items-start gap-4 border-l-2 border-transparent hover:border-cyan-400"
+      className={`w-full text-left px-6 py-3 hover:bg-neutral-900/50 transition-colors group flex items-start gap-4 border-l-2 ${
+        isExp ? "border-l-yellow-500/40 hover:border-l-yellow-500" : "border-transparent hover:border-cyan-400"
+      }`}
     >
-      {/* Vote score */}
+      {/* Left column: icon for experiment, score for others */}
       <div className="flex flex-col items-center pt-0.5 shrink-0 min-w-[32px]">
-        <span className="font-mono text-sm font-bold text-neutral-400 group-hover:text-white transition-colors">
-          {post.vote_score}
-        </span>
-        <span className="font-mono text-[8px] text-neutral-700 uppercase">pts</span>
+        {isExp ? (
+          <>
+            <FlaskConical size={16} className="text-yellow-500" />
+            <span className="font-mono text-[8px] text-yellow-500/60 uppercase mt-0.5">EXP</span>
+          </>
+        ) : (
+          <>
+            <span className="font-mono text-sm font-bold text-neutral-400 group-hover:text-white transition-colors tabular-nums">
+              {post.vote_score}
+            </span>
+            <span className="font-mono text-[8px] text-neutral-700 uppercase">pts</span>
+          </>
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
@@ -416,16 +474,19 @@ function PostRow({
           )}
           <span
             className={`font-mono text-[9px] uppercase tracking-wider ${
-              STATUS_COLORS[post.status] || "text-neutral-500"
+              isExp
+                ? post.status === "verified" ? "text-green-400" : post.status === "falsified" ? "text-red-400" : "text-yellow-500"
+                : STATUS_COLORS[post.status] || "text-neutral-500"
             }`}
           >
-            {statusLabels[post.status] || post.status}
+            {t(`forum.postStatus.${post.status}`, post.status)}
           </span>
           {post.zone === "ai_generated" && (
-            <span className="font-mono text-[9px] text-cyan-400 uppercase tracking-wider">
-              AI
-            </span>
+            <span className="font-mono text-[9px] text-cyan-400 uppercase tracking-wider">AI</span>
           )}
+          <span className={`font-mono text-[9px] uppercase tracking-wider ${isExp ? "text-yellow-500/70" : "text-neutral-700"}`}>
+            {t(`forum.postTypes.${post.post_type}`, post.post_type)}
+          </span>
         </div>
 
         <h3 className="text-sm text-neutral-300 group-hover:text-white truncate transition-colors">
@@ -433,24 +494,25 @@ function PostRow({
         </h3>
 
         <div className="flex items-center gap-3 mt-1 font-mono text-[10px] text-neutral-600">
-          {post.author && (
+          {post.author ? (
             <span>{post.author.display_name}</span>
-          )}
-          {!post.author && post.zone === "ai_generated" && (
+          ) : post.zone === "ai_generated" ? (
             <span className="text-cyan-400/60">Agent X Lab</span>
-          )}
+          ) : null}
           <span className="flex items-center gap-0.5">
             <MessageSquare size={9} /> {post.comment_count}
           </span>
-          <span className="flex items-center gap-0.5">
-            <ThumbsUp size={9} /> {post.vote_score}
-          </span>
+          {isExp && (
+            <span className="font-mono text-[9px] text-yellow-500/50 tabular-nums">
+              {post.vote_score} pts
+            </span>
+          )}
           {post.discipline_tags && post.discipline_tags.length > 0 && (
             <span className="truncate max-w-[150px] text-neutral-700">
               {post.discipline_tags.slice(0, 3).join(" / ")}
             </span>
           )}
-          <span className="ml-auto">
+          <span className="ml-auto tabular-nums">
             {new Date(post.created_at).toLocaleDateString(
               i18n.language === "zh" ? "zh-CN" : "en-US"
             )}

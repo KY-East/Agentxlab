@@ -36,6 +36,9 @@ class Debate(Base):
     intersection_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("intersections.id"), index=True
     )
+    created_by: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("users.id"), index=True
+    )
 
     summary_consensus: Mapped[str | None] = mapped_column(Text)
     summary_disagreements: Mapped[str | None] = mapped_column(Text)

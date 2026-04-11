@@ -10,7 +10,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
-  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    const text = await res.text();
+    if (res.status === 429) {
+      window.dispatchEvent(new CustomEvent("axl:quota-exceeded"));
+    }
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
   return res.json();
 }
 
@@ -120,10 +126,13 @@ export const api = {
       body: JSON.stringify(params),
     }),
 
-  getDebates: (status?: string) =>
-    request<import("../types").DebateBrief[]>(
-      `/api/debates${status ? `?status=${status}` : ""}`
-    ),
+  getDebates: (params?: { status?: string; created_by?: number }) => {
+    const qs = new URLSearchParams();
+    if (params?.status) qs.set("status", params.status);
+    if (params?.created_by != null) qs.set("created_by", String(params.created_by));
+    const q = qs.toString();
+    return request<import("../types").DebateBrief[]>(`/api/debates${q ? `?${q}` : ""}`);
+  },
 
   getDebate: (id: number) =>
     request<import("../types").Debate>(`/api/debates/${id}`),
@@ -268,6 +277,8 @@ export const api = {
     post_type?: string;
     status?: string;
     discipline_tag?: string;
+    user_id?: number;
+    debate_id?: number;
     sort?: string;
     limit?: number;
     offset?: number;
@@ -277,6 +288,8 @@ export const api = {
     if (params?.post_type) qs.set("post_type", params.post_type);
     if (params?.status) qs.set("status", params.status);
     if (params?.discipline_tag) qs.set("discipline_tag", params.discipline_tag);
+    if (params?.user_id != null) qs.set("user_id", String(params.user_id));
+    if (params?.debate_id != null) qs.set("debate_id", String(params.debate_id));
     if (params?.sort) qs.set("sort", params.sort);
     if (params?.limit != null) qs.set("limit", String(params.limit));
     if (params?.offset != null) qs.set("offset", String(params.offset));
@@ -305,10 +318,19 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  deleteForumPost: (id: number) =>
+    request<{ ok: boolean }>(`/api/forum/posts/${id}`, { method: "DELETE" }),
+
+  updateMe: (body: { display_name?: string; avatar_url?: string }) =>
+    request<{ id: number; email: string; display_name: string; avatar_url: string | null; did_address: string | null; points: number; role: string }>("/api/auth/me", {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
   getForumComments: (postId: number) =>
     request<import("../types").ForumComment[]>(`/api/forum/posts/${postId}/comments`),
 
-  createForumComment: (postId: number, body: { content: string; parent_id?: number; comment_type?: string }) =>
+  createForumComment: (postId: number, body: { content: string; parent_id?: number; comment_type?: string; result_verdict?: string }) =>
     request<import("../types").ForumComment>(`/api/forum/posts/${postId}/comments`, {
       method: "POST",
       body: JSON.stringify(body),
@@ -334,4 +356,62 @@ export const api = {
     request<import("../types").LeaderboardEntry[]>(
       `/api/points/leaderboard${limit ? `?limit=${limit}` : ""}`
     ),
+
+  // ── Translation API ──
+
+  translateContent: (body: {
+    content_type: "post" | "comment";
+    content_id: number;
+    fields: string[];
+    target_lang: string;
+  }) =>
+    request<{ translations: Record<string, string> }>("/api/forum/translate", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  // ── Subscription API ──
+
+  getPlans: () =>
+    request<import("../types").PlanInfo[]>("/api/subscription/plans"),
+
+  getMySubscription: () =>
+    request<import("../types").SubscriptionInfo>("/api/subscription/me"),
+
+  updatePreferredModel: (preferred_model: string) =>
+    request<import("../types").SubscriptionInfo>("/api/subscription/model", {
+      method: "PATCH",
+      body: JSON.stringify({ preferred_model }),
+    }),
+
+  getUsage: () =>
+    request<import("../types").UsageInfo>("/api/subscription/usage"),
+
+  createStripeCheckout: (plan: string) =>
+    request<{ checkout_url: string }>(`/api/payment/stripe/checkout?plan=${plan}`, {
+      method: "POST",
+    }),
+
+  createStripePortal: () =>
+    request<{ portal_url: string }>("/api/payment/stripe/portal", {
+      method: "POST",
+    }),
+
+  requestCryptoPayment: (plan: string) =>
+    request<{
+      payment_id: number;
+      wallet_address: string;
+      network: string;
+      amount_usd: number;
+      memo: string;
+      status: string;
+    }>("/api/payment/crypto/request", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+    }),
+
+  submitCryptoTx: (paymentId: number, txHash: string) =>
+    request<{ ok: boolean }>(`/api/payment/crypto/submit-tx?payment_id=${paymentId}&tx_hash=${encodeURIComponent(txHash)}`, {
+      method: "POST",
+    }),
 };

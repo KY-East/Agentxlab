@@ -10,6 +10,10 @@ import PaperEditor from "./pages/PaperEditor";
 import ForumPostDetail from "./pages/ForumPostDetail";
 
 const Profile = lazy(() => import("./pages/Profile"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+
+const LazyFallback = <div className="p-8 text-gray-400">Loading...</div>;
 
 export default function App() {
   return (
@@ -22,14 +26,9 @@ export default function App() {
         <Route path="paper/:draftId" element={<PaperEditor />} />
         <Route path="forum" element={<Forum />} />
         <Route path="forum/:postId" element={<ForumPostDetail />} />
-        <Route
-          path="profile"
-          element={
-            <Suspense fallback={<div className="p-8 text-gray-400">Loading...</div>}>
-              <Profile />
-            </Suspense>
-          }
-        />
+        <Route path="profile" element={<Suspense fallback={LazyFallback}><Profile /></Suspense>} />
+        <Route path="verify-email" element={<Suspense fallback={LazyFallback}><VerifyEmail /></Suspense>} />
+        <Route path="reset-password" element={<Suspense fallback={LazyFallback}><ResetPassword /></Suspense>} />
       </Route>
     </Routes>
   );

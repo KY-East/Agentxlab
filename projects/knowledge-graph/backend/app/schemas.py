@@ -357,6 +357,7 @@ class ForumCommentCreate(BaseModel):
     content: str
     parent_id: int | None = None
     comment_type: str = "normal"
+    result_verdict: str | None = None
 
 
 class ForumCommentOut(BaseModel):

@@ -15,15 +15,19 @@ export interface AuthUser {
   did_address: string | null;
   points: number;
   role: string;
+  email_verified?: boolean;
 }
 
 interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   loading: boolean;
-  login: (credential: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
+  setAuthData: (token: string, user: unknown) => void;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  showAuthModal: boolean;
+  setShowAuthModal: (v: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => localStorage.getItem(TOKEN_KEY),
   );
   const [loading, setLoading] = useState(!!localStorage.getItem(TOKEN_KEY));
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const fetchMe = useCallback(async (t: string) => {
     const res = await fetch(`${API_BASE}/api/auth/me`, {
@@ -57,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [token, fetchMe]);
 
-  const login = useCallback(async (credential: string) => {
+  const googleLogin = useCallback(async (credential: string) => {
     const res = await fetch(`${API_BASE}/api/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,6 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, data.token);
     setToken(data.token);
     setUser(data.user);
+  }, []);
+
+  const setAuthData = useCallback((newToken: string, newUser: unknown) => {
+    localStorage.setItem(TOKEN_KEY, newToken);
+    setToken(newToken);
+    setUser(newUser as AuthUser);
   }, []);
 
   const logout = useCallback(() => {
@@ -81,7 +92,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token, fetchMe]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        googleLogin,
+        setAuthData,
+        logout,
+        refreshUser,
+        showAuthModal,
+        setShowAuthModal,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
