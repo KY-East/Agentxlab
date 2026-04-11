@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { api } from "../../api/client";
 import type { Intersection, ChatHypothesisResponse } from "../../types";
+import ModelSelector from "../ModelSelector";
 
 interface ChatMessage {
   role: "system" | "user" | "assistant" | "action";
@@ -139,7 +140,7 @@ export default function DetailPanel({
         if (m) return { type: "add_discipline", payload: { name: m[1].trim() } };
       }
 
-      if (/^(?:start debate|发起辩论|开始辩论|辩论)$/i.test(lower) || /^(?:start debate|发起辩论|开始辩论|辩论)$/i.test(zhLower)) {
+      if (/(?:start debate|发起辩论|开始辩论|进入辩论|去辩论|辩论一下)/i.test(lower) || /(?:start debate|发起辩论|开始辩论|进入辩论|去辩论|辩论一下)/i.test(zhLower)) {
         return { type: "start_debate" };
       }
 
@@ -177,19 +178,6 @@ export default function DetailPanel({
       }
 
       setLastUserDirection(text.trim());
-
-      if (!intersectionId && selectedNodeIds.length === 0) {
-        setChatMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: lang() === "zh"
-              ? "画布上还没有选中学科。你可以用自然语言操作画布：\n- \"加上 XX\" 添加学科\n- \"清除\" 清空画布"
-              : "No disciplines on canvas. Use natural language:\n- \"add XX\" to select\n- \"clear\" to reset",
-          },
-        ]);
-        return;
-      }
 
       setChatLoading(true);
 
@@ -559,6 +547,7 @@ export default function DetailPanel({
             <Terminal size={10} />
             {t("detailChat.chatTitle")}
           </span>
+          <ModelSelector />
         </div>
 
         {/* Messages */}
@@ -566,16 +555,8 @@ export default function DetailPanel({
           {chatMessages.length === 0 && (
             <p className="text-[10px] text-neutral-600 font-mono text-center py-4">
               {lang() === "zh"
-                ? (intersectionId
-                    ? "输入指令或问题，如「去掉XX」「加上XX」「发起辩论」"
-                    : selectedNodeIds.length > 0
-                      ? `画布上有 ${selectedNodeIds.length} 个学科，直接提问即可`
-                      : "先在左侧选择学科，然后可以对话探索")
-                : (intersectionId
-                    ? "Type a command or question, e.g. \"remove XX\", \"add XX\", \"start debate\""
-                    : selectedNodeIds.length > 0
-                      ? `${selectedNodeIds.length} disciplines on canvas. Ask anything.`
-                      : "Select disciplines first, then chat to explore")}
+                ? "描述你的研究方向，或输入指令如「加上XX」「去掉XX」「发起辩论」"
+                : "Describe your research idea, or use commands like \"add XX\", \"remove XX\""}
             </p>
           )}
           {chatMessages.map((msg, i) => (

@@ -58,13 +58,23 @@ async def chat_completion(
     temperature: float = 0.7,
     max_tokens: int = 2000,
     retries: int = 2,
+    user_id: int | None = None,
+    db=None,
 ) -> str:
-    """Generic LLM call with retry for transient API errors."""
+    """Generic LLM call with retry and optional token quota tracking."""
     import asyncio
     import logging
 
     logger = logging.getLogger(__name__)
-    model = model or settings.default_ai_model
+
+    sub = None
+    remaining = None
+    if user_id and db:
+        from app.services.token_quota import check_quota, validate_model, record_usage
+        sub = check_quota(user_id, db)
+        model = validate_model(sub, model)
+    else:
+        model = model or settings.default_ai_model
 
     for attempt in range(1, retries + 2):
         try:
@@ -74,7 +84,15 @@ async def chat_completion(
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            return response.choices[0].message.content
+            content = response.choices[0].message.content
+
+            if sub and db:
+                usage = getattr(response, "usage", None)
+                tokens = usage.total_tokens if usage else max_tokens
+                remaining = record_usage(sub, tokens, db)
+                logger.info("User %d used %d tokens (%d remaining)", user_id, tokens, remaining)
+
+            return content
         except Exception as exc:
             if attempt > retries:
                 raise
@@ -86,6 +104,8 @@ async def generate_hypothesis(
     discipline_names: list[str],
     model: str | None = None,
     language: str = "zh",
+    user_id: int | None = None,
+    db=None,
 ) -> str:
     lang = language if language in ("zh", "en") else "zh"
     system = SYSTEM_PROMPTS.get(lang, SYSTEM_PROMPTS["en"])
@@ -96,37 +116,42 @@ async def generate_hypothesis(
             {"role": "user", "content": user_prompt},
         ],
         model=model,
+        user_id=user_id,
+        db=db,
     )
 
 
 EXPLORE_SYSTEM_PROMPTS = {
     "en": (
         "You are an interdisciplinary research advisor at Agent X Lab.\n\n"
-        "The user is exploring a research intersection between academic disciplines. "
-        "Your role is to suggest promising research angles, refine ideas through conversation, "
-        "and ultimately help the user arrive at a well-formed research hypothesis.\n\n"
-        "Conversation flow:\n"
-        "1. First, analyze the intersection context and suggest 2-3 distinct research angles.\n"
-        "2. Let the user pick or propose their own direction, then discuss it.\n"
-        "3. When the user is satisfied, produce the final hypothesis.\n\n"
+        "Help the user explore cross-disciplinary research directions through conversation.\n\n"
+        "Rules:\n"
+        "- Answer the user's ACTUAL question directly. Do not repeat analysis they've already seen.\n"
+        "- When the user has chosen a direction or says they want to proceed, STOP suggesting alternatives.\n"
+        "  Instead, finalize: set hypothesis to a one-paragraph research hypothesis, and reply with a brief confirmation.\n"
+        "- When the user says anything about debate/discuss/start/proceed, confirm their direction and finalize.\n"
+        "- suggestions should be SHORT actionable next-step labels (max 15 words each), not multi-paragraph analyses.\n"
+        "- Keep reply concise. No walls of text.\n\n"
         "Respond ONLY with valid JSON:\n"
-        '{"reply": "<your conversational reply in markdown>", '
-        '"hypothesis": "<full hypothesis text if finalized, else null>", '
-        '"suggestions": ["<angle 1>", "<angle 2>", ...] }\n\n'
+        '{"reply": "<concise reply in markdown>", '
+        '"hypothesis": "<finalized hypothesis text, or null if still exploring>", '
+        '"suggestions": ["<short next step>", ...] }\n\n'
         "All output in English."
     ),
     "zh": (
         "你是 Agent X Lab 的跨学科研究顾问。\n\n"
-        "用户正在探索学科交叉的研究方向。你的职责是建议有前景的研究角度，"
-        "通过对话完善想法，最终帮助用户形成一个完整的研究假设。\n\n"
-        "对话流程：\n"
-        "1. 首先，分析交叉领域的背景，建议 2-3 个不同的研究角度。\n"
-        "2. 让用户选择或提出自己的方向，然后讨论细化。\n"
-        "3. 当用户满意后，产出最终的假设。\n\n"
+        "通过对话帮助用户探索交叉学科研究方向。\n\n"
+        "规则：\n"
+        "- 直接回答用户的实际问题。不要重复用户已经看过的分析。\n"
+        "- 当用户已经选定方向或表示要继续（辩论、开始、就这个），立刻停止建议替代方案。\n"
+        "  直接确认方向，把 hypothesis 设置为一段完整的研究假设文本。\n"
+        "- 用户说辩论/讨论/开始/就做这个/进入辩论等，就意味着方向已定。\n"
+        "- suggestions 是简短的下一步操作标签（每条不超过15字），不是长篇分析。\n"
+        "- reply 要简洁，不要大段文字墙。\n\n"
         "只用有效 JSON 回复：\n"
-        '{"reply": "<你的对话回复，用 markdown>", '
-        '"hypothesis": "<如果已确定，输出完整假设文本，否则为 null>", '
-        '"suggestions": ["<角度 1>", "<角度 2>", ...] }\n\n'
+        '{"reply": "<简洁的回复，用 markdown>", '
+        '"hypothesis": "<已确定的完整假设文本，或探索中为 null>", '
+        '"suggestions": ["<简短下一步>", ...] }\n\n'
         "所有内容用中文输出。"
     ),
 }
@@ -138,6 +163,8 @@ async def chat_hypothesis(
     user_message: str,
     history: list[dict],
     language: str = "zh",
+    user_id: int | None = None,
+    db=None,
 ) -> dict:
     """Conversational hypothesis exploration."""
     import json
@@ -165,9 +192,7 @@ async def chat_hypothesis(
         else:
             messages.append({"role": "user", "content": f"{context_block}\n\nPlease analyze this intersection and suggest 2-3 research angles."})
 
-    import logging as _log
-    _log.getLogger(__name__).info("chat_hypothesis messages: %s", [{"role": m["role"], "content": m["content"][:200]} for m in messages])
-    raw = await chat_completion(messages=messages, temperature=0.6, max_tokens=2000)
+    raw = await chat_completion(messages=messages, temperature=0.6, max_tokens=2000, user_id=user_id, db=db)
 
     try:
         start = raw.find("{")

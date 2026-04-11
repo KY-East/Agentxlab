@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import Discipline, Intersection, AIHypothesis
+from app.models.user import User
 from app.schemas import (
     HypothesisOut,
     HypothesisRequest,
@@ -16,6 +17,7 @@ from app.schemas import (
     CanvasChatRequest,
 )
 from app.services.ai_provider import generate_hypothesis, chat_hypothesis
+from app.services.auth import get_optional_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
@@ -105,6 +107,7 @@ async def create_hypothesis(body: HypothesisRequest, db: Session = Depends(get_d
 async def chat_hypothesis_endpoint(
     body: ChatHypothesisRequest,
     db: Session = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ):
     ix = db.query(Intersection).filter(Intersection.id == body.intersection_id).first()
     if not ix:
@@ -137,6 +140,8 @@ async def chat_hypothesis_endpoint(
         user_message=body.message,
         history=body.history,
         language=lang,
+        user_id=user.id if user else None,
+        db=db,
     )
 
     if result.get("hypothesis"):
@@ -160,6 +165,7 @@ async def chat_hypothesis_endpoint(
 async def edge_chat_endpoint(
     body: EdgeChatRequest,
     db: Session = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ):
     """Chat about a cross-subfield connection without requiring an intersection."""
     disc_a = db.query(Discipline).filter(Discipline.id == body.subfield_a_id).first()
@@ -199,6 +205,8 @@ async def edge_chat_endpoint(
         user_message=body.message,
         history=body.history,
         language=lang,
+        user_id=user.id if user else None,
+        db=db,
     )
 
     return ChatHypothesisResponse(
@@ -212,27 +220,37 @@ async def edge_chat_endpoint(
 async def canvas_chat_endpoint(
     body: CanvasChatRequest,
     db: Session = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ):
     """Chat about the disciplines currently visible on the canvas."""
-    unique_ids = list(dict.fromkeys(body.discipline_ids))
-    discs = db.query(Discipline).filter(Discipline.id.in_(unique_ids)).all()
-    if not discs:
-        raise HTTPException(400, "No valid disciplines")
-
     lang = body.language if body.language in ("zh", "en") else "zh"
-    names = [(d.name_zh or d.name_en) if lang == "zh" else d.name_en for d in discs]
 
-    if lang == "zh":
-        ctx = f"用户画布上选中了 {len(names)} 个学科：{', '.join(names)}。"
+    unique_ids = list(dict.fromkeys(body.discipline_ids))
+    if unique_ids:
+        discs = db.query(Discipline).filter(Discipline.id.in_(unique_ids)).all()
+        names = [(d.name_zh or d.name_en) if lang == "zh" else d.name_en for d in discs]
     else:
-        ctx = f"User has {len(names)} disciplines on canvas: {', '.join(names)}."
+        names = []
+
+    if names:
+        if lang == "zh":
+            ctx = f"用户画布上选中了 {len(names)} 个学科：{', '.join(names)}。"
+        else:
+            ctx = f"User has {len(names)} disciplines on canvas: {', '.join(names)}."
+    else:
+        if lang == "zh":
+            ctx = "用户还没有选择学科，正在自由探索。请根据用户的描述推荐合适的学科方向。"
+        else:
+            ctx = "No disciplines selected yet. Recommend suitable disciplines based on the user's description."
 
     result = await chat_hypothesis(
-        discipline_names=names,
+        discipline_names=names if names else ["interdisciplinary research"],
         context_text=ctx,
         user_message=body.message,
         history=body.history,
         language=lang,
+        user_id=user.id if user else None,
+        db=db,
     )
     return ChatHypothesisResponse(
         reply=result["reply"],

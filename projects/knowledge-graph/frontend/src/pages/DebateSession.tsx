@@ -5,8 +5,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Play, Square, ArrowLeft, BookOpen, Share2, FlaskConical } from "lucide-react";
 import { api } from "../api/client";
+import { useAuth } from "../contexts/AuthContext";
 import type { Debate, DebateAgent, DebateMessage, DraftBrief, Spark, SparkStats } from "../types";
 import PaperChat from "../components/PaperChat/PaperChat";
+import ModelSelector from "../components/ModelSelector";
 
 const PERSONA_META: Record<string, { label: string; color: string }> = {
   pioneer: { label: "PIONEER", color: "text-amber-400" },
@@ -42,6 +44,7 @@ export default function DebateSession() {
   const { t } = useTranslation();
   const { debateId } = useParams<{ debateId: string }>();
   const navigate = useNavigate();
+  const { user, setShowAuthModal } = useAuth();
 
   const [debate, setDebate] = useState<Debate | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +74,11 @@ export default function DebateSession() {
     try {
       const d = await api.getDebate(Number(debateId));
       setDebate(d);
+      if (d.status === "completed") {
+        api.listForumPosts({ debate_id: d.id, post_type: "debate_summary", limit: 1 })
+          .then((posts) => { if (posts.length > 0) setSharedPostId(posts[0].id); })
+          .catch(() => {});
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("debateSession.loadFailed"));
     } finally {
@@ -222,6 +230,7 @@ export default function DebateSession() {
 
   const handleShareToForum = async () => {
     if (!debate) return;
+    if (!user) { setShowAuthModal(true); return; }
     setSharing(true);
     try {
       const res = await api.shareDebateToForum(debate.id);
@@ -235,6 +244,7 @@ export default function DebateSession() {
 
   const handleRequestExperiment = async (sparkId: number) => {
     if (!debate) return;
+    if (!user) { setShowAuthModal(true); return; }
     try {
       const res = await api.requestExperiment(debate.id, sparkId);
       setExperimentRequested((prev) => new Set(prev).add(sparkId));
@@ -372,6 +382,7 @@ export default function DebateSession() {
               ? t("debate.statusCompleted")
               : `R${maxRound}`}
           </span>
+          <ModelSelector />
         </div>
 
         {/* Messages */}
@@ -527,7 +538,7 @@ export default function DebateSession() {
                   className="flex items-center gap-2 px-4 py-2 border border-green-500/50 text-green-400 font-mono text-xs uppercase tracking-wider hover:border-green-400 transition-colors"
                 >
                   <Share2 size={12} />
-                  {i18n.language?.startsWith("zh") ? "查看帖子" : "VIEW POST"}
+                  {t("debateSession.viewPost")}
                 </button>
               ) : (
                 <button
@@ -536,7 +547,7 @@ export default function DebateSession() {
                   className="flex items-center gap-2 px-4 py-2 border border-neutral-700 text-neutral-400 font-mono text-xs uppercase tracking-wider hover:border-cyan-400 hover:text-white disabled:opacity-40 transition-colors"
                 >
                   {sharing ? <Loader2 size={12} className="animate-spin" /> : <Share2 size={12} />}
-                  {i18n.language?.startsWith("zh") ? "分享到社区" : "SHARE TO COMMUNITY"}
+                  {t("debateSession.shareToCommunity")}
                 </button>
               )}
             </>

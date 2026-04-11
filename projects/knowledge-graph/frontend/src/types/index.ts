@@ -375,3 +375,41 @@ export interface ChatHypothesisResponse {
   hypothesis: string | null;
   suggestions: string[];
 }
+
+// ── Subscription ──
+
+export interface PlanInfo {
+  name: string;
+  label_en: string;
+  label_zh: string;
+  monthly_tokens: number;
+  allowed_models: string[];
+  price_monthly_cents: number;
+  price_once_cents: number;
+}
+
+export interface SubscriptionInfo {
+  plan: string;
+  status: string;
+  monthly_token_limit: number;
+  tokens_used_this_month: number;
+  quota_reset_at: string | null;
+  allowed_models: string[];
+  preferred_model: string | null;
+  stripe_customer_id: string | null;
+}
+
+export interface UsageInfo {
+  tokens_used: number;
+  tokens_limit: number;
+  quota_reset_at: string | null;
+  payments: {
+    id: number;
+    amount_cents: number;
+    currency: string;
+    payment_method: string;
+    plan: string;
+    status: string;
+    created_at: string;
+  }[];
+}

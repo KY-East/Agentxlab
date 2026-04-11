@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { api } from "../../api/client";
 import type { EdgeDetail, ChatHypothesisResponse } from "../../types";
+import ModelSelector from "../ModelSelector";
 
 interface ChatMessage {
   role: "system" | "user" | "assistant" | "action";
@@ -204,6 +205,15 @@ export default function EdgeDetailPanel({ sourceId, targetId, onClose }: Props) 
             <Swords size={12} />
             {isZh ? "辩论" : "DEBATE"}
           </button>
+          <button
+            onClick={() => {
+              const tag = data ? `${data.subfield_a_name}` : "";
+              navigate(`/forum?zone=ai_generated${tag ? `&discipline_tag=${encodeURIComponent(tag)}` : ""}`);
+            }}
+            className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 border border-neutral-700 hover:border-cyan-400 text-neutral-400 hover:text-white text-[10px] font-mono uppercase tracking-wider transition-colors"
+          >
+            {isZh ? "论坛" : "FORUM"}
+          </button>
         </div>
       )}
 
@@ -287,6 +297,7 @@ export default function EdgeDetailPanel({ sourceId, targetId, onClose }: Props) 
             <Terminal size={10} />
             {isZh ? "对话" : "CHAT"}
           </span>
+          <ModelSelector />
         </div>
 
         {/* Messages */}

@@ -36,10 +36,11 @@ app.include_router(paper_gen.router)
 app.include_router(sparks.router)
 
 try:
-    from app.routers import auth, forum, points
+    from app.routers import auth, forum, points, subscription
     app.include_router(auth.router)
     app.include_router(forum.router)
     app.include_router(points.router)
+    app.include_router(subscription.router)
 except ImportError as _auth_exc:
     logger.warning("Auth/forum dependencies not installed (PyJWT / google-auth) — "
                     "/api/auth, /api/forum, /api/points endpoints disabled: %s", _auth_exc)
