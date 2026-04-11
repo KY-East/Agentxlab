@@ -1,6 +1,6 @@
 # Agent X Lab — 开发进度
 
-> 最后更新: 2026-04-30
+> 最后更新: 2026-03-30
 
 ## 总览
 
@@ -15,6 +15,8 @@
 | 4c | Agent 阵容层级化 | 已完成 | 2026-04-04 | 2026-04-04 | 每学科团队(教授+副教授) + 权重 + 随机性格 |
 | 5 | 论坛 + 社区功能 | 已完成 | 2026-04-04 | 2026-04-04 | 两区制(AI/社区) + OAuth + 积分 + 排行榜 |
 | 5.5 | AI 想象力实验 | 已完成 | 2026-04-04 | 2026-04-04 | 火花采集 + Agent 记忆 + 实验面板 |
+| 6 | 订阅 + Token 配额 + 支付 | 已完成 | 2026-03-30 | 2026-03-30 | Free/Pro/Lifetime + Stripe + Crypto + 配额计量 |
+| 6.1 | 安全修复 | 已完成 | 2026-03-30 | 2026-03-30 | 邮箱验证权限统一 + 论坛状态保护 + 支付安全 |
 
 ---
 
@@ -372,6 +374,258 @@
 
 ---
 
+## 2026-03-30 更新 (续) — OpenAlex Topics 迁移 & 学科树重构
+
+### OpenAlex Topics (depth=2) 整合
+
+- [x] `fetch_openalex_topics.py` — 从 OpenAlex API 拉取 4516 个 topics，挂到对应 subfield 下
+- [x] `openalex_taxonomy.json` 新增 topics 层 (field → subfield → topic 三层体系)
+- [x] `disciplines.py` 写入 DB: 26 fields / 252 subfields / 4516 topics，各带 `openalex_id`
+- [x] `fetch_openalex_topics.py` 幂等修复 — 重跑前先清空 subfield 已有 children，防止重复追加
+- [x] `paper_discipline` 标签同步 — 4516 个 topic 全部有论文关联
+
+### 学科树前端重构
+
+- [x] `DisciplineTree` 只展示两层 (field → subfield)，不再显示 topic 名称（避免信息过载）
+- [x] 学科树默认折叠
+- [x] 智能搜索 + 发光高亮 (search + glowing)
+- [x] 用户自定义学科支持（任意层级添加，视觉区分，绑定用户）
+
+### 旧种子数据修复
+
+- [x] `import_from_markdown.py` 新增 `_NAME_ALIASES` 映射表 — 旧 scholar/intersection 名称到 OpenAlex 官方 taxonomy 的模糊匹配
+- [x] `_build_disc_resolver(db)` — 别名优先 + 精确匹配 fallback
+- [x] `insert_scholars` / `insert_intersections` 使用 resolver + 去重，修复 66/66 scholars 和 143/147 intersections 的学科关联
+
+### 画布入口优化
+
+- [x] 从 field 入口进画布时，按 `works_count` 降序排列 subfield，取前 15 个（之前是随机 8 个）
+
+---
+
+## 2026-03-30 更新 (续) — 图谱交互 & 社区集成
+
+### EdgeDetailPanel — 连线详情面板
+
+- [x] 新组件 `EdgeDetailPanel` — 点击图谱连线展示 topic 级交叉明细
+- [x] 显示两个节点之间的共享论文数 + topic 交叉对列表
+- [x] 操作按钮：辩论、探索
+- [x] 内置对话式 AI 聊天区（可调大小）
+- [x] `buildContextPrefix` — 自动注入当前交叉学科上下文到 AI 对话首条消息
+
+### 后端 API 新增
+
+- [x] `GET /api/graph/edge-detail` — topic 级交叉明细查询
+- [x] `POST /api/ai/edge-chat` — 连线上下文 AI 对话
+- [x] `POST /api/ai/canvas-chat` — 画布上下文 AI 对话（支持无选中学科时的自由探索）
+- [x] `POST /api/debates/{id}/share-to-forum` — 分享辩论结果到论坛
+- [x] `POST /api/debates/{id}/sparks/{spark_id}/request-experiment` — 从火花创建实验请求帖
+
+### Schema 新增
+
+- [x] `EdgeChatRequest`, `CanvasChatRequest`, `TopicCrossPair`, `EdgeDetail`
+
+### DetailPanel 对话式增强
+
+- [x] 支持无 intersection 时通过 `canvasChat` 与 AI 对话
+- [x] 支持无选中学科时的自由探索模式（AI 推荐学科方向）
+- [x] Placeholder 更新为引导性提示："描述你的研究方向，或输入指令如「加上XX」「去掉XX」「发起辩论」"
+
+### 社区集成
+
+- [x] `DebateSession` 新增"分享到社区"按钮 + "查看帖子"跳转
+- [x] `SparkBlock` 新增"请求实验"按钮
+- [x] `forum_auto.py` 辩论完成自动创建帖子逻辑
+
+### AI 上下文修复
+
+- [x] `ai_provider.py` `chat_hypothesis` 重构 — 首轮对话将 context + user_message 合并为单条消息，避免 AI 忽略用户问题
+- [x] `DetailPanel` / `EdgeDetailPanel` chatHistory 管理修复 — 防止首条消息 history 非空导致上下文丢失
+
+---
+
+## 2026-03-30 更新 (续) — System Prompt & 指令匹配优化
+
+### AI System Prompt 重写
+
+- [x] `EXPLORE_SYSTEM_PROMPTS` 中英双版本重写：
+  - 用户选定方向后立刻收敛，输出 hypothesis，不再无限建议替代方案
+  - suggestions 改为简短操作标签（每条不超 15 字），不再是长篇分析
+  - 明确识别"辩论/开始/就做这个/进入辩论"等信号词为方向已定
+
+### 指令匹配放宽
+
+- [x] `DetailPanel` 辩论指令匹配从精确等于 `辩论` 扩展为包含匹配：`进入辩论`、`去辩论`、`辩论一下` 等均可触发
+
+### 清理
+
+- [x] 移除 `ai_provider.py` 中的临时 debug 日志
+
+---
+
+## 2026-03-30 更新 (续) — 图谱数据层 Bug 修复
+
+### Bug Fix: 父层 intersection 投影错误 (高优先级)
+
+**问题**: `build_graph` 中父层 intersection（关联 subfield/field 级 discipline）被投影时，对每个成员只 `min(candidates)` 挑一个 topic 做代表。导致 subfield 级交叉被画成两个随机 topic 的连线，语义完全错误。
+
+**修复**: 每个 intersection 成员映射到画布上**所有匹配的节点** (`member_groups`)，在不同成员组之间做 cross-join 画线。
+
+### Bug Fix: edge-detail 面板假设节点是 subfield (中优先级)
+
+**问题**: `get_edge_detail` 硬编码查 `parent_id == a, depth == 2` 子节点。当 a/b 本身是 topic (depth=2) 时查不到子节点，面板永远显示"无 topic 级明细"。
+
+**修复**: 新增 `_collect_topics` 函数 — 无 depth=2 子节点的节点返回自身。两个 topic 之间直接查共享论文数。仅 subfield 及以上才展开子节点做交叉查询。
+
+---
+
+## 2026-03-30 更新 (续) — 流程闭环 & 社区翻译
+
+### DebateSession <-> Forum 联动
+
+- [x] DebateSession 加载时自动检查该辩论是否已有论坛帖子 (`debate_id` 过滤)，如有则直接显示 "VIEW POST" 按钮
+- [x] 后端 `list_posts` 新增 `debate_id` 查询参数
+- [x] 前端 `api.listForumPosts` 新增 `debate_id` 参数支持
+
+### Profile — 我的辩论
+
+- [x] `Debate` model 新增 `created_by` 字段 (`ForeignKey users.id`)
+- [x] `create_debate` 端点记录创建者 `user.id`
+- [x] `list_debates` 新增 `created_by` 过滤参数
+- [x] Profile 页面新增 "MY DEBATES" tab，展示用户创建的辩论列表（含状态高亮）
+- [x] Stats 行从 3 列扩展为 4 列，增加辩论计数
+- [x] 前端 `api.getDebates` 改为接收 `{ status?, created_by? }` 参数对象
+
+### 论坛一键翻译（Twitter 风格）
+
+- [x] 新增 `TranslationCache` 数据模型：按 `(content_type, content_id, field, target_lang)` 唯一索引，缓存翻译结果
+- [x] 新增 `POST /api/forum/translate` 端点：AI 翻译 + 数据库缓存，首次调用走 LLM，后续秒返回
+- [x] `ForumPostDetail` 帖子正文下方添加 "翻译帖子" 按钮，点击后在虚线框中内联展示翻译结果（标题 + 正文）
+- [x] `CommentTree` 每条评论添加 "翻译" 按钮，点击后在评论下方内联展示翻译
+- [x] 翻译方向根据当前 UI 语言自动判断（中文界面 → 翻译到英文；英文界面 → 翻译到中文）
+- [x] 再次点击切换回原文（toggle 行为）
+- [x] i18n 新增 `translatePost`, `translate`, `translating`, `showOriginal` 翻译键
+
+---
+
+## 2026-03-30 更新 (续) — 双轨登录系统
+
+### 邮箱 + 密码注册/登录
+
+- [x] `User` model 新增 `password_hash`、`email_verified`、`verify_token`、`reset_token`、`reset_token_exp` 字段
+- [x] `google_sub` 改为 `nullable`（邮箱注册用户无 Google 账号）
+- [x] SQLite `users` 表重建（移除 `google_sub NOT NULL` 约束）
+- [x] `POST /api/auth/register`：邮箱 + 密码 + 昵称注册，自动发送验证邮件
+- [x] `POST /api/auth/login`：邮箱 + 密码登录
+- [x] `GET /api/auth/verify-email?token=`：邮箱验证
+- [x] `POST /api/auth/resend-verification`：重新发送验证邮件
+- [x] `POST /api/auth/forgot-password`：发送密码重置链接
+- [x] `POST /api/auth/reset-password`：重置密码
+- [x] Google OAuth 登录兼容：如已有邮箱账号，自动关联 Google 身份
+- [x] SMTP 配置支持（`.env` 配置 `SMTP_HOST/PORT/USER/PASSWORD/FROM`）
+- [x] `bcrypt` 密码加密，`aiosmtplib` 异步邮件发送
+
+### 前端 AuthModal
+
+- [x] 新建 `AuthModal.tsx` 组件：弹窗式登录/注册/忘记密码三合一界面
+- [x] 登录 tab：邮箱 + 密码输入 + Google OAuth 按钮
+- [x] 注册 tab：邮箱 + 密码 + 昵称 + Google OAuth
+- [x] 忘记密码 tab：输入邮箱发送重置链接
+- [x] 密码显示/隐藏切换
+- [x] 表单验证（邮箱格式、密码长度 >= 8）
+- [x] Brutalist/Lab 风格设计
+- [x] `AuthContext` 更新：新增 `setAuthData`、`showAuthModal`、`setShowAuthModal`
+- [x] Layout 头部：未登录时显示 "SIGN IN" 按钮（取代内嵌 GoogleLogin 组件）
+- [x] 所有需要登录的操作（发帖、投票、评论、分享）改为弹出 AuthModal（取代 alert）
+- [x] 未验证邮箱时顶部显示黄色 banner 提示
+- [x] 新增 `/verify-email` 和 `/reset-password` 页面
+
+### i18n
+
+- [x] 新增 `auth.*` 完整翻译键（中英双语）
+- [x] 新增 `nav.signIn` 翻译键
+
+---
+
+## 2026-03-30 更新 (续) — 订阅 + Token 配额 + 支付系统
+
+### 数据模型
+
+- [x] 新增 `Subscription` 模型：plan / status / token 配额 / Stripe 字段 / crypto 引用 / 首选模型
+- [x] 新增 `PaymentRecord` 模型：金额 / 币种 / 支付方式 / 状态 / 关联计划
+- [x] 新增 `plan_config.py`：三层计划配置（Free 50K / Pro 500K / Lifetime 300K tokens）
+- [x] `config.py` 新增 Stripe + Crypto 配置项
+- [x] `requirements.txt` 新增 `stripe>=8.0.0`
+
+### 后端 API
+
+- [x] `GET /api/subscription/plans` — 公开计划列表
+- [x] `GET /api/subscription/me` — 当前用户订阅状态 + token 用量
+- [x] `PATCH /api/subscription/model` — 切换首选 AI 模型
+- [x] `GET /api/subscription/usage` — 详细 token 使用 + 支付历史
+- [x] `POST /api/payment/stripe/checkout` — 创建 Stripe Checkout Session（Pro 月费 / Lifetime 买断）
+- [x] `POST /api/payment/stripe/portal` — Stripe Customer Portal（管理/取消订阅）
+- [x] `POST /api/payment/stripe/webhook` — Stripe webhook 回调（checkout.completed / invoice.paid / subscription 变更）
+- [x] `POST /api/payment/crypto/request` — 请求加密货币支付（返回钱包地址 + 金额 + memo）
+- [x] `POST /api/payment/crypto/submit-tx` — 用户提交 tx hash
+- [x] `POST /api/payment/crypto/confirm` — 管理员确认到账激活订阅
+
+### Token 配额计量
+
+- [x] `token_quota.py` 服务：配额检查 / 消耗记录 / 按需月度重置
+- [x] `ai_provider.py` 的 `chat_completion` / `generate_hypothesis` / `chat_hypothesis` 全部接入 `user_id` + `db` 参数
+- [x] 调用前检查额度，超额返回 429；调用后从 LiteLLM response 读取 `usage.total_tokens` 累加
+- [x] 模型访问控制：验证请求模型在 `allowed_models` 列表中
+- [x] 所有 AI 端点（chat-hypothesis / edge-chat / canvas-chat）传递用户上下文进行计量
+
+### 前端
+
+- [x] `PricingModal` 组件：三列价格卡片 + Stripe 重定向 + 加密钱包地址显示 / tx hash 提交
+- [x] `ModelSelector` 组件：轻量模型下拉，集成到 DetailPanel / EdgeDetailPanel / DebateSession
+- [x] `QuotaIndicator` 组件：低配额 header 徽章 + 429 全局升级提示条
+- [x] `SubscriptionContext`：全局订阅状态管理 + 429 事件监听自动弹出升级提示
+- [x] Profile 页新增订阅卡片（计划 / 状态 / token 进度条 / 重置日期 / 升级按钮）
+- [x] Profile 页新增模型选择器（仅 allowed_models > 1 时显示）
+- [x] API client 新增全部订阅/支付方法 + 429 错误全局事件分发
+- [x] TypeScript 类型：`PlanInfo` / `SubscriptionInfo` / `UsageInfo`
+- [x] i18n 新增 `pricing.*` + `subscription.*` 完整中英翻译
+
+---
+
+## 2026-03-30 更新 (续) — 安全修复
+
+### 邮箱验证权限统一
+
+- [x] 新增 `get_verified_user` 依赖：在 `get_current_user` 基础上检查 `email_verified=True`，未验证返回 403
+- [x] 论坛写操作（发帖 / 改帖 / 删帖 / 评论 / 投票）切换到 `get_verified_user`
+- [x] 支付操作（Stripe checkout / portal / crypto request / submit-tx）切换到 `get_verified_user`
+- [x] 辩论社区联动（share-to-forum / request-experiment）切换到 `get_verified_user`
+- [x] 个人资料修改（PATCH /me）切换到 `get_verified_user`
+- [x] 保持 `get_current_user`：GET /me、resend-verification、GET 订阅信息、积分查询、admin 操作
+
+### 论坛状态保护
+
+- [x] `PATCH /posts/{id}` 的 `status` 字段只允许 moderator / admin 修改，普通作者只能改 title / content
+- [x] `claim_experiment` / `submit_result` 评论校验 `post_type` 必须为 `experiment_request` 或 `experiment_result`
+- [x] 前端认领实验下拉从 `post.zone === "ai_generated"` 改为按 `post.post_type` 过滤
+
+### 支付安全
+
+- [x] `confirm_crypto_payment` 移除 `body.user_id`，改用 `record.user_id` 激活订阅
+- [x] 新增幂等检查：已确认的支付不可重复确认
+- [x] Stripe 订阅取消后清空 `stripe_subscription_id`
+
+### 前端修复
+
+- [x] `VerifyEmail.tsx`：验证成功后调用 `refreshUser()` 同步 AuthContext，banner 立即消失
+- [x] `AuthModal.tsx`：Google 登录添加 `.catch()` + `onError` 回调，失败时显示错误提示
+- [x] `Forum.tsx`：从 URL searchParams 初始化 `tagFilter` + `statusFilter`，深链筛选生效
+
+---
+
 ## 阻塞点 & 待决事项
 
-_暂无_
+- [ ] Stripe Dashboard 配置 Product + Price，`.env` 补充 `STRIPE_*` + `CRYPTO_WALLET_ADDRESS`
+- [ ] 画布从 field 入口进入时 topic 选取数量（15 个）仍可能偏少，但暂不改动（需权衡性能和图谱可读性）
+- [ ] 全局统计页: 跨辩论趋势分析, 条件对比, Agent 学习曲线 (Future)
+- [ ] Zep 知识库实际数据灌入（待集成测试）
