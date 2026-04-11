@@ -28,7 +28,7 @@ from app.services.debate_engine import (
     suggest_mode,
 )
 from app.models.user import User
-from app.services.auth import get_current_user, get_optional_user, get_verified_user
+from app.services.auth import get_optional_user, get_verified_user
 from app.services.forum_auto import auto_create_debate_post
 
 router = APIRouter(prefix="/api/debates", tags=["debates"])
@@ -50,7 +50,7 @@ def _load_debate(debate_id: int, db: Session) -> Debate:
 
 
 @router.post("", response_model=DebateOut)
-async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user: User | None = Depends(get_optional_user)):
+async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     if body.mode not in ("free", "debate"):
         raise HTTPException(400, "mode must be 'free' or 'debate'")
     if body.mode == "debate" and not body.proposition:
@@ -96,7 +96,7 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user:
         proposition=body.proposition,
         status="active",
         intersection_id=resolved_intersection_id,
-        created_by=user.id if user else None,
+        created_by=user.id,
     )
     debate.disciplines = list(disciplines)
     db.add(debate)
@@ -106,6 +106,8 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user:
         disciplines, body.mode, body.proposition,
         user_weights=body.discipline_weights,
         language=lang,
+        user_id=user.id,
+        db=db,
     )
     for spec in agent_specs:
         agent = DebateAgent(debate_id=debate.id, **spec)
@@ -135,7 +137,7 @@ def get_debate(debate_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{debate_id}/rounds", response_model=list[MessageOut])
-async def next_round(debate_id: int, db: Session = Depends(get_db)):
+async def next_round(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = _load_debate(debate_id, db)
     if debate.status != "active":
         raise HTTPException(400, "Debate is not active")
@@ -144,7 +146,7 @@ async def next_round(debate_id: int, db: Session = Depends(get_db)):
     if current > MAX_ROUNDS:
         raise HTTPException(400, f"Maximum round limit ({MAX_ROUNDS}) reached")
 
-    new_msgs = await run_round(debate, db)
+    new_msgs = await run_round(debate, db, user_id=user.id)
     db.commit()
 
     for m in new_msgs:
@@ -153,7 +155,7 @@ async def next_round(debate_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{debate_id}/rounds/stream")
-async def next_round_stream(debate_id: int, db: Session = Depends(get_db)):
+async def next_round_stream(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     """SSE endpoint — streams each agent's message as it is generated."""
     debate = _load_debate(debate_id, db)
     if debate.status != "active":
@@ -168,11 +170,12 @@ async def next_round_stream(debate_id: int, db: Session = Depends(get_db)):
         1 for a in debate.agents
         if not (a.persona == "moderator" and current == 1)
     )
+    _user_id = user.id
 
     async def event_generator():
         idx = 0
         try:
-            async for msg in run_round_stream(debate, db):
+            async for msg in run_round_stream(debate, db, user_id=_user_id):
                 idx += 1
                 payload = {
                     "id": msg.id,
@@ -208,7 +211,7 @@ def round_info(debate_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/{debate_id}/summarize", response_model=DebateOut)
-async def summarize_debate(debate_id: int, db: Session = Depends(get_db)):
+async def summarize_debate(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = _load_debate(debate_id, db)
     if debate.status == "completed":
         raise HTTPException(400, "Debate already summarized")
@@ -218,17 +221,25 @@ async def summarize_debate(debate_id: int, db: Session = Depends(get_db)):
     debate.status = "summarizing"
     db.flush()
 
-    await generate_summary(debate, db)
+    await generate_summary(debate, db, user_id=user.id)
     db.commit()
 
     return DebateOut.model_validate(_load_debate(debate_id, db))
 
 
 @router.post("/suggest-mode", response_model=ModeSuggestion)
-async def api_suggest_mode(body: SuggestModeRequest):
+async def api_suggest_mode(
+    body: SuggestModeRequest,
+    db: Session = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
+):
     if len(body.discipline_names) < 2:
         raise HTTPException(400, "At least 2 discipline names required")
-    result = await suggest_mode(body.discipline_names)
+    result = await suggest_mode(
+        body.discipline_names,
+        user_id=user.id if user else None,
+        db=db,
+    )
     return ModeSuggestion(**result)
 
 

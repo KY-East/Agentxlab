@@ -86,7 +86,7 @@ def _parse_llm_response(raw: str) -> dict:
     return json.loads(text)
 
 
-async def discover(question: str, db: Session) -> dict:
+async def discover(question: str, db: Session, *, user_id: int | None = None) -> dict:
     """Main discovery pipeline: question → LLM → matched disciplines + combos."""
     catalogue, disc_by_id = _build_discipline_catalogue(db)
 
@@ -103,6 +103,8 @@ async def discover(question: str, db: Session) -> dict:
         ],
         temperature=0.4,
         max_tokens=3000,
+        user_id=user_id,
+        db=db,
     )
 
     try:

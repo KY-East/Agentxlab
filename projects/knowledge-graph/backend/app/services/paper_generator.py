@@ -135,7 +135,7 @@ def _get_related_papers(discipline_ids: list[int], db: Session, limit: int = 10)
     return "Relevant published papers:\n" + "\n".join(lines)
 
 
-async def generate_outline(debate: Debate, direction: str, db: Session) -> PaperDraft:
+async def generate_outline(debate: Debate, direction: str, db: Session, *, user_id: int | None = None) -> PaperDraft:
     """Generate a paper outline from a completed debate + chosen direction."""
     lang = getattr(debate, "language", "zh") or "zh"
     if lang not in ("zh", "en"):
@@ -169,6 +169,8 @@ async def generate_outline(debate: Debate, direction: str, db: Session) -> Paper
         ],
         temperature=0.4,
         max_tokens=3000,
+        user_id=user_id,
+        db=db,
     )
 
     parsed = _parse_json_response(raw)
@@ -213,6 +215,8 @@ async def generate_section_content(
     draft: PaperDraft,
     section: PaperSection,
     db: Session,
+    *,
+    user_id: int | None = None,
 ) -> PaperSection:
     """Generate content for a single paper section."""
     debate = draft.debate
@@ -269,6 +273,8 @@ async def generate_section_content(
         ],
         temperature=0.6,
         max_tokens=4000,
+        user_id=user_id,
+        db=db,
     )
 
     is_regeneration = section.content is not None
@@ -414,7 +420,7 @@ All output in English.""",
 }
 
 
-async def suggest_directions(debate: Debate, db: Session) -> list[dict]:
+async def suggest_directions(debate: Debate, db: Session, *, user_id: int | None = None) -> list[dict]:
     """Suggest 2-3 research directions from a completed debate."""
     lang = getattr(debate, "language", "zh") or "zh"
     if lang not in ("zh", "en"):
@@ -438,6 +444,8 @@ async def suggest_directions(debate: Debate, db: Session) -> list[dict]:
         ],
         temperature=0.5,
         max_tokens=1500,
+        user_id=user_id,
+        db=db,
     )
 
     parsed = _parse_json_array(raw)
@@ -464,6 +472,8 @@ async def refine_outline_via_chat(
     current_sections: list[dict],
     user_message: str,
     db: Session,
+    *,
+    user_id: int | None = None,
 ) -> dict:
     """Refine an outline based on user's natural language instruction."""
     lang = getattr(debate, "language", "zh") or "zh"
@@ -488,6 +498,8 @@ async def refine_outline_via_chat(
         ],
         temperature=0.4,
         max_tokens=3000,
+        user_id=user_id,
+        db=db,
     )
 
     parsed = _parse_json_response(raw)
@@ -498,7 +510,7 @@ async def refine_outline_via_chat(
     }
 
 
-async def generate_all_sections(draft: PaperDraft, db: Session):
+async def generate_all_sections(draft: PaperDraft, db: Session, *, user_id: int | None = None):
     """Async generator: generate all pending sections one by one.
 
     Yields dict events for SSE streaming:
@@ -521,7 +533,7 @@ async def generate_all_sections(draft: PaperDraft, db: Session):
     for section in pending:
         yield {"event": "section_start", "section_id": section.id, "heading": section.heading}
         try:
-            await generate_section_content(draft, section, db)
+            await generate_section_content(draft, section, db, user_id=user_id)
             db.commit()
             yield {"event": "section_done", "section_id": section.id, "heading": section.heading}
         except Exception as exc:

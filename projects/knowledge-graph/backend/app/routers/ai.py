@@ -17,14 +17,18 @@ from app.schemas import (
     CanvasChatRequest,
 )
 from app.services.ai_provider import generate_hypothesis, chat_hypothesis
-from app.services.auth import get_optional_user
+from app.services.auth import get_verified_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 
 
 @router.post("/hypothesis", response_model=HypothesisOut)
-async def create_hypothesis(body: HypothesisRequest, db: Session = Depends(get_db)):
+async def create_hypothesis(
+    body: HypothesisRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_verified_user),
+):
     unique_ids = list(dict.fromkeys(body.discipline_ids))
     disciplines = (
         db.query(Discipline)
@@ -39,7 +43,7 @@ async def create_hypothesis(body: HypothesisRequest, db: Session = Depends(get_d
         names = [(d.name_zh or d.name_en) for d in disciplines]
     else:
         names = [d.name_en for d in disciplines]
-    text = await generate_hypothesis(names, model=body.model, language=lang)
+    text = await generate_hypothesis(names, model=body.model, language=lang, user_id=user.id, db=db)
 
     from app.models import intersection_discipline
     from sqlalchemy import func
@@ -107,7 +111,7 @@ async def create_hypothesis(body: HypothesisRequest, db: Session = Depends(get_d
 async def chat_hypothesis_endpoint(
     body: ChatHypothesisRequest,
     db: Session = Depends(get_db),
-    user: User | None = Depends(get_optional_user),
+    user: User = Depends(get_verified_user),
 ):
     ix = db.query(Intersection).filter(Intersection.id == body.intersection_id).first()
     if not ix:
@@ -140,7 +144,7 @@ async def chat_hypothesis_endpoint(
         user_message=body.message,
         history=body.history,
         language=lang,
-        user_id=user.id if user else None,
+        user_id=user.id,
         db=db,
     )
 
@@ -165,7 +169,7 @@ async def chat_hypothesis_endpoint(
 async def edge_chat_endpoint(
     body: EdgeChatRequest,
     db: Session = Depends(get_db),
-    user: User | None = Depends(get_optional_user),
+    user: User = Depends(get_verified_user),
 ):
     """Chat about a cross-subfield connection without requiring an intersection."""
     disc_a = db.query(Discipline).filter(Discipline.id == body.subfield_a_id).first()
@@ -205,7 +209,7 @@ async def edge_chat_endpoint(
         user_message=body.message,
         history=body.history,
         language=lang,
-        user_id=user.id if user else None,
+        user_id=user.id,
         db=db,
     )
 
@@ -220,7 +224,7 @@ async def edge_chat_endpoint(
 async def canvas_chat_endpoint(
     body: CanvasChatRequest,
     db: Session = Depends(get_db),
-    user: User | None = Depends(get_optional_user),
+    user: User = Depends(get_verified_user),
 ):
     """Chat about the disciplines currently visible on the canvas."""
     lang = body.language if body.language in ("zh", "en") else "zh"
@@ -249,7 +253,7 @@ async def canvas_chat_endpoint(
         user_message=body.message,
         history=body.history,
         language=lang,
-        user_id=user.id if user else None,
+        user_id=user.id,
         db=db,
     )
     return ChatHypothesisResponse(

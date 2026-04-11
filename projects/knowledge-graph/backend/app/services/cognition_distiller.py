@@ -75,6 +75,8 @@ async def distill_agent_cognition(
     debate: Debate,
     agent: DebateAgent,
     db: Session,
+    *,
+    user_id: int | None = None,
 ) -> dict[str, list[str]]:
     """Distill cognition for a single agent after a debate.
 
@@ -140,6 +142,8 @@ async def distill_agent_cognition(
             ],
             temperature=0.3,
             max_tokens=2000,
+            user_id=user_id,
+            db=db,
         )
 
         start = raw.index("{")
@@ -188,7 +192,7 @@ def _merge_sparks(existing: list[str], new: list[str]) -> list[str]:
     return merged
 
 
-async def distill_all_agents(debate: Debate, db: Session) -> None:
+async def distill_all_agents(debate: Debate, db: Session, *, user_id: int | None = None) -> None:
     """Run cognition distillation for all non-moderator agents in a debate."""
     for agent in debate.agents:
         if agent.persona == "moderator":
@@ -196,7 +200,7 @@ async def distill_all_agents(debate: Debate, db: Session) -> None:
         if not agent.discipline_id:
             continue
         try:
-            await distill_agent_cognition(debate, agent, db)
+            await distill_agent_cognition(debate, agent, db, user_id=user_id)
         except Exception as exc:
             logger.warning(
                 "Cognition distillation failed for %s: %s",

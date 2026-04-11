@@ -12,7 +12,9 @@ from sqlalchemy.orm import Session, selectinload
 from app.db import get_db
 from app.models.debate import Debate
 from app.models.paper_draft import PaperDraft, PaperSection
+from app.models.user import User
 from app.schemas import DraftBrief, DraftCreate, DraftOut, DraftUpdate, SectionOut
+from app.services.auth import get_verified_user
 from app.services.paper_generator import (
     export_markdown,
     generate_all_sections,
@@ -37,7 +39,7 @@ def _load_draft(draft_id: int, db: Session) -> PaperDraft:
 
 
 @router.post("", response_model=DraftOut)
-async def create_draft(body: DraftCreate, db: Session = Depends(get_db)):
+async def create_draft(body: DraftCreate, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = (
         db.query(Debate)
         .options(selectinload(Debate.disciplines))
@@ -52,7 +54,7 @@ async def create_draft(body: DraftCreate, db: Session = Depends(get_db)):
     if not direction:
         raise HTTPException(400, "direction is required")
 
-    draft = await generate_outline(debate, direction, db)
+    draft = await generate_outline(debate, direction, db, user_id=user.id)
     db.commit()
 
     return DraftOut.model_validate(_load_draft(draft.id, db))
@@ -114,7 +116,7 @@ def update_draft(draft_id: int, body: DraftUpdate, db: Session = Depends(get_db)
 
 @router.post("/{draft_id}/sections/{section_id}/generate", response_model=SectionOut)
 async def generate_section(
-    draft_id: int, section_id: int, db: Session = Depends(get_db)
+    draft_id: int, section_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user),
 ):
     draft = _load_draft(draft_id, db)
 
@@ -131,7 +133,7 @@ async def generate_section(
         raise HTTPException(404, "Associated debate not found")
 
     draft.debate = debate
-    section = await generate_section_content(draft, section, db)
+    section = await generate_section_content(draft, section, db, user_id=user.id)
     db.commit()
 
     return SectionOut.model_validate(section)
@@ -153,7 +155,7 @@ class SuggestDirectionsRequest(BaseModel):
 
 @router.post("/suggest-directions")
 async def api_suggest_directions(
-    body: SuggestDirectionsRequest, db: Session = Depends(get_db)
+    body: SuggestDirectionsRequest, db: Session = Depends(get_db), user: User = Depends(get_verified_user),
 ):
     debate = (
         db.query(Debate)
@@ -165,7 +167,7 @@ async def api_suggest_directions(
     if debate.status != "completed":
         raise HTTPException(400, "Debate must be completed first")
 
-    directions = await suggest_directions(debate, db)
+    directions = await suggest_directions(debate, db, user_id=user.id)
     return {"directions": directions}
 
 
@@ -177,7 +179,7 @@ class ChatRefineRequest(BaseModel):
 
 
 @router.post("/chat-refine")
-async def api_chat_refine(body: ChatRefineRequest, db: Session = Depends(get_db)):
+async def api_chat_refine(body: ChatRefineRequest, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = (
         db.query(Debate)
         .options(selectinload(Debate.disciplines))
@@ -192,16 +194,18 @@ async def api_chat_refine(body: ChatRefineRequest, db: Session = Depends(get_db)
         current_sections=body.current_sections,
         user_message=body.message,
         db=db,
+        user_id=user.id,
     )
     return result
 
 
 @router.post("/{draft_id}/generate-all")
-async def api_generate_all(draft_id: int, db: Session = Depends(get_db)):
+async def api_generate_all(draft_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     draft = _load_draft(draft_id, db)
+    _user_id = user.id
 
     async def event_stream():
-        async for event in generate_all_sections(draft, db):
+        async for event in generate_all_sections(draft, db, user_id=_user_id):
             yield f"data: {json.dumps(event)}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")

@@ -207,6 +207,8 @@ async def _resolve_weights(
     disciplines: list[Discipline],
     user_weights: dict[int, int] | None,
     proposition: str | None,
+    user_id: int | None = None,
+    db: Session | None = None,
 ) -> dict[int, int]:
     """Determine weight for each discipline: user-specified > LLM-inferred > equal."""
     weights: dict[int, int] = {}
@@ -237,6 +239,8 @@ async def _resolve_weights(
             [{"role": "user", "content": prompt}],
             temperature=0.2,
             max_tokens=300,
+            user_id=user_id,
+            db=db,
         )
         start = raw.index("{")
         end = raw.rindex("}") + 1
@@ -285,11 +289,13 @@ async def generate_agents(
     *,
     user_weights: dict[int, int] | None = None,
     language: str = "zh",
+    user_id: int | None = None,
+    db: Session | None = None,
 ) -> list[dict]:
     """Build agent specs (not yet persisted). Returns list of dicts ready for DebateAgent creation."""
     lang = language
     names = [d.name_en for d in disciplines]
-    weights = await _resolve_weights(disciplines, user_weights, proposition)
+    weights = await _resolve_weights(disciplines, user_weights, proposition, user_id=user_id, db=db)
     team_sizes = _decide_team_sizes(disciplines, weights)
 
     persona_pool = list(PERSONAS)
@@ -441,15 +447,15 @@ def _order_agents_for_round(agents: list[DebateAgent], round_num: int) -> list[D
 MAX_ROUNDS = 6
 
 
-async def run_round(debate: Debate, db: Session) -> list[DebateMessage]:
+async def run_round(debate: Debate, db: Session, *, user_id: int | None = None) -> list[DebateMessage]:
     """Execute one round: each agent speaks in order, seeing full history."""
     msgs: list[DebateMessage] = []
-    async for msg in run_round_stream(debate, db):
+    async for msg in run_round_stream(debate, db, user_id=user_id):
         msgs.append(msg)
     return msgs
 
 
-async def run_round_stream(debate: Debate, db: Session):
+async def run_round_stream(debate: Debate, db: Session, *, user_id: int | None = None):
     """Async generator that yields each DebateMessage as it is created.
 
     This powers both the batch ``run_round`` and the SSE endpoint so that
@@ -503,7 +509,7 @@ async def run_round_stream(debate: Debate, db: Session):
                     "content": f"[{_agent_label(nm, debate)}]: {nm.content}",
                 })
 
-        content = await chat_completion(messages, temperature=0.8, max_tokens=max_tokens)
+        content = await chat_completion(messages, temperature=0.8, max_tokens=max_tokens, user_id=user_id, db=db)
 
         msg = DebateMessage(
             debate_id=debate.id,
@@ -526,6 +532,7 @@ async def run_round_stream(debate: Debate, db: Session):
                     discipline_name_to_id=disc_name_to_id,
                     db=db,
                     language=lang,
+                    user_id=user_id,
                 )
             except Exception as exc:
                 logger.warning("Spark extraction failed for message %d: %s", msg.id, exc)
@@ -535,7 +542,7 @@ async def run_round_stream(debate: Debate, db: Session):
     db.flush()
 
 
-async def generate_summary(debate: Debate, db: Session) -> dict[str, str]:
+async def generate_summary(debate: Debate, db: Session, *, user_id: int | None = None) -> dict[str, str]:
     """Generate structured four-part summary from the Moderator perspective."""
     lang = getattr(debate, "language", "zh") or "zh"
     history = _build_history(debate.messages)
@@ -567,7 +574,7 @@ async def generate_summary(debate: Debate, db: Session) -> dict[str, str]:
         {"role": "user", "content": prompt},
     ]
 
-    raw = await chat_completion(messages, temperature=0.5, max_tokens=3000)
+    raw = await chat_completion(messages, temperature=0.5, max_tokens=3000, user_id=user_id, db=db)
     sections = _parse_summary_sections(raw)
 
     debate.summary_consensus = sections.get("consensus", raw)
@@ -596,7 +603,7 @@ async def generate_summary(debate: Debate, db: Session) -> dict[str, str]:
 
         try:
             from app.services.cognition_distiller import distill_all_agents
-            await distill_all_agents(debate, db)
+            await distill_all_agents(debate, db, user_id=user_id)
         except Exception as e:
             logger.warning("Post-debate cognition distillation failed: %s", e)
 
@@ -616,7 +623,7 @@ async def generate_summary(debate: Debate, db: Session) -> dict[str, str]:
     return sections
 
 
-async def suggest_mode(discipline_names: list[str]) -> dict:
+async def suggest_mode(discipline_names: list[str], *, user_id: int | None = None, db: Session | None = None) -> dict:
     """Ask the LLM which debate mode fits the given discipline combination."""
     prompt = (
         f"Given these academic disciplines: {', '.join(discipline_names)}\n\n"
@@ -631,6 +638,8 @@ async def suggest_mode(discipline_names: list[str]) -> dict:
         [{"role": "user", "content": prompt}],
         temperature=0.3,
         max_tokens=500,
+        user_id=user_id,
+        db=db,
     )
 
     import json

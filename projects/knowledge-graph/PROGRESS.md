@@ -2,6 +2,53 @@
 
 > 最后更新: 2026-03-30
 
+## 产品完成度评估
+
+**目标: 120 / 100** — 功能代码完成度约 50%，生产就绪度约 35%
+
+### 已完成 (~50 分)
+
+| 得分 | 模块 | 说明 |
+|------|------|------|
+| 8 | 数据层 (OpenAlex) | 26 fields / 252 subfields / 4516 topics + 论文关联 |
+| 8 | 知识图谱画布 | 学科树 + 力导图 + 连线交互 + EdgeDetailPanel + AI 对话 |
+| 7 | 多 Agent 辩论引擎 | 4 性格 + 层级团队 + Zep 记忆 + 火花采集 |
+| 5 | 反向发现引擎 | 研究问题 → LLM → 学科推荐 → 画布 |
+| 5 | 论文生成 | 对话式方向推荐 + 大纲 + SSE 逐章扩写 |
+| 6 | 社区论坛 | 双区 + 实验验证 + 积分 + 翻译 |
+| 4 | 认证 + 订阅 + 支付 | Google + 邮箱 + Stripe + Crypto + Token 配额 |
+| 3 | 安全修复 + i18n | 权限链路 + 中英双语 |
+| 4 | UI/UX (Brutalist) | 基本风格统一，但缺 loading/empty/error 状态设计 |
+
+### 缺失部分 — 达到 100 分需要 (~50 分)
+
+| 优先级 | 模块 | 预估分值 | 说明 |
+|--------|------|----------|------|
+| P0 | DB 迁移补全 | 3 | Subscription/PaymentRecord/TranslationCache/User 字段无 migration |
+| P0 | .env.example 完善 | 1 | 缺 20+ 配置项，新环境无法启动 |
+| P0 | 核心路径测试 | 8 | 前后端测试 = 0，认证/支付/辩论/论坛需覆盖 |
+| P0 | Stripe 实际接入 | 2 | Dashboard 配置 + webhook + 真实 key |
+| P1 | 全局错误处理 | 4 | Error Boundary + loading skeleton + empty state + SSE 重连 |
+| P1 | 前端代码清理 | 2 | 死代码 hook + 硬编码英文 + i18n 补全 |
+| P1 | 全局统计页 | 8 | 跨辩论趋势 + 条件对比 + Agent 学习曲线 — 验证核心假说 |
+| P1 | Zep 集成测试 | 3 | 代码全通但从未真实环境验证 |
+| P1 | 管理后台 | 5 | 用户/支付/帖子/辩论管理，目前靠直接打 API |
+| P2 | 部署流水线 | 4 | CI/CD + Docker 完善 + 一键部署 |
+| P2 | SEO / OG / PWA | 2 | 元标签 + 社交分享卡 + 离线支持 |
+| P2 | 监控 + 日志 | 3 | APM + 结构化日志 + 异常告警 |
+| P2 | 文档站 | 2 | API 文档 + 用户指南 + 开发者文档 |
+| P2 | 性能优化 | 3 | 懒加载 + 虚拟列表 + 图谱大数据渲染 + 后端缓存 |
+
+### 超出预期 — 冲 120 分 (~20 分)
+
+| 模块 | 预估分值 | 说明 |
+|------|----------|------|
+| Agent 人格进化系统 | 5 | Agent 跨辩论积累经验，形成独特学术人格，可被社区评价 |
+| 实时协作辩论 | 4 | WebSocket 多人同时观看/参与辩论，弹幕式评论 |
+| 知识图谱 3D 可视化 | 3 | Three.js 沉浸式图谱，VR-ready |
+| AI 创造力量化仪表盘 | 5 | 项目核心假说的可视化证明——AI 跨学科碰撞的创造力指标体系 |
+| 开放 API + 插件系统 | 3 | 第三方接入，让其他研究者基于平台做实验 |
+
 ## 总览
 
 | Phase | 名称 | 状态 | 开始时间 | 完成时间 | 备注 |
@@ -17,6 +64,11 @@
 | 5.5 | AI 想象力实验 | 已完成 | 2026-04-04 | 2026-04-04 | 火花采集 + Agent 记忆 + 实验面板 |
 | 6 | 订阅 + Token 配额 + 支付 | 已完成 | 2026-03-30 | 2026-03-30 | Free/Pro/Lifetime + Stripe + Crypto + 配额计量 |
 | 6.1 | 安全修复 | 已完成 | 2026-03-30 | 2026-03-30 | 邮箱验证权限统一 + 论坛状态保护 + 支付安全 |
+| 6.2 | 代码归档 | 已完成 | 2026-03-30 | 2026-03-30 | 早期研究文档归档到 archive/early-research 分支 |
+| 7 | 工程基础设施 | 未开始 | — | — | DB 迁移补全 + .env + 测试 + 错误处理 |
+| 8 | 全局统计 + 管理后台 | 未开始 | — | — | AI 创造力仪表盘 + 后台管理 |
+| 9 | 部署 + 运维 | 未开始 | — | — | CI/CD + 监控 + 文档 |
+| 10 | 超预期功能 | 未开始 | — | — | Agent 进化 + 实时协作 + 3D 图谱 |
 
 ---
 
@@ -623,9 +675,115 @@
 
 ---
 
-## 阻塞点 & 待决事项
+## Phase 7: 工程基础设施 (未开始)
 
-- [ ] Stripe Dashboard 配置 Product + Price，`.env` 补充 `STRIPE_*` + `CRYPTO_WALLET_ADDRESS`
-- [ ] 画布从 field 入口进入时 topic 选取数量（15 个）仍可能偏少，但暂不改动（需权衡性能和图谱可读性）
-- [ ] 全局统计页: 跨辩论趋势分析, 条件对比, Agent 学习曲线 (Future)
-- [ ] Zep 知识库实际数据灌入（待集成测试）
+### 7.1 数据库迁移补全
+- [ ] Alembic migration: `subscriptions` + `payment_records` 表
+- [ ] Alembic migration: `translation_cache` 表
+- [ ] Alembic migration: `users` 表新增 `password_hash` / `email_verified` / `verify_token` / `reset_token` / `reset_token_exp` 列
+- [ ] `models/__init__.py` 补全 `Subscription` / `PaymentRecord` 导出
+- [ ] 验证全新数据库从 `alembic upgrade head` 到可用
+
+### 7.2 环境配置
+- [ ] `.env.example` 补全所有配置项（JWT / Google OAuth / Stripe / SMTP / Crypto / Zep / DeepSeek）
+- [ ] Stripe Dashboard 配置 Product + Price + Webhook
+- [ ] Docker Compose 验证一键启动
+
+### 7.3 测试
+- [ ] 后端: pytest + httpx 测试框架搭建
+- [ ] 后端: 认证流测试（注册 / 登录 / 验证 / 重置）
+- [ ] 后端: 论坛 CRUD + 状态流转测试
+- [ ] 后端: 辩论创建 + 轮次 + 总结测试
+- [ ] 后端: 支付流测试（Stripe webhook / Crypto 确认）
+- [ ] 后端: Token 配额检查 + 月度重置测试
+- [ ] 前端: Vitest + RTL 测试框架搭建
+- [ ] 前端: AuthModal 交互测试
+- [ ] 前端: Canvas 学科选择 + 图谱加载测试
+- [ ] 前端: Forum 发帖 / 投票 / 翻译流程测试
+
+### 7.4 全局错误处理 + UX 完善
+- [ ] React Error Boundary 全局兜底
+- [ ] Loading skeleton（画布 / 论坛 / 辩论列表）
+- [ ] Empty state 设计（无辩论 / 无帖子 / 无积分）
+- [ ] SSE 断线重连机制
+- [ ] 后端 rate limiting（非 token quota 的通用限流）
+- [ ] Toast / notification 系统统一
+
+### 7.5 代码清理
+- [ ] 删除死代码: `useDebate.ts` / `useGraph.ts`
+- [ ] `DebateSession` persona/rank/novelty 硬编码英文 → i18n
+- [ ] Lazy route fallback → `t("common.loading")`
+- [ ] 补全缺失 i18n key（verify-email / reset-password 页面）
+- [ ] `subscription.py` 移除 `if False` 死分支
+- [ ] `requirements.txt` 明确列出 `PyJWT` / `google-auth`（可选依赖文档化）
+
+---
+
+## Phase 8: 全局统计 + 管理后台 (未开始)
+
+### 8.1 AI 创造力量化仪表盘（核心假说验证）
+- [ ] 跨辩论火花趋势分析（时间线 + 学科热力图）
+- [ ] 条件对比实验（学科数 / Agent 数 / 轮次 vs 火花质量）
+- [ ] Agent 学习曲线（同一 Agent 跨辩论的认知深度变化）
+- [ ] 创造力指标体系定义（新颖度 / 跨域度 / 可验证度 / 被引用度）
+- [ ] 可视化 Dashboard 页面（图表 + 可下载数据）
+
+### 8.2 管理后台
+- [ ] 用户管理（列表 / 封禁 / 角色修改）
+- [ ] 支付管理（Crypto 确认 / 退款 / 订阅状态）
+- [ ] 帖子管理（审核 / 删除 / 置顶）
+- [ ] 辩论管理（查看 / 删除 / 数据导出）
+- [ ] 系统配置（AI 模型参数 / 积分规则 / 计划价格动态调整）
+
+### 8.3 Zep 集成验证
+- [ ] 真实环境数据灌入
+- [ ] Agent 记忆召回质量评估
+- [ ] 知识图谱与 Zep 双向同步
+
+---
+
+## Phase 9: 部署 + 运维 (未开始)
+
+- [ ] GitHub Actions CI/CD（lint + test + build + deploy）
+- [ ] Docker Compose 生产配置（Nginx + SSL + Postgres）
+- [ ] 结构化日志（Python logging → JSON）
+- [ ] APM / 异常监控（Sentry 或类似）
+- [ ] 自动备份策略（DB + 上传文件）
+- [ ] SEO / OG Meta / 社交分享卡
+- [ ] API 文档（FastAPI 自带 /docs 之外的用户文档）
+- [ ] 开发者指南 + 贡献指南
+
+---
+
+## Phase 10: 超预期功能 — 冲 120 分 (未开始)
+
+### 10.1 Agent 人格进化系统
+- [ ] Agent 跨辩论积累经验，形成独特学术人格档案
+- [ ] Agent 成长可视化（知识广度 / 深度 / 创造力雷达图）
+- [ ] 社区可以对 Agent 评价、点赞、"收藏"特定 Agent
+- [ ] Agent 之间形成"学术关系网"（频繁合作 / 观点冲突记录）
+
+### 10.2 实时协作辩论
+- [ ] WebSocket 多人同时观看辩论进行
+- [ ] 观众可以实时投票支持某 Agent 的观点
+- [ ] 弹幕式评论 / 提问（AI 可以回应观众问题）
+- [ ] "辩论直播"模式 vs "回放"模式
+
+### 10.3 知识图谱 3D 可视化
+- [ ] Three.js / React Three Fiber 沉浸式图谱
+- [ ] 节点按维度分层（field → subfield → topic 三层球体）
+- [ ] 飞行穿梭交互（点击节点"进入"该学科空间）
+
+### 10.4 开放 API + 插件系统
+- [ ] 公开 REST API（带 API Key 认证）
+- [ ] 第三方研究者可基于平台数据做实验
+- [ ] 插件系统：自定义 Agent 性格 / 评估指标 / 数据源
+
+---
+
+## 阻塞点 & 已知问题
+
+- [ ] 画布从 field 入口进入时 topic 选取数量（15 个）仍可能偏少（需权衡性能和图谱可读性）
+- [ ] `EdgeDetailPanel` 中 `isZh` 硬编码判断未走 i18n 标准流程
+- [ ] Alembic migration 与 ORM 模型不同步（高优先级，影响新环境部署）
+- [ ] `.env.example` 与 `config.py` 严重脱节（新开发者无法启动）

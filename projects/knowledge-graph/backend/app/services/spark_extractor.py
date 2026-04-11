@@ -133,6 +133,7 @@ async def extract_sparks_from_message(
     discipline_name_to_id: dict[str, int],
     db: Session,
     language: str = "en",
+    user_id: int | None = None,
 ) -> list[Spark]:
     """Analyze a single agent message and persist any sparks found.
 
@@ -149,7 +150,7 @@ async def extract_sparks_from_message(
     )
 
     try:
-        raw = await chat_completion(messages, temperature=0.2, max_tokens=1000)
+        raw = await chat_completion(messages, temperature=0.2, max_tokens=1000, user_id=user_id, db=db)
     except Exception as exc:
         logger.warning("Spark extraction LLM call failed for message %d: %s", message.id, exc)
         return []
