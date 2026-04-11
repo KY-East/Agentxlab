@@ -126,13 +126,14 @@ Three resizable panels. Left: full discipline taxonomy (OpenAlex-based, user-ext
 | Backend | Python FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2 |
 | AI | DeepSeek via LiteLLM (swappable to OpenAI / Anthropic / any provider) |
 | Academic Data | OpenAlex API (240M+ works, 250K+ concepts) |
-| Auth | Google OAuth 2.0 + JWT |
+| Auth | Google OAuth 2.0 + Email/Password + JWT |
+| Payments | Stripe (card) + USDT/Crypto (manual wallet) |
 | i18n | Chinese / English, auto-detect |
 | Deploy | Docker Compose |
 
-Backend: 62 API routes, 13 routers -- disciplines, intersections, graph construction, AI hypothesis (one-shot + conversational), multi-agent debate engine (SSE streaming), reverse discovery, paper generation, forum (voting / points / leaderboard), OpenAlex sync, Zep memory.
+Backend: 62+ API routes, 15 routers -- disciplines, intersections, graph construction, AI hypothesis (one-shot + conversational), multi-agent debate engine (SSE streaming), reverse discovery, paper generation, forum (voting / points / leaderboard), subscription & payment, OpenAlex sync, Zep memory.
 
-后端：62 个 API 路由，13 个路由模块 -- 学科管理、交叉点查询、图谱构建、AI 假设生成（单次 + 对话式）、多智能体辩论引擎（SSE 流式）、反向发现、论文生成、论坛（投票 / 积分 / 排行榜）、OpenAlex 同步、Zep 记忆。
+后端：62+ 个 API 路由，15 个路由模块 -- 学科管理、交叉点查询、图谱构建、AI 假设生成（单次 + 对话式）、多智能体辩论引擎（SSE 流式）、反向发现、论文生成、论坛（投票 / 积分 / 排行榜）、订阅与支付、OpenAlex 同步、Zep 记忆。
 
 ---
 
@@ -173,30 +174,21 @@ docker compose up -d          # http://localhost
 
 ## Repository / 仓库结构
 
-This repo contains both the research foundation and the application built on top of it.
-
-本仓库同时包含研究基础和基于其构建的应用。
-
 ```
 /
-├── research/                 Academic literature & notes / 学术文献与笔记
-│   ├── README.md             71+ classics, 65+ frontier papers / 71+ 经典，65+ 前沿
-│   ├── 6 research directions / 6 个研究方向
-│   └── synthesis/            Cross-direction analysis / 跨方向综合分析
-│
 ├── projects/
 │   └── knowledge-graph/      The web application / Web 应用
-│       ├── backend/          FastAPI, 62 routes, 11 migrations
+│       ├── backend/          FastAPI, 62+ routes, 15 routers
 │       └── frontend/         React 19, D3.js, Brutalist UI
 │
-├── notes/                    Research journal / 研究日志
-├── CHANGELOG.md
-└── STRUCTURE.md              Repo conventions / 仓库规范
+└── CHANGELOG.md
 ```
 
-The research corpus -- from Frege (1892) to 2026 frontier papers on AI alignment, computational creativity, and symbol grounding -- feeds directly into the knowledge graph. Theory drives the product. The product validates the theory.
+### Research Background / 研究背景
 
-研究语料库 -- 从 Frege（1892）到 2026 年 AI 对齐、计算创造力和符号接地的前沿论文 -- 直接驱动知识图谱。理论驱动产品，产品验证理论。
+This project grew out of an extensive cross-disciplinary literature review spanning 71+ classic works (Frege 1892 to present) and 65+ frontier papers (2024-2026) across philosophy of language, cognitive science, cybernetics, computational creativity, AI alignment, and symbol grounding. That foundational research -- 6 directions, 90+ annotated PDFs, synthesis notes, and a full discipline taxonomy -- is preserved in the [`archive/early-research`](https://github.com/KY-East/Agentxlab/tree/archive/early-research) branch.
+
+本项目源于一次大规模的跨学科文献综述，涵盖 71+ 部经典著作（从 Frege 1892 至今）和 65+ 篇前沿论文（2024-2026），横跨语言哲学、认知科学、控制论、计算创造力、AI 对齐和符号接地。这些基础研究 -- 6 个方向、90+ 篇注释 PDF、综合笔记和完整学科谱系 -- 保存在 [`archive/early-research`](https://github.com/KY-East/Agentxlab/tree/archive/early-research) 分支中。
 
 ---
 
