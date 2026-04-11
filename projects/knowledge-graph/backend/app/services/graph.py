@@ -116,28 +116,29 @@ def build_graph(db: Session, *, discipline_ids: list[int] | None = None) -> Grap
     ix_edge_map: dict[tuple[int, int], Intersection] = {}
     for ix in intersections:
         all_member_ids = {d.id for d in ix.disciplines}
-        representative: set[int] = set()
-        used: set[int] = set()
+        member_groups: list[set[int]] = []
         for mid in all_member_ids:
-            candidates = (ancestor_to_selected.get(mid, set()) & disc_ids) - used
-            if candidates:
-                pick = min(candidates)
-                representative.add(pick)
-                used.add(pick)
-        visible_members = sorted(representative)
-        if len(visible_members) < 2:
+            matched = ancestor_to_selected.get(mid, set()) & disc_ids
+            if matched:
+                member_groups.append(matched)
+        if len(member_groups) < 2:
             continue
         member_count = len(all_member_ids)
         ix_rank = (member_count, _STATUS_PRIORITY.get(ix.status, 9))
-        for a, b in combinations(visible_members, 2):
-            existing = ix_edge_map.get((a, b))
-            if existing is None:
-                ix_edge_map[(a, b)] = ix
-            else:
-                ex_members = len(existing.disciplines)
-                ex_rank = (ex_members, _STATUS_PRIORITY.get(existing.status, 9))
-                if ix_rank < ex_rank:
-                    ix_edge_map[(a, b)] = ix
+        for gi, gj in combinations(range(len(member_groups)), 2):
+            for a_node in member_groups[gi]:
+                for b_node in member_groups[gj]:
+                    if a_node == b_node:
+                        continue
+                    edge_key = (min(a_node, b_node), max(a_node, b_node))
+                    existing = ix_edge_map.get(edge_key)
+                    if existing is None:
+                        ix_edge_map[edge_key] = ix
+                    else:
+                        ex_members = len(existing.disciplines)
+                        ex_rank = (ex_members, _STATUS_PRIORITY.get(existing.status, 9))
+                        if ix_rank < ex_rank:
+                            ix_edge_map[edge_key] = ix
 
     # --- Edge source 2: shared papers (paper_discipline cross-count) ---
     # Map each selected disc to its nearest ancestor that has papers (openalex_id).
