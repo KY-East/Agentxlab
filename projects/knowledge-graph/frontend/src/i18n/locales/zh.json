@@ -112,6 +112,8 @@
     "structuredDesc": "围绕命题，正反交锋",
     "proposition": "辩论命题",
     "propositionPlaceholder": "输入一个可以正反辩论的学术命题...",
+    "topic": "讨论主题",
+    "topicPlaceholder": "输入要讨论的核心问题（如：如何科学预测足球比赛结果）...",
     "weightSettings": "学科权重设置",
     "weightOptional": "可选 · 不设置则由 AI 自动判断",
     "weightCoreHint": "核心方向分配 2 人团队（教授+副教授），辅助方向 1 人（教授）",

@@ -112,6 +112,8 @@
     "structuredDesc": "For-and-against a proposition",
     "proposition": "Proposition",
     "propositionPlaceholder": "Enter a debatable academic proposition...",
+    "topic": "Discussion Topic",
+    "topicPlaceholder": "Enter the core question to discuss...",
     "weightSettings": "Discipline Weight Settings",
     "weightOptional": "Optional · AI will decide if not set",
     "weightCoreHint": "Core disciplines get a 2-person team (Prof + Assoc.), support gets 1 (Prof)",

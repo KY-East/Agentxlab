@@ -91,12 +91,13 @@ export default function Debate() {
   }, [searchParams, leaves]);
 
   useEffect(() => {
-    if (!navCtx.coreTension && !navCtx.direction && !navCtx.hypothesis) return;
     const candidate =
-      navCtx.hypothesis || navCtx.coreTension || navCtx.direction || "";
+      navCtx.hypothesis || navCtx.coreTension || navCtx.direction || navCtx.discoveryQuestion || "";
     if (candidate && !proposition) {
       setProposition(candidate);
-      setMode("debate");
+      if (navCtx.hypothesis || navCtx.coreTension || navCtx.direction) {
+        setMode("debate");
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -144,7 +145,7 @@ export default function Debate() {
       const debate = await api.createDebate({
         discipline_ids: [...selected],
         mode,
-        proposition: mode === "debate" ? proposition : undefined,
+        proposition: proposition.trim() || undefined,
         intersection_id: intersectionId ? Number(intersectionId) : undefined,
         discipline_weights: Object.keys(dw).length > 0 ? dw : undefined,
         language: debateLang,
@@ -357,20 +358,18 @@ export default function Debate() {
                   </p>
                 </div>
               )}
-              {mode === "debate" && (
-                <div className="mt-4">
-                  <label className="font-mono text-[10px] uppercase tracking-wider text-neutral-400 mb-1 block">
-                    {t("debate.proposition")}
-                  </label>
-                  <textarea
-                    value={proposition}
-                    onChange={(e) => setProposition(e.target.value)}
-                    placeholder={t("debate.propositionPlaceholder")}
-                    rows={2}
-                    className={`${inputClass} resize-none mb-0`}
-                  />
-                </div>
-              )}
+              <div className="mt-4">
+                <label className="font-mono text-[10px] uppercase tracking-wider text-neutral-400 mb-1 block">
+                  {mode === "debate" ? t("debate.proposition") : t("debate.topic")}
+                </label>
+                <textarea
+                  value={proposition}
+                  onChange={(e) => setProposition(e.target.value)}
+                  placeholder={mode === "debate" ? t("debate.propositionPlaceholder") : t("debate.topicPlaceholder")}
+                  rows={2}
+                  className={`${inputClass} resize-none mb-0`}
+                />
+              </div>
             </section>
 
             {/* Language selector */}

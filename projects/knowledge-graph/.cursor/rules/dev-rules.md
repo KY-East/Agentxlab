@@ -11,6 +11,7 @@ alwaysApply: true
 1. **Retrieval-First**: 新建文件前先检查是否已有同类文件
 2. **Single Source of Truth**: 配置集中在 `.env`，数据模型集中在 `models/`，不允许硬编码
 3. **Atomic Commits**: 一个 commit 只做一件事
+4. **不重复造轮子**: 能用现成开源方案的就封装进来，不自己重写。自己只做差异化的部分。技术选型优先级：成熟开源 > 自建封装 > 从零开发
 
 ## 文件结构
 

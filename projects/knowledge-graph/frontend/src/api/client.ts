@@ -143,11 +143,15 @@ export const api = {
       { method: "POST" }
     ),
 
-  runRoundStream: (debateId: number) =>
-    fetch(`${API_BASE}/api/debates/${debateId}/rounds/stream`, {
+  runRoundStream: (debateId: number) => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}/api/debates/${debateId}/rounds/stream`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-    }),
+      headers,
+    });
+  },
 
   summarizeDebate: (debateId: number) =>
     request<import("../types").Debate>(
@@ -208,11 +212,15 @@ export const api = {
       { method: "POST" }
     ),
 
-  exportDraft: (draftId: number) =>
-    fetch(`${API_BASE}/api/papers/drafts/${draftId}/export`).then((r) => {
+  exportDraft: (draftId: number) => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}/api/papers/drafts/${draftId}/export`, { headers }).then((r) => {
       if (!r.ok) throw new Error(`Export failed: ${r.status}`);
       return r.text();
-    }),
+    });
+  },
 
   suggestDirections: (debateId: number) =>
     request<{ directions: { title: string; description: string; estimated_sections: number }[] }>(
@@ -231,8 +239,15 @@ export const api = {
       { method: "POST", body: JSON.stringify(payload) }
     ),
 
-  generateAllSections: (draftId: number) =>
-    fetch(`${API_BASE}/api/papers/drafts/${draftId}/generate-all`, { method: "POST" }),
+  generateAllSections: (draftId: number) => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE}/api/papers/drafts/${draftId}/generate-all`, {
+      method: "POST",
+      headers,
+    });
+  },
 
   // ── Spark API ──
 

@@ -139,6 +139,15 @@ def _build_agent_system_prompt(
             f"辩论主题涵盖：{topic}。",
             f"\n## 学术定位\n{core_hint}",
         ]
+        if proposition:
+            if mode == "debate":
+                parts.append(f'\n## 命题\n"{proposition}"')
+            else:
+                parts.append(
+                    f'\n## 核心问题\n本次讨论要解决的核心问题是：**"{proposition}"**\n'
+                    f"你的所有发言都必须围绕这个问题展开。从你的学科角度出发，具体回答这个问题——"
+                    f"提供方法论、关键变量、分析框架或可操作的建议。不要泛泛而谈学科概述。"
+                )
         if teammate_name:
             if is_senior:
                 parts.append(f"\n## 团队\n你有一位同学科的初级同事 **{teammate_name}**。你可以补充、指导或建设性地反对他的观点。")
@@ -147,15 +156,14 @@ def _build_agent_system_prompt(
         parts.append(f"\n## 讨论风格\n{persona_desc}")
         if mode == "debate" and stance and stance in STANCE_PROMPTS:
             parts.append(f"\n## 立场\n{STANCE_PROMPTS[stance]['zh']}")
-            if proposition:
-                parts.append(f'\n## 命题\n"{proposition}"')
         parts.append(
             f"\n## 输出规则\n"
             f"- 只用**中文**回复\n"
             f"- 使用**要点列表**（bullet points）格式，不写长段落\n"
             f"- 控制在 {word_limit} 字以内\n"
             f"- 引用你学科的具体理论、学者或研究发现\n"
-            f"- 回应其他参与者的论点——赞同、质疑或发展"
+            f"- 回应其他参与者的论点——赞同、质疑或发展\n"
+            f"- 每次发言结尾必须回扣核心问题，给出你学科的具体贡献"
         )
     else:
         core_hint = "Your discipline is a **core direction** in this debate." if weight >= 40 else "Your discipline provides a **supporting perspective**."
@@ -165,6 +173,16 @@ def _build_agent_system_prompt(
             f"Topic: {topic}.",
             f"\n## Standing\n{core_hint}",
         ]
+        if proposition:
+            if mode == "debate":
+                parts.append(f'\n## Proposition\n"{proposition}"')
+            else:
+                parts.append(
+                    f'\n## Core Question\nThe central question of this discussion is: **"{proposition}"**\n'
+                    f"ALL your contributions must directly address this question. From your disciplinary perspective, "
+                    f"provide specific methodologies, key variables, analytical frameworks, or actionable insights. "
+                    f"Do NOT give generic overviews of your discipline."
+                )
         if teammate_name:
             if is_senior:
                 parts.append(f"\n## Team\nYou have a junior colleague **{teammate_name}**. Build on their points or respectfully disagree.")
@@ -173,15 +191,14 @@ def _build_agent_system_prompt(
         parts.append(f"\n## Style\n{persona_desc}")
         if mode == "debate" and stance and stance in STANCE_PROMPTS:
             parts.append(f"\n## Stance\n{STANCE_PROMPTS[stance]['en']}")
-            if proposition:
-                parts.append(f'\n## Proposition\n"{proposition}"')
         parts.append(
             f"\n## Output Rules\n"
             f"- Respond ONLY in **English**\n"
             f"- Use **bullet points** — no long paragraphs\n"
             f"- Keep under {word_limit} words\n"
             f"- Cite specific theories, scholars, or findings from your discipline\n"
-            f"- Engage with other participants — agree, challenge, or build upon their arguments"
+            f"- Engage with other participants — agree, challenge, or build upon their arguments\n"
+            f"- End each response by tying back to the core question with your discipline's specific contribution"
         )
     return "\n".join(parts)
 
@@ -358,6 +375,12 @@ async def generate_agents(
 
     moderator_stance = "moderator" if mode == "debate" else None
     mod_name = "主持人 (跨学科综合)" if lang == "zh" else "Moderator (Interdisciplinary)"
+    mod_prompt = MODERATOR_PROMPTS.get(lang, MODERATOR_PROMPTS["en"])
+    if proposition:
+        if lang == "zh":
+            mod_prompt += f'\n\n本次讨论的核心问题是：**"{proposition}"**\n你的总结和引导必须围绕这个问题。每轮结束时，明确指出各学科对核心问题的具体贡献，以及还有哪些方面尚未回答。'
+        else:
+            mod_prompt += f'\n\nThe core question of this discussion is: **"{proposition}"**\nYour summaries and guidance must center on this question. At the end of each round, explicitly state each discipline\'s concrete contribution to answering the question, and what aspects remain unanswered.'
     agent_specs.append({
         "agent_name": mod_name,
         "discipline_id": None,
@@ -365,7 +388,7 @@ async def generate_agents(
         "rank": "professor",
         "weight": 0,
         "stance": moderator_stance,
-        "system_prompt": MODERATOR_PROMPTS.get(lang, MODERATOR_PROMPTS["en"]),
+        "system_prompt": mod_prompt,
         "sort_order": order,
     })
 

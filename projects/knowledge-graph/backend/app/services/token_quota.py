@@ -15,6 +15,11 @@ from app.plan_config import get_plan
 logger = logging.getLogger(__name__)
 
 
+def _utcnow() -> datetime:
+    """Naive UTC now — matches SQLite's timezone-unaware storage."""
+    return datetime.utcnow()
+
+
 def get_or_create_sub(user_id: int, db: Session) -> Subscription:
     sub = db.query(Subscription).filter(Subscription.user_id == user_id).first()
     if sub:
@@ -28,7 +33,7 @@ def get_or_create_sub(user_id: int, db: Session) -> Subscription:
         tokens_used_this_month=0,
         allowed_models=json.dumps(plan["allowed_models"]),
         preferred_model=plan["allowed_models"][0],
-        quota_reset_at=datetime.now(timezone.utc) + timedelta(days=30),
+        quota_reset_at=_utcnow() + timedelta(days=30),
     )
     db.add(sub)
     db.commit()
@@ -37,10 +42,10 @@ def get_or_create_sub(user_id: int, db: Session) -> Subscription:
 
 
 def maybe_reset_quota(sub: Subscription, db: Session) -> None:
-    now = datetime.now(timezone.utc)
+    now = _utcnow()
     if sub.quota_reset_at and sub.quota_reset_at < now:
         sub.tokens_used_this_month = 0
-        sub.quota_reset_at = now + timedelta(days=30)
+        sub.quota_reset_at = _utcnow() + timedelta(days=30)
         db.commit()
         logger.info("Quota reset for user %d (plan=%s)", sub.user_id, sub.plan)
 
