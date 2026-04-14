@@ -169,7 +169,8 @@ async def distill_agent_cognition(
         for item in items:
             if item.strip():
                 push_agent_cognition(
-                    agent.discipline_id, agent.rank, layer, item
+                    agent.discipline_id, agent.rank, layer, item,
+                    debate_id=debate.id,
                 )
 
     logger.info(

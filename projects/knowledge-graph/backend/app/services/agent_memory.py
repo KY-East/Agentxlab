@@ -8,17 +8,13 @@ Three layers:
   2. Arguments & Stances — reasoned positions with logical chains
   3. Cross-Domain Sparks — creative connections, never auto-deleted
 
-Each layer is stored as a separate Zep graph entry with a structured prefix
-so retrieval and distillation can target specific layers.
+All writes carry origin + evidence_ref metadata for trust chain traceability.
 """
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any
-
-from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +30,19 @@ LAYER_CAPACITY = {
     "sparks": 999,
 }
 
+GRAPH_ID = "agent-x-lab"
+
 
 def _agent_user_id(discipline_id: int, rank: str) -> str:
     return f"agent-{discipline_id}-{rank}"
 
 
 def _get_client():
-    """Lazy import + init Zep client."""
     from app.services.zep_manager import get_zep_client
     return get_zep_client()
 
 
 def _ensure_agent_user(discipline_id: int, rank: str) -> str:
-    """Ensure the Zep user for this agent identity exists."""
     uid = _agent_user_id(discipline_id, rank)
     client = _get_client()
     try:
@@ -66,13 +62,15 @@ def push_agent_cognition(
     layer: str,
     content: str,
     *,
-    graph_id: str = "agent-x-lab",
+    debate_id: int | None = None,
+    graph_id: str = GRAPH_ID,
 ) -> None:
     """Push a single cognition item into the agent's Zep memory.
 
     Args:
         layer: one of "facts", "arguments", "sparks"
         content: the cognition content to store
+        debate_id: source debate for evidence_ref traceability
     """
     if layer not in LAYER_PREFIXES:
         raise ValueError(f"Unknown layer: {layer}")
@@ -81,6 +79,16 @@ def push_agent_cognition(
     prefix = LAYER_PREFIXES[layer]
     tagged = f"{prefix} {content}"
 
+    from app.services.zep_manager import _base_metadata
+
+    meta = _base_metadata(
+        memory_type="insight",
+        origin="generated",
+        confidence="medium",
+        evidence_ref=f"debate_{debate_id}" if debate_id else "",
+        source_id=f"agent_{uid}",
+    )
+
     try:
         client = _get_client()
         client.graph.add(
@@ -88,6 +96,7 @@ def push_agent_cognition(
             type="text",
             user_id=uid,
             graph_id=graph_id,
+            metadata=meta,
         )
         logger.info("Pushed %s cognition for agent %s", layer, uid)
     except Exception as exc:
@@ -101,11 +110,12 @@ def retrieve_agent_cognition(
     *,
     layer: str | None = None,
     limit: int = 10,
-    graph_id: str = "agent-x-lab",
+    graph_id: str = GRAPH_ID,
 ) -> list[dict[str, Any]]:
     """Retrieve cognition entries for an agent, optionally filtered by layer.
 
-    Returns list of {"layer": str, "content": str, "score": float|None}.
+    Returns list of {"layer": str, "content": str, "score": float|None,
+                     "origin": str, "evidence_ref": str}.
     """
     uid = _agent_user_id(discipline_id, rank)
 
@@ -130,10 +140,19 @@ def retrieve_agent_cognition(
             clean = _strip_prefix(fact)
             if layer and detected_layer != layer:
                 continue
+
+            ep_meta = {}
+            if hasattr(e, "episodes") and e.episodes:
+                ep = e.episodes[0] if isinstance(e.episodes, list) else None
+                if ep and hasattr(ep, "metadata") and ep.metadata:
+                    ep_meta = ep.metadata
+
             items.append({
                 "layer": detected_layer,
                 "content": clean,
                 "score": score,
+                "origin": ep_meta.get("origin", "generated"),
+                "evidence_ref": ep_meta.get("evidence_ref", ""),
             })
         return items
     except Exception as exc:
@@ -147,10 +166,7 @@ def format_agent_cognition_for_prompt(
     debate_topic: str,
     discipline_name: str,
 ) -> str | None:
-    """Retrieve and format an agent's accumulated cognition for system prompt injection.
-
-    Returns a formatted string or None if no cognition found.
-    """
+    """Retrieve and format an agent's accumulated cognition for system prompt injection."""
     items = retrieve_agent_cognition(
         discipline_id, rank,
         query=f"{debate_topic} {discipline_name}",

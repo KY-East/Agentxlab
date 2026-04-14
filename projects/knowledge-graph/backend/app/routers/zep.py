@@ -26,7 +26,10 @@ def api_push_disciplines(limit: int = 50, db: Session = Depends(get_db)):
     for d in disciplines:
         children_names = [c.name_en for c in d.children] if d.children else []
         try:
-            push_discipline_knowledge(d.name_en, d.description or "", children_names)
+            push_discipline_knowledge(
+                d.name_en, d.description or "", children_names,
+                openalex_id=d.openalex_id,
+            )
             pushed += 1
         except Exception:
             continue
@@ -45,7 +48,10 @@ def api_push_scholars(limit: int = 30, db: Session = Depends(get_db)):
     pushed = 0
     for s in scholars:
         try:
-            push_scholar_knowledge(s.name, s.affiliation, s.works_count, s.cited_by_count)
+            push_scholar_knowledge(
+                s.name, s.affiliation, s.works_count, s.cited_by_count,
+                openalex_id=s.openalex_id,
+            )
             pushed += 1
         except Exception:
             continue
