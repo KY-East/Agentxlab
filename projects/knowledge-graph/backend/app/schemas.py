@@ -196,6 +196,7 @@ class DebateCreate(BaseModel):
     proposition: str | None = None
     intersection_id: int | None = None
     language: str = "zh"
+    depth: str = "standard"
     discipline_weights: dict[int, int] | None = None
 
 
@@ -207,6 +208,7 @@ class AgentOut(BaseModel):
     rank: str = "professor"
     weight: int = 50
     stance: str | None = None
+    assigned_model: str | None = None
     sort_order: int
 
     model_config = {"from_attributes": True}

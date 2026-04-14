@@ -139,6 +139,7 @@ export interface DebateAgent {
   rank: "professor" | "associate" | "assistant";
   weight: number;
   stance: string | null;
+  assigned_model: string | null;
   sort_order: number;
 }
 

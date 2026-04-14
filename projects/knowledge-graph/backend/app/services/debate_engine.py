@@ -13,10 +13,60 @@ from sqlalchemy.orm import Session
 from app.models.debate import Debate, DebateAgent, DebateMessage
 from app.models.discipline import Discipline
 from app.services.ai_provider import chat_completion
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 MAX_AGENTS = 8
+
+
+def _get_model_pool() -> list[str]:
+    """Collect available debate models from config, deduplicated."""
+    pool: list[str] = []
+    for m in (settings.debate_model_pro, settings.debate_model_con, settings.debate_model_moderator):
+        if m and m not in pool:
+            pool.append(m)
+    return pool
+
+
+def assign_models_to_agents(agents: list[DebateAgent], db: Session) -> None:
+    """Randomly assign models to agents and persist to DB.
+
+    Guarantees every model in the pool appears at least once.
+    Skips agents that already have an assigned_model (idempotent).
+    """
+    pool = _get_model_pool()
+    if not pool:
+        return
+
+    unassigned = [a for a in agents if not a.assigned_model]
+    if not unassigned:
+        return
+
+    random.shuffle(unassigned)
+
+    if len(pool) >= len(unassigned):
+        for i, agent in enumerate(unassigned):
+            agent.assigned_model = pool[i % len(pool)]
+    else:
+        already_used = {a.assigned_model for a in agents if a.assigned_model}
+        missing = [m for m in pool if m not in already_used]
+
+        seed_count = min(len(missing), len(unassigned))
+        shuffled_missing = list(missing)
+        random.shuffle(shuffled_missing)
+        for i in range(seed_count):
+            unassigned[i].assigned_model = shuffled_missing[i]
+
+        for agent in unassigned[seed_count:]:
+            agent.assigned_model = random.choice(pool)
+
+    db.flush()
+
+
+def _model_for_agent(agent: DebateAgent) -> str | None:
+    """Return the model assigned to this agent, or None for default."""
+    return agent.assigned_model or None
 RANK_LABELS = {
     "professor": {"en": "Professor", "zh": "教授", "prefix": "Prof."},
     "associate": {"en": "Associate Professor", "zh": "副教授", "prefix": "Assoc. Prof."},
@@ -82,28 +132,70 @@ MODERATOR_PROMPTS = {
 }
 
 STANCE_PROMPTS = {
-    "advocate": {
-        "en": "You argue IN FAVOUR of the proposition. Build the strongest case for its value, feasibility, and timeliness.",
-        "zh": "你为命题辩护（正方）。论证这个研究方向的价值、可行性和时效性。",
-    },
-    "challenger": {
-        "en": "You argue AGAINST the proposition. Identify fundamental flaws, overlooked risks, or better alternatives.",
-        "zh": "你反对命题（反方）。指出根本缺陷、被忽视的风险或更好的替代方案。",
+    "discipline_advocate": {
+        "en": (
+            "You represent the perspective of YOUR discipline on this proposition. "
+            "Argue WHY your field's methods, theories, and evidence are essential for understanding this topic. "
+            "Challenge other disciplines' blind spots — point out what THEY miss that YOUR field captures. "
+            "Defend your discipline's unique contribution when others question it."
+        ),
+        "zh": (
+            "你代表你所在学科的视角来看待这个命题。"
+            "论证为什么你的领域的方法论、理论和证据对于理解这个话题不可或缺。"
+            "质疑其他学科的盲区——指出他们遗漏了什么，而你的学科能捕捉到什么。"
+            "当其他学科质疑你时，捍卫你的学科的独特贡献。"
+        ),
     },
 }
 
 ROUND_OPENERS = {
     1: {
-        "en": "Round 1 — Opening Arguments. Present your core position in structured bullet points. Include:\n- Your main thesis (1 sentence)\n- 2-3 key supporting arguments with evidence\n- 1 question for other disciplines",
-        "zh": "第 1 轮 —— 开场立论。用结构化要点陈述你的核心立场，包括：\n- 核心论点（1 句话）\n- 2-3 个关键论据（附证据/引用）\n- 向其他学科提出 1 个问题",
+        "en": (
+            "Round 1 — Opening Positions. Present YOUR DISCIPLINE's unique perspective:\n"
+            "- Your discipline's core thesis on this topic (1 sentence)\n"
+            "- 2-3 key arguments: what does YOUR field see that others don't? Cite specific theories, methods, or findings.\n"
+            "- Directly challenge another discipline's likely blind spot — what are they probably going to miss?\n"
+            "- Pose 1 pointed question to a SPECIFIC other discipline in this debate."
+        ),
+        "zh": (
+            "第 1 轮 —— 学科立场陈述。从你的学科视角出发：\n"
+            "- 你的学科对这个话题的核心论点（1句话）\n"
+            "- 2-3 个关键论据：你的领域能看到什么别人看不到的？引用具体的理论、方法或研究发现。\n"
+            "- 直接指出另一个学科可能存在的盲区——他们大概率会忽略什么？\n"
+            "- 向辩论中的某一个具体学科提出 1 个尖锐问题。"
+        ),
     },
     2: {
-        "en": "Round 2 — Cross-examination. Respond to other participants' arguments:\n- Identify 1-2 points you agree with (and why)\n- Challenge 1-2 points you disagree with (cite evidence)\n- Propose a cross-disciplinary insight that emerged",
-        "zh": "第 2 轮 —— 交叉质疑。回应其他参与者的论点：\n- 指出 1-2 个你赞同的观点（说明为什么）\n- 质疑 1-2 个你反对的观点（引用证据）\n- 提出一个由讨论激发的跨学科洞察",
+        "en": (
+            "Round 2 — Interdisciplinary Clash. Directly engage with other disciplines:\n"
+            "- Respond to challenges aimed at YOUR discipline — defend or concede with evidence\n"
+            "- Attack 1-2 specific claims from OTHER disciplines — explain why their framework is insufficient\n"
+            "- Identify 1 point where another discipline complements yours (be specific about the mechanism)\n"
+            "- Propose how YOUR discipline's methods could resolve a gap exposed by the debate"
+        ),
+        "zh": (
+            "第 2 轮 —— 跨学科交锋。直接与其他学科碰撞：\n"
+            "- 回应其他学科对你的质疑——用证据反驳或坦然承认不足\n"
+            "- 攻击其他学科的 1-2 个具体论点——解释为什么他们的框架不够\n"
+            "- 找出 1 个其他学科与你互补的点（具体说明怎么互补）\n"
+            "- 提出你的学科方法如何能填补辩论中暴露的某个空白"
+        ),
     },
     3: {
-        "en": "Round 3 — Synthesis. Final response:\n- Your refined position after hearing all arguments\n- The most promising cross-disciplinary research direction\n- 1 concrete next step (experiment, paper, collaboration)",
-        "zh": "第 3 轮 —— 总结回应。最终发言：\n- 听完所有论点后你修正过的立场\n- 你认为最有前景的跨学科研究方向\n- 1 个具体的下一步行动（实验/论文/合作）",
+        "en": (
+            "Round 3 — Integration & Boundaries. Final response:\n"
+            "- What did other disciplines teach you that YOUR field alone could not see?\n"
+            "- Where does your discipline's contribution START and END — be honest about your boundaries\n"
+            "- Propose 1 concrete cross-disciplinary research design that combines insights from this debate\n"
+            "- Name the single biggest remaining disagreement between disciplines and why it matters"
+        ),
+        "zh": (
+            "第 3 轮 —— 整合与边界。最终发言：\n"
+            "- 其他学科让你看到了什么你自己领域看不到的东西？\n"
+            "- 你的学科贡献的边界在哪里——诚实地说你的局限\n"
+            "- 提出 1 个结合本次辩论各方洞察的具体跨学科研究方案\n"
+            "- 指出学科间目前最大的未解决分歧是什么，为什么它重要"
+        ),
     },
 }
 
@@ -131,12 +223,18 @@ def _build_agent_system_prompt(
     is_senior = rank == "professor"
     word_limit = "150-250" if is_senior else "100-180"
 
+    other_disciplines = [n for n in all_discipline_names if n != discipline_name]
+    others_str = "、".join(other_disciplines)
+    others_str_en = ", ".join(other_disciplines)
+
     if lang == "zh":
         core_hint = "你的学科是本次辩论的**核心方向**。" if weight >= 40 else "你的学科提供**辅助视角**。"
         persona_desc = persona.get("desc_zh", persona.get("desc", ""))
         parts = [
             f"你是{rank_info['zh']}，专攻 **{discipline_name}**，参与一场跨学科学术辩论。",
-            f"辩论主题涵盖：{topic}。",
+            f"参与辩论的学科有：{topic}。",
+            f"\n## 你的使命\n你代表 **{discipline_name}** 参战。你的对手是来自 **{others_str}** 的学者。",
+            f"你需要证明你的学科视角对这个问题不可或缺，同时直接质疑其他学科的局限性。",
             f"\n## 学术定位\n{core_hint}",
         ]
         if proposition:
@@ -145,14 +243,14 @@ def _build_agent_system_prompt(
             else:
                 parts.append(
                     f'\n## 核心问题\n本次讨论要解决的核心问题是：**"{proposition}"**\n'
-                    f"你的所有发言都必须围绕这个问题展开。从你的学科角度出发，具体回答这个问题——"
-                    f"提供方法论、关键变量、分析框架或可操作的建议。不要泛泛而谈学科概述。"
+                    f"你的所有发言都必须围绕这个问题展开。从 **{discipline_name}** 的角度出发，"
+                    f"提供其他学科无法提供的方法论、关键变量、分析框架或可操作的建议。"
                 )
         if teammate_name:
             if is_senior:
-                parts.append(f"\n## 团队\n你有一位同学科的初级同事 **{teammate_name}**。你可以补充、指导或建设性地反对他的观点。")
+                parts.append(f"\n## 同学科队友\n**{teammate_name}** 是你的同学科队友。你们是一队的，共同捍卫 {discipline_name} 的立场。你可以补充或深化他的观点。")
             else:
-                parts.append(f"\n## 团队\n你与资深同事 **{teammate_name}** 同属一个学科。你可以补充细节、提供新角度或建设性地反对。")
+                parts.append(f"\n## 同学科队友\n**{teammate_name}** 是你的资深同学科队友。你们是一队的。你可以从不同角度补充、或提出他未涉及的细节。")
         parts.append(f"\n## 讨论风格\n{persona_desc}")
         if mode == "debate" and stance and stance in STANCE_PROMPTS:
             parts.append(f"\n## 立场\n{STANCE_PROMPTS[stance]['zh']}")
@@ -160,17 +258,18 @@ def _build_agent_system_prompt(
             f"\n## 输出规则\n"
             f"- 只用**中文**回复\n"
             f"- 使用**要点列表**（bullet points）格式，不写长段落\n"
-            f"- 控制在 {word_limit} 字以内\n"
             f"- 引用你学科的具体理论、学者或研究发现\n"
-            f"- 回应其他参与者的论点——赞同、质疑或发展\n"
-            f"- 每次发言结尾必须回扣核心问题，给出你学科的具体贡献"
+            f"- **必须点名回应**其他学科的具体论点——赞同、反驳或发展\n"
+            f"- 每次发言结尾：你的学科对核心问题的独特贡献是什么，其他学科做不到的"
         )
     else:
         core_hint = "Your discipline is a **core direction** in this debate." if weight >= 40 else "Your discipline provides a **supporting perspective**."
         persona_desc = persona.get("desc_en", persona.get("desc", ""))
         parts = [
             f"You are a {rank_info['en']} specializing in **{discipline_name}**, in an interdisciplinary academic debate.",
-            f"Topic: {topic}.",
+            f"Disciplines in this debate: {topic}.",
+            f"\n## Your Mission\nYou represent **{discipline_name}**. Your opponents are scholars from **{others_str_en}**.",
+            f"Prove that YOUR discipline's perspective is indispensable for this topic, while directly challenging the limitations of other disciplines.",
             f"\n## Standing\n{core_hint}",
         ]
         if proposition:
@@ -179,15 +278,14 @@ def _build_agent_system_prompt(
             else:
                 parts.append(
                     f'\n## Core Question\nThe central question of this discussion is: **"{proposition}"**\n'
-                    f"ALL your contributions must directly address this question. From your disciplinary perspective, "
-                    f"provide specific methodologies, key variables, analytical frameworks, or actionable insights. "
-                    f"Do NOT give generic overviews of your discipline."
+                    f"ALL your contributions must directly address this question. From **{discipline_name}**'s perspective, "
+                    f"provide methodologies, variables, frameworks, or insights that OTHER disciplines cannot offer."
                 )
         if teammate_name:
             if is_senior:
-                parts.append(f"\n## Team\nYou have a junior colleague **{teammate_name}**. Build on their points or respectfully disagree.")
+                parts.append(f"\n## Teammate\n**{teammate_name}** is your same-discipline teammate. You are on the same side, defending {discipline_name}'s position together. Build on or deepen their points.")
             else:
-                parts.append(f"\n## Team\nYou work with senior colleague **{teammate_name}**. Supplement, offer fresh angles, or disagree constructively.")
+                parts.append(f"\n## Teammate\n**{teammate_name}** is your senior same-discipline teammate. You are allies. Supplement with new angles or details they didn't cover.")
         parts.append(f"\n## Style\n{persona_desc}")
         if mode == "debate" and stance and stance in STANCE_PROMPTS:
             parts.append(f"\n## Stance\n{STANCE_PROMPTS[stance]['en']}")
@@ -195,10 +293,9 @@ def _build_agent_system_prompt(
             f"\n## Output Rules\n"
             f"- Respond ONLY in **English**\n"
             f"- Use **bullet points** — no long paragraphs\n"
-            f"- Keep under {word_limit} words\n"
             f"- Cite specific theories, scholars, or findings from your discipline\n"
-            f"- Engage with other participants — agree, challenge, or build upon their arguments\n"
-            f"- End each response by tying back to the core question with your discipline's specific contribution"
+            f"- **You MUST name and respond to** specific arguments from OTHER disciplines — agree, refute, or extend\n"
+            f"- End each response: what is YOUR discipline's unique contribution that no other field can provide?"
         )
     return "\n".join(parts)
 
@@ -311,7 +408,8 @@ async def generate_agents(
 ) -> list[dict]:
     """Build agent specs (not yet persisted). Returns list of dicts ready for DebateAgent creation."""
     lang = language
-    names = [d.name_en for d in disciplines]
+    names_en = [d.name_en for d in disciplines]
+    names_display = [(d.name_zh or d.name_en) if lang == "zh" else d.name_en for d in disciplines]
     weights = await _resolve_weights(disciplines, user_weights, proposition, user_id=user_id, db=db)
     team_sizes = _decide_team_sizes(disciplines, weights)
 
@@ -344,12 +442,13 @@ async def generate_agents(
             persona = next_persona()
             stance: str | None = None
             if mode == "debate":
-                stance = "advocate" if order % 2 == 0 else "challenger"
+                stance = "discipline_advocate"
 
+            disc_display = (disc.name_zh or disc.name_en) if lang == "zh" else disc.name_en
             teammate = team_names[1 - j] if size == 2 else None
             base_prompt = _build_agent_system_prompt(
-                disc.name_en, persona, rank, w,
-                mode, stance, names, proposition,
+                disc_display, persona, rank, w,
+                mode, stance, names_display, proposition,
                 language=lang,
                 teammate_name=teammate,
             )
@@ -493,10 +592,21 @@ async def run_round_stream(debate: Debate, db: Session, *, user_id: int | None =
         raise ValueError(f"Maximum round limit ({MAX_ROUNDS}) reached")
 
     lang = getattr(debate, "language", "zh") or "zh"
+    depth = getattr(debate, "depth", "standard") or "standard"
 
-    history = _build_history(debate.messages)
+    from app.services.session_memory import build_compressed_context
+    history = await build_compressed_context(
+        list(debate.messages), current_round,
+        depth=depth, language=lang, user_id=user_id, db=db,
+    )
+
     opener_map = ROUND_OPENERS.get(current_round, DEFAULT_ROUND_OPENER)
     round_opener = opener_map.get(lang, opener_map.get("en", ""))
+
+    if any(not a.assigned_model for a in debate.agents):
+        assign_models_to_agents(list(debate.agents), db)
+    model_info = {a.agent_name: a.assigned_model or "default" for a in debate.agents}
+    logger.info("Debate %d round %d models: %s", debate.id, current_round, model_info)
 
     shared_ctx, per_agent_ctx = _retrieve_zep_contexts(debate)
     speaking_order = _order_agents_for_round(list(debate.agents), current_round)
@@ -510,7 +620,14 @@ async def run_round_stream(debate: Debate, db: Session, *, user_id: int | None =
         if agent.persona == "moderator" and current_round == 1:
             continue
 
-        max_tokens = 800 if agent.rank == "professor" else 600
+        depth_tokens = {
+            "quick":    (1500, 1000),
+            "standard": (4000, 3000),
+            "deep":     (8000, 6000),
+            "max":      (12000, 10000),
+        }
+        prof_max, assoc_max = depth_tokens.get(depth, (4000, 3000))
+        max_tokens = prof_max if agent.rank == "professor" else assoc_max
 
         messages = [
             {"role": "system", "content": agent.system_prompt},
@@ -532,7 +649,8 @@ async def run_round_stream(debate: Debate, db: Session, *, user_id: int | None =
                     "content": f"[{_agent_label(nm, debate)}]: {nm.content}",
                 })
 
-        content = await chat_completion(messages, temperature=0.8, max_tokens=max_tokens, user_id=user_id, db=db)
+        agent_model = _model_for_agent(agent)
+        content = await chat_completion(messages, model=agent_model, temperature=0.8, max_tokens=max_tokens, user_id=user_id, db=db)
 
         msg = DebateMessage(
             debate_id=debate.id,
@@ -597,7 +715,9 @@ async def generate_summary(debate: Debate, db: Session, *, user_id: int | None =
         {"role": "user", "content": prompt},
     ]
 
-    raw = await chat_completion(messages, temperature=0.5, max_tokens=3000, user_id=user_id, db=db)
+    mod_agent = next((a for a in debate.agents if a.persona == "moderator"), None)
+    mod_model = _model_for_agent(mod_agent) if mod_agent else None
+    raw = await chat_completion(messages, model=mod_model, temperature=0.5, max_tokens=3000, user_id=user_id, db=db)
     sections = _parse_summary_sections(raw)
 
     debate.summary_consensus = sections.get("consensus", raw)
@@ -620,6 +740,7 @@ async def generate_summary(debate: Debate, db: Session, *, user_id: int | None =
                 disagreements=debate.summary_disagreements,
                 open_questions=debate.summary_open_questions,
                 directions=debate.summary_directions,
+                debate_id=debate.id,
             )
         except Exception as e:
             logger.warning("Zep push after debate summary failed: %s", e)
@@ -650,12 +771,14 @@ async def suggest_mode(discipline_names: list[str], *, user_id: int | None = Non
     """Ask the LLM which debate mode fits the given discipline combination."""
     prompt = (
         f"Given these academic disciplines: {', '.join(discipline_names)}\n\n"
-        "Which debate format would be more productive for exploring their intersection?\n"
-        "A) Free Discussion (自由讨论) — open-ended exploration of connections\n"
-        "B) Structured Debate (正反辩论) — arguing for/against a specific proposition\n\n"
+        "Which format would be more productive for their interdisciplinary exchange?\n"
+        "A) Free Discussion — open-ended exploration, each discipline shares perspectives freely\n"
+        "B) Focused Debate — each discipline defends its own approach to a specific question, "
+        "disciplines clash with each other (NOT for/against, but discipline-vs-discipline)\n\n"
         "Respond with ONLY a JSON object: "
         '{"mode": "free" or "debate", "reason_en": "...", "reason_zh": "...", '
-        '"suggested_proposition": "..." (only if mode is debate, else null)}'
+        '"suggested_proposition": "..." (only if mode is debate — phrase it as a research question '
+        'that each discipline would approach differently, NOT a yes/no proposition)}'
     )
     raw = await chat_completion(
         [{"role": "user", "content": prompt}],

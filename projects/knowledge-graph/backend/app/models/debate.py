@@ -32,6 +32,7 @@ class Debate(Base):
     mode: Mapped[str] = mapped_column(String(20), nullable=False)
     proposition: Mapped[str | None] = mapped_column(Text)
     language: Mapped[str] = mapped_column(String(5), default="zh")
+    depth: Mapped[str] = mapped_column(String(20), default="standard")
     status: Mapped[str] = mapped_column(String(20), default="active")
     intersection_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("intersections.id"), index=True
@@ -89,6 +90,7 @@ class DebateAgent(Base):
     stance: Mapped[str | None] = mapped_column(String(20))
     system_prompt: Mapped[str] = mapped_column(Text, nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    assigned_model: Mapped[str | None] = mapped_column(String(100))
 
     debate: Mapped[Debate] = relationship(back_populates="agents")
     discipline = relationship("Discipline", uselist=False)

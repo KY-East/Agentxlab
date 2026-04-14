@@ -141,7 +141,7 @@ export default function DetailPanel({
       }
 
       if (/(?:start debate|发起辩论|开始辩论|进入辩论|去辩论|辩论一下)/i.test(lower) || /(?:start debate|发起辩论|开始辩论|进入辩论|去辩论|辩论一下)/i.test(zhLower)) {
-        return { type: "start_debate" };
+        return { type: "start_debate", payload: { proposition: confirmedHypothesis || lastUserDirection || undefined } };
       }
 
       if (/^(?:clear|清除|清空|reset)$/i.test(lower)) {

@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     deepseek_api_key: str = ""
     default_ai_model: str = "deepseek/deepseek-chat"
 
+    # Multi-model debate: different models for different roles
+    debate_model_pro: str = ""
+    debate_model_con: str = ""
+    debate_model_moderator: str = ""
+
     # Zep Cloud — Agent Memory & Graph RAG
     zep_api_key: str = ""
 

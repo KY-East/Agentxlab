@@ -55,6 +55,7 @@ export default function DebateSession() {
   const [roundProgress, setRoundProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const autoRunRef = useRef(false);
 
 
   const [showPaperChat, setShowPaperChat] = useState(false);
@@ -66,6 +67,48 @@ export default function DebateSession() {
   const [sharing, setSharing] = useState(false);
   const [experimentRequested, setExperimentRequested] = useState<Set<number>>(new Set());
 
+  const [sidebarW, setSidebarW] = useState(220);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const startW = useRef(220);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!dragging.current) return;
+      const delta = e.clientX - startX.current;
+      setSidebarW(Math.min(480, Math.max(160, startW.current + delta)));
+    };
+    const onUp = () => { dragging.current = false; document.body.style.cursor = ""; document.body.style.userSelect = ""; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, []);
+
+  const STORAGE_KEY = `debate_autorun_${debateId}`;
+
+  const saveAutoRunState = useCallback((targetRounds: number) => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ debateId, targetRounds, ts: Date.now() }));
+    } catch {}
+  }, [STORAGE_KEY, debateId]);
+
+  const clearAutoRunState = useCallback(() => {
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch {}
+  }, [STORAGE_KEY]);
+
+  const getSavedAutoRun = useCallback((): { debateId: string; targetRounds: number; ts: number } | null => {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (Date.now() - parsed.ts > 30 * 60 * 1000) {
+        sessionStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return parsed;
+    } catch { return null; }
+  }, [STORAGE_KEY]);
+
   const load = useCallback(async () => {
     if (!debateId) return;
     setLoading(true);
@@ -75,6 +118,7 @@ export default function DebateSession() {
       const d = await api.getDebate(Number(debateId));
       setDebate(d);
       if (d.status === "completed") {
+        clearAutoRunState();
         api.listForumPosts({ debate_id: d.id, post_type: "debate_summary", limit: 1 })
           .then((posts) => { if (posts.length > 0) setSharedPostId(posts[0].id); })
           .catch(() => {});
@@ -84,9 +128,35 @@ export default function DebateSession() {
     } finally {
       setLoading(false);
     }
-  }, [debateId, t]);
+  }, [debateId, t, clearAutoRunState]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!autoRunning) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [autoRunning]);
+
+  useEffect(() => {
+    if (!debate || debate.status !== "active" || autoRunning || roundLoading) return;
+    const saved = getSavedAutoRun();
+    if (!saved) return;
+    const maxRoundSoFar = debate.messages.length > 0
+      ? Math.max(...debate.messages.map((m) => m.round_number))
+      : 0;
+    const remaining = Math.max(0, saved.targetRounds - maxRoundSoFar);
+    if (remaining > 0) {
+      handleAutoRun(saved.targetRounds);
+    } else if (maxRoundSoFar >= saved.targetRounds) {
+      clearAutoRunState();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debate?.id, loading]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -185,14 +255,33 @@ export default function DebateSession() {
     }
   };
 
-  const handleAutoRun = async () => {
-    if (!debate) return;
-    const totalRounds = 3;
+  const handleAutoRun = async (targetRounds = 3) => {
+    if (!debate || autoRunRef.current) return;
+    const currentRound = debate.messages.length > 0
+      ? Math.max(...debate.messages.map((m) => m.round_number))
+      : 0;
+    const remaining = Math.max(0, targetRounds - currentRound);
+    if (remaining === 0) {
+      clearAutoRunState();
+      setSummarizing(true);
+      try {
+        const updated = await api.summarizeDebate(debate.id);
+        setDebate(updated);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t("debateSession.generateFailed"));
+      } finally {
+        setSummarizing(false);
+      }
+      return;
+    }
+    autoRunRef.current = true;
     setAutoRunning(true);
     setError(null);
+    saveAutoRunState(targetRounds);
     try {
-      for (let r = 1; r <= totalRounds; r++) {
-        setRoundProgress(t("debateSession.roundProgress", { current: r, total: totalRounds }).toUpperCase());
+      for (let r = 1; r <= remaining; r++) {
+        const roundLabel = currentRound + r;
+        setRoundProgress(t("debateSession.roundProgress", { current: roundLabel, total: targetRounds }).toUpperCase());
         setRoundLoading(true);
         setThinkingAgent("...");
         const ok = await runOneRoundSSE(debate.id);
@@ -203,9 +292,11 @@ export default function DebateSession() {
       setSummarizing(true);
       const updated = await api.summarizeDebate(debate.id);
       setDebate(updated);
+      clearAutoRunState();
     } catch (err) {
       setError(err instanceof Error ? err.message : t("debateSession.generateFailed"));
     } finally {
+      autoRunRef.current = false;
       setAutoRunning(false);
       setRoundLoading(false);
       setSummarizing(false);
@@ -295,13 +386,13 @@ export default function DebateSession() {
   return (
     <div className="flex h-full">
       {/* Agent sidebar */}
-      <aside className="w-52 shrink-0 border-r-2 border-neutral-800 flex flex-col">
+      <aside style={{ width: sidebarW }} className="shrink-0 border-r-2 border-neutral-800 flex flex-col relative">
         <div className="px-3 py-2.5 border-b border-neutral-800">
           <button
             onClick={() => navigate("/debate")}
-            className="flex items-center gap-1 font-mono text-[10px] text-neutral-600 hover:text-white transition-colors mb-2 uppercase tracking-wider"
+            className="flex items-center gap-2 w-full px-2 py-2 font-mono text-xs text-neutral-300 hover:text-white hover:bg-neutral-800 transition-colors mb-2 uppercase tracking-wider border border-neutral-800 hover:border-neutral-600"
           >
-            <ArrowLeft size={10} />
+            <ArrowLeft size={14} />
             {t("debateSession.back")}
           </button>
           <div className="font-mono text-[10px] uppercase tracking-wider text-neutral-500">
@@ -329,8 +420,8 @@ export default function DebateSession() {
               return (
                 <div key={discId ?? "mod"}>
                   {disc && (
-                    <p className="font-mono text-[9px] text-neutral-600 uppercase tracking-wider pl-1 mt-2 mb-1 truncate">
-                      {disc.name_en}
+                    <p className="font-mono text-[9px] text-neutral-600 uppercase tracking-wider pl-1 mt-2 mb-1 break-words">
+                      {i18n.language?.startsWith("zh") ? (disc.name_zh || disc.name_en) : disc.name_en}
                     </p>
                   )}
                   {members.map((agent) => (
@@ -353,6 +444,18 @@ export default function DebateSession() {
           </div>
         )}
       </aside>
+
+      {/* Resize handle */}
+      <div
+        onMouseDown={(e) => {
+          dragging.current = true;
+          startX.current = e.clientX;
+          startW.current = sidebarW;
+          document.body.style.cursor = "col-resize";
+          document.body.style.userSelect = "none";
+        }}
+        className="w-1 shrink-0 cursor-col-resize hover:bg-cyan-400/30 active:bg-cyan-400/50 transition-colors"
+      />
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-0">
@@ -432,6 +535,21 @@ export default function DebateSession() {
             </div>
           )}
 
+          {/* Incomplete debate hint */}
+          {debate.status === "active" && debate.messages.length > 0 && !autoRunning && !roundLoading && (
+            <div className="mx-4 my-3 px-4 py-3 border border-amber-500/30 bg-amber-500/5">
+              <p className="font-mono text-xs text-amber-400">
+                {(() => {
+                  const cur = Math.max(...debate.messages.map((m) => m.round_number));
+                  const rem = Math.max(0, 3 - cur);
+                  return i18n.language?.startsWith("zh")
+                    ? `辩论进行中 — 已完成 ${cur} 轮${rem > 0 ? `，还剩 ${rem} 轮` : "，可生成总结"}。点击下方按钮继续。`
+                    : `Debate in progress — ${cur} round${cur > 1 ? "s" : ""} completed${rem > 0 ? `, ${rem} remaining` : ", ready to summarize"}. Click below to continue.`;
+                })()}
+              </p>
+            </div>
+          )}
+
           {/* Summary */}
           {debate.status === "completed" && debate.summary_consensus && (
             <SummaryBlock debate={debate} />
@@ -473,6 +591,13 @@ export default function DebateSession() {
 
         {/* Action bar */}
         <div className="px-5 py-3 border-t-2 border-neutral-800 flex items-center gap-3">
+          <button
+            onClick={() => navigate("/debate")}
+            className="flex items-center gap-1.5 px-3 py-2 border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 font-mono text-xs uppercase tracking-wider transition-colors"
+          >
+            <ArrowLeft size={12} />
+            {t("debateSession.back")}
+          </button>
           {error && (
             <p className="font-mono text-[10px] text-red-500 flex-1">{error}</p>
           )}
@@ -481,7 +606,7 @@ export default function DebateSession() {
             <>
               {debate.messages.length === 0 ? (
                 <button
-                  onClick={handleAutoRun}
+                  onClick={() => handleAutoRun(3)}
                   disabled={autoRunning}
                   className="flex items-center gap-2 px-5 py-2 bg-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-cyan-300 disabled:opacity-40 transition-colors"
                 >
@@ -493,18 +618,38 @@ export default function DebateSession() {
                   {t("debateSession.startDebateThreeRounds").toUpperCase()}
                 </button>
               ) : (
-                <button
-                  onClick={handleNextRound}
-                  disabled={roundLoading || summarizing || autoRunning}
-                  className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-cyan-300 disabled:opacity-40 transition-colors"
-                >
-                  {roundLoading ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Play size={12} />
-                  )}
-                  {t("debateSession.nextRound").toUpperCase()}
-                </button>
+                <>
+                  <button
+                    onClick={() => handleAutoRun(3)}
+                    disabled={roundLoading || summarizing || autoRunning}
+                    className="flex items-center gap-2 px-4 py-2 bg-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-cyan-300 disabled:opacity-40 transition-colors"
+                  >
+                    {autoRunning ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Play size={12} />
+                    )}
+                    {(() => {
+                      const cur = Math.max(...debate.messages.map((m) => m.round_number));
+                      const rem = Math.max(0, 3 - cur);
+                      return rem > 0
+                        ? (i18n.language?.startsWith("zh") ? `继续 (剩${rem}轮+总结)` : `CONTINUE (${rem} ROUNDS + SUMMARY)`)
+                        : (i18n.language?.startsWith("zh") ? "生成总结" : "SUMMARIZE");
+                    })()}
+                  </button>
+                  <button
+                    onClick={handleNextRound}
+                    disabled={roundLoading || summarizing || autoRunning}
+                    className="flex items-center gap-2 px-4 py-2 border border-neutral-700 text-neutral-400 hover:text-white hover:border-cyan-400 font-mono text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-40"
+                  >
+                    {roundLoading ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Play size={12} />
+                    )}
+                    {t("debateSession.nextRound").toUpperCase()}
+                  </button>
+                </>
               )}
               {debate.messages.length > 0 && !autoRunning && (
                 <button
@@ -572,21 +717,17 @@ function AgentRow({ agent, colorIdx }: { agent: DebateAgent; colorIdx: number })
   const borderColor = AGENT_BORDER_COLORS[colorIdx % AGENT_BORDER_COLORS.length];
 
   return (
-    <div className={`pl-2 py-1.5 border-l-2 ${borderColor} flex items-center gap-2`}>
+    <div className={`pl-2 py-1.5 border-l-2 ${borderColor} flex items-start gap-2`}>
       <div className="flex-1 min-w-0">
-        <p className="font-mono text-[11px] text-neutral-300 truncate">{agent.agent_name}</p>
+        <p className="font-mono text-[11px] text-neutral-300 break-words leading-tight">{agent.agent_name}</p>
         <div className="flex items-center gap-1 mt-0.5 flex-wrap">
           {agent.persona !== "moderator" && (
             <span className="font-mono text-[8px] text-neutral-600 uppercase">{rankMeta.label}</span>
           )}
           <span className={`font-mono text-[8px] uppercase ${meta.color}`}>{meta.label}</span>
-          {agent.stance && agent.stance !== "moderator" && (
-            <span
-              className={`font-mono text-[8px] uppercase ${
-                agent.stance === "advocate" ? "text-green-400" : "text-red-400"
-              }`}
-            >
-              {agent.stance === "advocate" ? t("debateSession.advocate") : t("debateSession.challenger")}
+          {agent.persona !== "moderator" && agent.assigned_model && (
+            <span className="font-mono text-[8px] uppercase text-neutral-700">
+              {agent.assigned_model.split("/").pop()}
             </span>
           )}
         </div>
@@ -604,7 +745,6 @@ function MessageBlock({
   agent?: DebateAgent;
   agentIndex: number;
 }) {
-  const { t } = useTranslation();
   const meta = agent
     ? PERSONA_META[agent.persona] || PERSONA_META.moderator
     : PERSONA_META.moderator;
@@ -625,13 +765,9 @@ function MessageBlock({
             {agent.agent_name}
           </span>
           <span className={`font-mono text-[9px] uppercase ${meta.color}`}>{meta.label}</span>
-          {agent.stance && agent.stance !== "moderator" && (
-            <span
-              className={`font-mono text-[9px] uppercase ${
-                agent.stance === "advocate" ? "text-green-400" : "text-red-400"
-              }`}
-            >
-              {agent.stance === "advocate" ? t("debateSession.advocate") : t("debateSession.challenger")}
+          {agent.persona !== "moderator" && agent.assigned_model && (
+            <span className="font-mono text-[8px] uppercase text-neutral-700">
+              {agent.assigned_model.split("/").pop()}
             </span>
           )}
         </div>

@@ -49,6 +49,11 @@ def _load_debate(debate_id: int, db: Session) -> Debate:
     return debate
 
 
+def _check_owner(debate: Debate, user: User) -> None:
+    if debate.created_by and debate.created_by != user.id:
+        raise HTTPException(403, "You are not the owner of this debate")
+
+
 @router.post("", response_model=DebateOut)
 async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     if body.mode not in ("free", "debate"):
@@ -89,10 +94,14 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user:
     else:
         title = " \u00d7 ".join(d.name_en for d in disciplines)
 
+    valid_depths = ("quick", "standard", "deep", "max")
+    depth = body.depth if body.depth in valid_depths else "standard"
+
     debate = Debate(
         title=title,
         mode=body.mode,
         language=lang,
+        depth=depth,
         proposition=body.proposition,
         status="active",
         intersection_id=resolved_intersection_id,
@@ -139,6 +148,7 @@ def get_debate(debate_id: int, db: Session = Depends(get_db)):
 @router.post("/{debate_id}/rounds", response_model=list[MessageOut])
 async def next_round(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = _load_debate(debate_id, db)
+    _check_owner(debate, user)
     if debate.status != "active":
         raise HTTPException(400, "Debate is not active")
 
@@ -158,6 +168,7 @@ async def next_round(debate_id: int, db: Session = Depends(get_db), user: User =
 async def next_round_stream(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     """SSE endpoint — streams each agent's message as it is generated."""
     debate = _load_debate(debate_id, db)
+    _check_owner(debate, user)
     if debate.status != "active":
         raise HTTPException(400, "Debate is not active")
 
@@ -176,6 +187,7 @@ async def next_round_stream(debate_id: int, db: Session = Depends(get_db), user:
         idx = 0
         try:
             async for msg in run_round_stream(debate, db, user_id=_user_id):
+                db.commit()
                 idx += 1
                 payload = {
                     "id": msg.id,
@@ -189,7 +201,6 @@ async def next_round_stream(debate_id: int, db: Session = Depends(get_db), user:
                     "total": total_speakers,
                 }
                 yield f"data: {_json.dumps(payload, ensure_ascii=False)}\n\n"
-            db.commit()
             done = {"done": True, "round_number": current, "max_rounds": MAX_ROUNDS}
             yield f"data: {_json.dumps(done)}\n\n"
         except Exception as exc:
@@ -213,6 +224,7 @@ def round_info(debate_id: int, db: Session = Depends(get_db)):
 @router.post("/{debate_id}/summarize", response_model=DebateOut)
 async def summarize_debate(debate_id: int, db: Session = Depends(get_db), user: User = Depends(get_verified_user)):
     debate = _load_debate(debate_id, db)
+    _check_owner(debate, user)
     if debate.status == "completed":
         raise HTTPException(400, "Debate already summarized")
     if not debate.messages:

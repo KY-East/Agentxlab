@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import {
@@ -47,6 +47,7 @@ function findNode(nodes: Discipline[], id: number): Discipline | null {
 
 export default function Canvas() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { tree, loading: treeLoading, error: treeError, refresh: refreshTree } = useDisciplines();
   const { user } = useAuth();
@@ -386,8 +387,24 @@ export default function Canvas() {
         }
       } else if (action.type === "start_debate") {
         if (selectedNodes.size >= 2) {
-          const ids = [...selectedNodes].join(",");
-          window.location.href = `/debate?disciplines=${ids}`;
+          const ids = [...selectedNodes];
+          const proposition = action.payload?.proposition as string | undefined;
+          showToast(
+            i18n.language?.startsWith("zh")
+              ? "正在创建辩论…"
+              : "Creating debate…",
+          );
+          api.createDebate({
+            discipline_ids: ids,
+            mode: proposition ? "debate" : "free",
+            proposition: proposition || undefined,
+            intersection_id: activeIntersection || undefined,
+            language: i18n.language?.startsWith("zh") ? "zh" : "en",
+          }).then((debate) => {
+            navigate(`/debate/${debate.id}`);
+          }).catch((err) => {
+            showToast(err instanceof Error ? err.message : "Failed to create debate");
+          });
         } else {
           showToast(
             i18n.language?.startsWith("zh")

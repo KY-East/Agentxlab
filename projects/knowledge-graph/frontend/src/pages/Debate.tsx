@@ -65,6 +65,7 @@ export default function Debate() {
   const [toast, setToast] = useState<string | null>(null);
   const [showWeights, setShowWeights] = useState(false);
   const [weights, setWeights] = useState<Record<number, "core" | "support">>({});
+  const [depth, setDepth] = useState<"quick" | "standard" | "deep" | "max">("standard");
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -149,6 +150,7 @@ export default function Debate() {
         intersection_id: intersectionId ? Number(intersectionId) : undefined,
         discipline_weights: Object.keys(dw).length > 0 ? dw : undefined,
         language: debateLang,
+        depth,
       });
       navigate(`/debate/${debate.id}`);
     } catch (err) {
@@ -474,6 +476,36 @@ export default function Debate() {
             )}
 
             {/* Start button */}
+            {/* Depth selector */}
+            <div className="mb-4">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-neutral-500 mb-2">
+                {i18n.language?.startsWith("zh") ? "辩论深度" : "Debate Depth"}
+              </p>
+              <div className="grid grid-cols-4 gap-1">
+                {([
+                  { value: "quick" as const,    zh: "快速",   en: "Quick",    desc: { zh: "~1分钟", en: "~1 min" } },
+                  { value: "standard" as const, zh: "标准",   en: "Standard", desc: { zh: "~3分钟", en: "~3 min" } },
+                  { value: "deep" as const,     zh: "深度",   en: "Deep",     desc: { zh: "~8分钟", en: "~8 min" } },
+                  { value: "max" as const,       zh: "极限",   en: "Max",      desc: { zh: "~15分钟", en: "~15 min" } },
+                ]).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setDepth(opt.value)}
+                    className={`py-2 px-1 border text-center font-mono text-xs transition-colors ${
+                      depth === opt.value
+                        ? "border-cyan-400 text-cyan-400 bg-cyan-400/10"
+                        : "border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300"
+                    }`}
+                  >
+                    <div>{i18n.language?.startsWith("zh") ? opt.zh : opt.en}</div>
+                    <div className="text-[9px] mt-0.5 opacity-60">
+                      {i18n.language?.startsWith("zh") ? opt.desc.zh : opt.desc.en}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button
               onClick={handleCreate}
               disabled={selected.size < 2 || creating || (mode === "debate" && !proposition.trim())}
@@ -512,7 +544,7 @@ export default function Debate() {
                             {m.rank[0]}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs text-white truncate">{m.name}</p>
+                            <p className="text-xs text-white break-words leading-tight">{m.name}</p>
                             <span
                               className={`text-[10px] font-mono uppercase tracking-wider ${
                                 j === 0 ? "text-yellow-400" : "text-sky-400"

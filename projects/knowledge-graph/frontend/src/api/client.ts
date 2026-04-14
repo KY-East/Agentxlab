@@ -120,6 +120,7 @@ export const api = {
     intersection_id?: number;
     discipline_weights?: Record<number, number>;
     language?: string;
+    depth?: string;
   }) =>
     request<import("../types").Debate>("/api/debates", {
       method: "POST",
