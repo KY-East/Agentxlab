@@ -1,24 +1,33 @@
 # Agent X Lab — 开发进度
 
-> 最后更新: 2026-03-30
+> 最后更新: 2026-04-14
 
 ## 产品完成度评估
 
-**目标: 120 / 100** — 功能代码完成度约 50%，生产就绪度约 35%
+**目标: 120 / 100**
 
-### 已完成 (~50 分)
+### 三维度评分（2026-04-13 体检）
+
+| 维度 | 得分 | 说明 |
+|------|------|------|
+| 功能完成度 | **87/100** | 图谱/探索/辩论/论文/社区/订阅全链路已通 |
+| 产品完成度 | **72/100** | 核心体验连贯，但 i18n 硬编码多、状态覆盖不全 |
+| 生产就绪度 | **48/100** | 3张表+15字段缺 migration、零测试、.env.example 不全 |
+
+### 已完成 (~62 分)
 
 | 得分 | 模块 | 说明 |
 |------|------|------|
 | 8 | 数据层 (OpenAlex) | 26 fields / 252 subfields / 4516 topics + 论文关联 |
 | 8 | 知识图谱画布 | 学科树 + 力导图 + 连线交互 + EdgeDetailPanel + AI 对话 |
-| 7 | 多 Agent 辩论引擎 | 4 性格 + 层级团队 + Zep 记忆 + 火花采集 |
+| 9 | 多 Agent 辩论引擎 | 学科碰撞模型 + 多LLM混合 + 可选深度(quick~max) + 流程连续性保护 + Zep 记忆 |
 | 5 | 反向发现引擎 | 研究问题 → LLM → 学科推荐 → 画布 |
 | 5 | 论文生成 | 对话式方向推荐 + 大纲 + SSE 逐章扩写 |
-| 6 | 社区论坛 | 双区 + 实验验证 + 积分 + 翻译 |
-| 4 | 认证 + 订阅 + 支付 | Google + 邮箱 + Stripe + Crypto + Token 配额 |
-| 3 | 安全修复 + i18n | 权限链路 + 中英双语 |
-| 4 | UI/UX (Brutalist) | 基本风格统一，但缺 loading/empty/error 状态设计 |
+| 7 | 社区论坛 | 双区 + 实验验证 + 积分 + 翻译 + 状态保护 |
+| 6 | 认证 + 订阅 + 支付 | Google + 邮箱 + Stripe + Crypto + Token 配额 + owner 校验 |
+| 5 | 安全修复 + i18n | 权限链路统一 + 学科碰撞文案 + 中文学科名 prompt |
+| 5 | UI/UX (Brutalist) | 侧边栏可拖拽 + 深度选择器 + 名称自动换行 |
+| 4 | KPAX 产品设计 | 五层架构 + 组件输出协议 + pipeline 映射表（文档完成，代码未开始） |
 
 ### 缺失部分 — 达到 100 分需要 (~50 分)
 
@@ -41,13 +50,24 @@
 
 ### 超出预期 — 冲 120 分 (~20 分)
 
+真正的超出预期 = 两个产品形成生态 + 知识沉淀对抗模型退化
+
 | 模块 | 预估分值 | 说明 |
 |------|----------|------|
-| Agent 人格进化系统 | 5 | Agent 跨辩论积累经验，形成独特学术人格，可被社区评价 |
-| 实时协作辩论 | 4 | WebSocket 多人同时观看/参与辩论，弹幕式评论 |
-| 知识图谱 3D 可视化 | 3 | Three.js 沉浸式图谱，VR-ready |
-| AI 创造力量化仪表盘 | 5 | 项目核心假说的可视化证明——AI 跨学科碰撞的创造力指标体系 |
-| 开放 API + 插件系统 | 3 | 第三方接入，让其他研究者基于平台做实验 |
+| KPAX MVP 上线 | 8 | 五种决策类型 + 报告模板 + 论文/实操数据注入，调用 AXL 底座能力 |
+| 共享记忆飞轮 | 6 | AXL ↔ KPAX 双向知识沉淀，用户越多越聪明，对抗模型退化的核心防线 |
+| Agent 人格进化 | 3 | 跨辩论积累经验，记忆系统的自然延伸 |
+| 开放 API | 3 | 第三方接入，放大生态 |
+
+**战略前提：模型会退化（Brain Rot），知识沉淀和人类数据是生存线，不是锦上添花。**
+参考：Shumailov et al. (2024) Nature Model Collapse + arXiv:2510.13928 Brain Rot
+
+**记忆系统架构状态（2026-04-14）：**
+- Plan 完成（含第一性原理 Review），存放于 `.cursor/plans/memory_system_architecture_7d1abf0b.plan.md`
+- **Phase 1 已实施**：metadata schema（origin + evidence_ref）写入所有 Zep 入口 + 检索 re-rank + 17 条验收测试全通过
+- **Phase 2 已实施**：Round 3+ 会话记忆压缩（三层 context: 压缩摘要 + 上轮原文 + 未解决问题），14 条验收测试全通过
+- 待后期实施：按任务分检索器（数据积累后评估）、效用验证（数据积累后）
+- 下一步：Phase 3 KPAX 集成
 
 ## 总览
 
@@ -65,10 +85,13 @@
 | 6 | 订阅 + Token 配额 + 支付 | 已完成 | 2026-03-30 | 2026-03-30 | Free/Pro/Lifetime + Stripe + Crypto + 配额计量 |
 | 6.1 | 安全修复 | 已完成 | 2026-03-30 | 2026-03-30 | 邮箱验证权限统一 + 论坛状态保护 + 支付安全 |
 | 6.2 | 代码归档 | 已完成 | 2026-03-30 | 2026-03-30 | 早期研究文档归档到 archive/early-research 分支 |
-| 7 | 工程基础设施 | 未开始 | — | — | DB 迁移补全 + .env + 测试 + 错误处理 |
+| 6.3 | 辩论引擎大改 | 已完成 | 2026-04-05 | 2026-04-13 | 学科碰撞模型 + 多LLM + 深度选择 + 流程连续性 |
+| 6.4 | i18n & 文案对齐 | 已完成 | 2026-04-13 | 2026-04-13 | suggest_mode + 前端文案 + 中文学科名 prompt |
+| 6.5 | 项目体检 | 已完成 | 2026-04-13 | 2026-04-13 | 三维度评估 + 问题清单 + 优化路线图 |
+| 7 | 工程基础设施 | **待执行** | — | — | DB 迁移补全 + .env + 测试 + 错误处理 |
 | 8 | 全局统计 + 管理后台 | 未开始 | — | — | AI 创造力仪表盘 + 后台管理 |
 | 9 | 部署 + 运维 | 未开始 | — | — | CI/CD + 监控 + 文档 |
-| 10 | 超预期功能 | 未开始 | — | — | Agent 进化 + 实时协作 + 3D 图谱 |
+| 10 | 超预期功能 | 未开始 | — | — | Agent 进化 + 实时协作 + 开放 API |
 
 ---
 
@@ -739,6 +762,9 @@
 - [ ] 真实环境数据灌入
 - [ ] Agent 记忆召回质量评估
 - [ ] 知识图谱与 Zep 双向同步
+- [ ] origin=external/generated 检索优先级验证
+- [ ] evidence_ref 非空写入断言测试
+- [ ] 跨产品隔离验证（AXL 不泄漏 user_private，KPAX 不跨用户）
 
 ---
 
@@ -769,10 +795,6 @@
 - [ ] 弹幕式评论 / 提问（AI 可以回应观众问题）
 - [ ] "辩论直播"模式 vs "回放"模式
 
-### 10.3 知识图谱 3D 可视化
-- [ ] Three.js / React Three Fiber 沉浸式图谱
-- [ ] 节点按维度分层（field → subfield → topic 三层球体）
-- [ ] 飞行穿梭交互（点击节点"进入"该学科空间）
 
 ### 10.4 开放 API + 插件系统
 - [ ] 公开 REST API（带 API Key 认证）
@@ -781,9 +803,29 @@
 
 ---
 
-## 阻塞点 & 已知问题
+## 阻塞点 & 已知问题（2026-04-13 更新）
 
-- [ ] 画布从 field 入口进入时 topic 选取数量（15 个）仍可能偏少（需权衡性能和图谱可读性）
-- [ ] `EdgeDetailPanel` 中 `isZh` 硬编码判断未走 i18n 标准流程
-- [ ] Alembic migration 与 ORM 模型不同步（高优先级，影响新环境部署）
-- [ ] `.env.example` 与 `config.py` 严重脱节（新开发者无法启动）
+### P0 — 上线阻塞
+- [ ] 3 张表无 migration：`subscriptions`、`payment_records`、`translation_cache`
+- [ ] 15+ 字段缺 migration：`Debate.depth`、`Debate.created_by`、`DebateAgent.assigned_model`、`Discipline.is_custom/created_by`、User 认证字段
+- [ ] `Subscription`/`PaymentRecord` 不在 `models/__init__.py` 导出，Alembic autogenerate 看不到
+- [ ] `.env.example` 仅覆盖 5/26 个环境变量
+- [ ] JWT secret 硬编码默认值 "change-me-in-production"
+- [ ] 零测试覆盖
+
+### P1 — 产品体验
+- [ ] `DiscoveryPanel` 几乎全硬编码中文（~15处）
+- [ ] `EdgeDetailPanel` 大量硬编码中英混排（~12处）
+- [ ] `Debate.tsx` depth 选择器硬编码中文
+- [ ] `DebateSession.tsx` 错误/状态字符串硬编码
+- [ ] Profile 页 API 失败静默吞掉
+- [ ] Home 页初始学科加载无 loading/error 态
+- [ ] ForumPostDetail 投票按钮无 disabled 态
+- [ ] 孤儿 hooks：`useDebate.ts`、`useGraph.ts`
+
+### P2 — 增强
+- [ ] 无 React Error Boundary
+- [ ] 无 CI/CD
+- [ ] 图谱大数据量无虚拟化
+- [ ] SSE 断流无重连
+- [ ] 画布从 field 入口进入时 topic 选取数量仍可能偏少

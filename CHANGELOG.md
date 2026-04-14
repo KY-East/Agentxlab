@@ -1,5 +1,85 @@
 # Changelog
 
+## 2026-04-14 — Memory System Phase 1 实施
+
+### 代码变更
+- **zep_manager.py 重写**：所有 `graph.add` 写入附带结构化 metadata（origin, evidence_ref, memory_type, source, confidence, verification, created_at, source_id）
+- **检索升级**：`search_knowledge` 支持 metadata filter（origin / memory_type）+ origin 权重 re-rank（external x1.2, generated x0.9）
+- **`retrieve_context` 增强**：返回的上下文标注 [external] / [generated] 来源
+- **agent_memory.py 重写**：`push_agent_cognition` 写入附带 metadata + debate_id 证据锚点
+- **cognition_distiller.py**：传入 debate_id 到 agent memory，完成证据链
+- **debate_engine.py**：`push_debate_summary` 调用传入 debate_id
+- **zep.py 路由**：`push_discipline_knowledge` / `push_scholar_knowledge` 传入 openalex_id
+
+### Phase 2: 会话记忆压缩
+- **session_memory.py 新建**：Round 3+ 自动压缩历史为三层结构（压缩摘要 + 上轮原文 + 未解决问题清单）
+- **debate_engine.py**：`run_round_stream` 的 `_build_history` 替换为 `build_compressed_context`，按 depth 动态决定压缩时机
+- 压缩阈值：quick=R2, standard/deep=R3, max=R4
+- 压缩失败自动降级到全文模式，不中断辩论
+
+### 新增测试（项目第一批测试，31 条全通过）
+- `tests/test_memory_metadata.py`：17 条——metadata schema、origin re-ranking、filter 构建、writer 验证、evidence anchor
+- `tests/test_session_memory.py`：14 条——压缩阈值、消息分轮、三层 context 结构、降级回退、depth 适配、压缩效率
+
+### 架构改进（plan 更新）
+- **知识 vs 模型产物分层**：metadata schema 新增 `origin = external | generated` 字段，检索排序时 external 权重 x1.2、generated 权重 x0.9，从结构上防止 AI 自我强化
+- **证据锚点（evidence anchor）**：metadata schema 新增 `evidence_ref` 字段，每条长期记忆追溯到原始来源（debate_message_id / paper_id / content hash），让 verification 不只是标签而是可追溯的信任链
+- **Write Ownership Policy 扩展**：表中新增 origin 列和 evidence_ref 示例列，每种数据类型的来源分类和证据要求明确
+- **验收断言扩展**：新增 origin 优先级断言（external 排在 generated 之前）和 evidence_ref 非空断言
+
+### 第一性原理 Review 记录
+- 4 条洞察完整存档至 plan 文档末尾
+- 2 条已采纳（origin 分层 + evidence anchor），2 条记录待后期实施（task-specific retrieval + 效用验证）
+- 战略级提醒：当前用 metadata 分层是最小方案，数据量增长后可能需要拆检索管道
+
+### 文档同步
+- KPAX.md Brain Rot 防御思路新增"知识 vs 模型产物分层"和"证据锚点"两条
+- PROGRESS.md 更新记忆系统进度
+
+## 2026-04-13 — 项目体检 & 辩论引擎大改
+
+### 重大变更
+- **辩论模型：正反方 → 学科碰撞**：废弃旧的 advocate/challenger 正反方机制，改为每个学科代表自己参战、跨学科碰撞。同一学科的教授+副教授是队友，不同学科之间互相质疑。重写了 STANCE_PROMPTS、ROUND_OPENERS 和 `_build_agent_system_prompt`
+- **辩论深度可选**：新增 Debate.depth 字段（quick/standard/deep/max），用户可选辩论深度，token 上限从 1500~12000 动态调整
+- **多 LLM 混合辩论**：每场辩论随机分配 DeepSeek / GPT-5.4 / Claude Opus 4.6 给不同 agent，assignment 持久化到 DebateAgent.assigned_model，重启不丢
+- **辩论流程连续性保护**：sessionStorage 保存 autoRun 任务状态，刷新后自动恢复续跑；beforeunload 防误关；autoRunRef 防重入
+
+### 新增
+- **社区论坛系统**：ForumPost / ForumComment / ForumVote 全套，帖子类型（用户/AI生成/辩论总结/实验请求）、实验认领流程、积分系统、一键翻译
+- **用户系统**：注册/登录/Google OAuth/邮箱验证/密码重置，JWT 认证链路
+- **订阅与支付**：Subscription 模型、Stripe 集成、加密货币支付、token 配额管理、模型选择
+- **Profile 页**：个人资料编辑、头像、发帖/辩论/积分历史、订阅管理
+- **Pricing 页**：套餐对比、支付入口
+- **翻译缓存**：TranslationCache 模型，论坛内容一键翻译
+
+### 安全修复
+- 辩论 next_round / summarize 加 owner 校验，防止他人控制辩论
+- SSE 每条消息即时 commit，刷新不丢数据
+- 论坛帖子状态流转加 post_type 校验，普通帖不能进入实验状态
+- 加密支付确认改用 record.user_id，不再信任前端传入
+- Stripe 降级时清空 stripe_subscription_id 等字段
+- 邮箱验证接入 get_verified_user 权限链
+
+### i18n & 文案
+- suggest_mode() 推荐逻辑从"正反辩论"改为"学科碰撞"
+- en.json / zh.json 辩论相关文案全面更新（Structured Debate → Focused Debate / 学科碰撞）
+- 中文 prompt 用中文学科名，消除中英混排
+- 前端 AgentRow / MessageBlock 移除 advocate/challenger 标签，改显示 assigned_model
+
+### UI 改进
+- DebateSession 左侧 Agent 侧边栏可拖拽调整宽度（160px-480px）
+- Agent 名字从 truncate 改为 break-words 自动换行
+- 学科分组标题中文模式显示中文名
+- 辩论创建页新增 4 格深度选择器（快速/标准/深度/极限）
+
+### 项目体检
+- 完成三维度评估：功能 87 / 产品 72 / 生产就绪 48
+- 发现 3 张表 + 15 字段缺 migration
+- .env.example 仅覆盖 5/26 个变量
+- 输出 6 阶段优化路线图 + 27 项可执行任务列表
+
+---
+
 ## 2026-04-04 — 数据清理 & 画布重构
 
 ### 变更
