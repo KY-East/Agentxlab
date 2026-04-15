@@ -454,7 +454,7 @@ async def generate_agents(
             )
 
             cognition_block = _load_agent_cognition(
-                disc.id, rank, " x ".join(names), disc.name_en,
+                disc.id, rank, " x ".join(names_en), disc.name_en,
             )
             full_prompt = (
                 f"{base_prompt}\n\n{cognition_block}" if cognition_block else base_prompt
