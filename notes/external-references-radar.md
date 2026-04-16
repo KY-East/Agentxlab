@@ -63,6 +63,16 @@
 
 ---
 
+### [2026-03-28] Leo 的 Polymarket 玩家策略扒取 Skill
+- **链接**：https://x.com/runes_leo/status/2037871828149129466 （Solana Agent Economy Hackathon 参赛作品，$30k 奖金池）
+- **是什么**：Claude Code skill，装上后 AI 能扒 Polymarket 任意玩家的交易策略。展示案例：9 大品类排行榜第一名分析，有人 9 万笔交易覆盖 1181 个市场，有人靠 SPLIT 套利闷声赚 $21 万
+- **对 AXL / KPAX**：**弱相关**。KPAX 概率题类型（prob_01~prob_10 那批"世界杯谁赢""BTC 会破 20 万吗"之类）里，**Polymarket 实时赔率可作为 7 顾问辩论时的证据源**。扒玩家策略本身不是核心，但 Polymarket 数据接入是可延伸的一条线
+- **对 Ken 个人**：crypto 背景人的一个有意思 skill
+- **动作**：**track（弱）**
+- **理由**：Ken 标注"记录"即可。概率题场景的候选数据源之一，未来做实时证据接入时回来看
+
+---
+
 ### [2026-04-16] 歸藏的 Logo Generator Skill（KPAX v0 视觉产物工具）
 - **链接**：https://x.com/op7418/status/2044634498432962806（文章里会给 skill repo）
 - **是什么**：Claude Code / Gemini CLI skill，三步生成 Logo + 高级展示图
