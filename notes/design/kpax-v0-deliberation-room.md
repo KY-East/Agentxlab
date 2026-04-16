@@ -321,7 +321,7 @@ L7 是 Ken 相对 WisLand 的核心差异点，不能是黑箱。在 KPAX 前端
 - `projects/knowledge-graph/backend/app/routers/kpax_router.py` — AXL mock router（v0 要换成真 debate_engine 调用）
 - `notes/research/seven-layer-memory-design.md` — L1-L7 记忆体系
 - `notes/research/agent-evolution-free-parameters.md` — 5 类自由参数（在 AXL 层）
-- `notes/research/wisland-analysis-and-positioning.md` — KPAX 相对 WisLand 的差异化定位
+- `notes/research/` 下的对位分析笔记（项目研究上游，非对外定位参考）
 
 ---
 

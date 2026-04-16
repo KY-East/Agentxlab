@@ -161,10 +161,10 @@
 - **Post-train 自研 base 模型**：只 fine-tune 小 judge
 - **自研 PDF 板式解析模型**：用 unstructured/pdfminer 开箱
 - **DCA 端侧百万长序列**：没必要
-- **科研工具产品功能**（论文检索、学术写作、参考文献管理）：KPAX 保持在消费决策垂直
-- **追赶 WisLand 工程栈**：每周一自检属于 efficiency 跑道还是 capability 跑道
+- **科研工具产品功能**（论文检索、学术写作、参考文献管理）：KPAX 保持在通用决策场景，不扩成科研工具
+- **把 KPAX 扩到帮研究者"省时间"那一类**：KPAX 帮用户做判断，不是替用户更快完成任务
 
-依据：wisland note C.3 P1 表格 + C.4 陷阱清单
+依据：`notes/research/` 对位分析笔记
 
 ---
 

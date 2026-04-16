@@ -30,10 +30,10 @@ remediation-plan-multi-agent.md      ← 6. 修改方案：4 个修改点 P0/P1
 **关联实验**：整个涌现分解实验的理论上游。
 
 ### `wisland-analysis-and-positioning.md`
-**主题**：面对 WisLand/Faraday 项目的研究定位分析。
-**核心判断**：WisLand 是 efficiency play（天花板=省时间），Ken 是 capability play（天花板=新能力）。两者不在一条跑道，不要追赶工程栈，在他们必然不做的三个维度（L7 元进化 / 反事实实验 / 消费决策垂直）做到全行业第一。
-**关键产出**：A 项目事实 / B 11 条可偷启发 / C 研究定位回答。
-**硬规则来源**：`PROJECT.md` §5.5 反向清单的全部依据都在这里。
+**主题**：Ken 对 WisLand/Faraday 项目尽调后产出的内部分析笔记。
+**性质**：研究笔记（Ken 自己理解外部项目用），**不是**项目对外身份标签。主文档（`PROJECT.md`、`KPAX.md`、`README.md`）不引用为对比坐标系。
+**内容**：A 项目事实 / B 11 条可偷启发 / C 内部反向清单（"我们不做什么"的依据）。
+**硬规则来源**：`PROJECT.md` §5.5 反向清单的论证在这里展开。
 
 ### `agent-evolution-free-parameters.md`
 **主题**：5 类自由参数清单（fitness / re-rank / diversity 坍缩 / innovation 比例 / decay）。
