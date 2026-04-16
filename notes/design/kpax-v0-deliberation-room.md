@@ -126,6 +126,42 @@ World Labs 2 天前刚发的 3D Gaussian Splatting 的浏览器级流式渲染�
 - 种子 50 token / 消费 quick=10 / standard=25 / deep=60 / 分享奖励 20
 - **预留链上接口**（`ChainAdapter` 已抽象），Phase 2 上 Solana 或 Base
 
+### 4.7 外部架构参考：Claw3D（2026-04-16 cc 深读开源 repo）
+
+`iamlukethedev/Claw3D`（MIT，Next.js 16 + React 19 + R3F 9.5 + Drei 10.7 + Phaser 3.90 + Three.js 0.183 + ws 8.18）是目前对 KPAX 座谈会方向最直接的参照。他们不是真 3D——主"3D retro office" 实际是 **Phaser 2D 等轴测**（Arc 圆点 + Text 标签 + A* 寻路）。Three.js 在 deps 里但核心场景没用到。
+
+**可直接借鉴的抽象层**（不抄渲染）：
+
+1. **Scene Bridge 模式**（`OfficeSceneBridge.ts`）：极简 observer pattern，getState / setState / subscribe 三方法桥接 React state 和 Phaser/R3F 场景。30 行代码，不用 Redux。KPAX 直接照搬给 R3F 用。
+
+2. **Systems 架构**（`phaser/systems/`）：每个关注点独立 System 类，每帧 `update(state, delta)`。Claw3D 有 LightingSystem / AmbienceSystem / AgentEffectsSystem 三个。KPAX 翻译：
+   - `SpotlightSystem`——聚光灯跟发言者
+   - `HeadIKSystem`——其他顾问头部朝向当前发言者（R3F `@react-three/drei` 的 `useLookAt`）
+   - `LipSyncSystem`——NVIDIA Audio2Face-3D 驱动嘴型
+   - `DebateRoundSystem`——Round 1→2→3 推进
+   - `ChamberAmbienceSystem`——烛光摇曳 / 烟气 / 时钟秒针
+   - `VerdictSystem`——判决书浮现
+
+3. **Agent state → visual 映射** (`AgentEffectsSystem.ts`)：Claw3D 用颜色编码 working(绿) / meeting(蓝) / error(红) / idle(黄)。KPAX 对应：
+   - listening（侧耳）/ speaking（聚光）/ thinking（沉思）/ agreeing（点头）/ dissenting（摇头）/ dismissed（退到 second position）
+
+4. **Hooks 分离**：`useRemoteOfficePresence` / `useRemoteOfficeLayout`——backend 数据 → React state 的单一 hook。KPAX 对应：
+   - `useDebateStream`——AXL `/axl/v1/analyze/*` 的 debate_trace 流式数据
+   - `useChamberLayout`——7 座位 + 第二位置 + 氛围元素
+   - `useExpertPresence`——当前在场的顾问列表（7 or 3/5）
+   - `useVerdictComposer`——moderator 判决文的流式呈现
+
+5. **Procedural textures**（Phaser 写法，Three.js 类比：自建 `THREE.CanvasTexture` / `NodeMaterial`）：减少 asset loading 重量。书房里一些重复纹理（木纹 / 皮革）可以 procedural。
+
+**明确不抄的**：
+
+- **Phaser 2D 方向**：KPAX 要 Victorian UE5 质感，Phaser 做不到。R3F 才对。
+- **Studio 中间层 + WebSocket 代理**（`server/`）：Claw3D 需要因为他们连多种 runtime。KPAX 是 HTTP 调 AXL 一家，不需要。
+- **A* pathfinding**：Claw3D agents 持续走动。KPAX 顾问大多坐着，只在状态切换（入席 / 回第二位置）时需要简单插值，不需要 A*。
+- **agents 用 Arc circle**：我们 v0 从头就要 GLB rigged mesh。
+
+**立即可拿来用的代码量估计**：OfficeSceneBridge.ts（30 行）+ Systems 架构模板（300 行）+ presence/layout hook 模式（200 行）≈ 500 行"免费"架构模板。**我们应该从 Day 1 就按这个骨架起步**，不是自己从零试。
+
 ---
 
 ## 5. 一次使用的完整脚本（用户视角）

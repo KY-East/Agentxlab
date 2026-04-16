@@ -53,6 +53,22 @@
 
 ---
 
+### [2026-04-16] awesome-ceo —— Ken 个人 + KPAX 知识层候选内容源（2026-04-16 晚 Ken 纠正 cc 的第一判断）
+- **链接**：https://github.com/kuchin/awesome-ceo
+- **推文来源**：https://x.com/Bitturing/status/2044328380326379618
+- **是什么**：awesome-list 格式的 CEO / 创始人资源集合，8 模块（融资 / 产品 / 销售 / 营销 / 管理 / 招聘 / 财务 / 创业），内容来自 YC / a16z / Sequoia 及一线创业者
+- **对 AXL / KPAX**（cc 第一版写"不相关"，Ken 纠正）：**这是 KPAX 知识层的候选内容源**。KPAX 不是只吃论文，有三条知识输入线——
+  1. 学术论文（arXiv / OpenAlex / Semantic Scholar）
+  2. **行业 curated 资源（YC / a16z / Sequoia essays、playbooks）—— awesome-ceo 在这一层**
+  3. 社区经验数据（Reddit / 知乎 / Quora，由小伙伴爬虫）
+  7 位顾问辩论时从三类调证据。用户问"该不该辞职创业"这类问题时，行业 curated 层可以直接命中。
+- **对 Ken 个人**：融资 / 产品 / marketing / 管理翻起来顺手
+- **动作**：**track（短期）→ adopt（当 KPAX 开始 ingest curated 知识源时）**
+- **理由**：**cc 第一版判断"skip 项目"是因为把 KPAX 窄化成了只吃学术——错**。这是一条需要回头修的认知：KPAX 知识架构 = 论文 + 行业 curated + 社区经验 三线并行。awesome-ceo 在第二线里是一个完整的种子清单
+- **后续**：需要在 `notes/research/seven-layer-memory-design.md` 或新建 `notes/research/kpax-knowledge-source-architecture.md` 把三条线写清楚
+
+---
+
 ### [2026-04-16] Claw3D — 3D virtual office for AI agents（KPAX 最直接的正面参照物）
 - **链接**：https://claw3d.ai / @claw3dcity / @iamlukethedev（Luke The Dev，Christian / Dad / Farm life）
 - **推文来源**：https://x.com/iamlukethedev/status/2044523804718755890 （2026-04-15，Sims mode 发布）
