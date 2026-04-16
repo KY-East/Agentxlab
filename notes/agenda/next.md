@@ -114,6 +114,35 @@
 - 按 spec 5.2 顺序：baseline+A → B+C → D+E
 - 每批跑完生成中间 summary.md 给 Ken 过
 
+### `@cc` 跟进 Zep 从 memory 改名 context engineering 的技术含义
+- [ ] 读 Zep 的 Graphiti framework 新文档，看 temporal knowledge graph 的 valid_at / invalid_at 实现
+- [ ] 评估：AXL 当前七层记忆用 Zep 的 add_memory / search_knowledge 接口，Zep 新 positioning 是否要求我们改接口使用方式
+- [ ] 输出一段话更新 `notes/research/seven-layer-memory-design.md` 的 backend 部分
+- 依据：`notes/external-references-radar.md` [2026-04-16] witcheer Two-Camps 第 1 条连接
+
+### `@cc` OpenClaw 6 加权信号做 agent-evolution-free-parameters 默认值
+- [ ] 读 OpenClaw 的 dreaming process 源码（light sleep / REM / deep sleep 三阶段）
+- [ ] 把 6 个信号（relevance 0.30 / frequency 0.24 / query diversity 0.15 / recency 0.15 / consolidation 0.10 / conceptual richness 0.06）作为 AXL 自由参数 L7 元进化的 prior，写进 `notes/research/agent-evolution-free-parameters.md`
+- [ ] AXL 差异化写明：别人 hard-code，我们让它 per-user 可学习
+- 依据：同上，第 2 条连接
+
+### `@cursor` emergence_decomposition 续集：compounding_gain_benchmark（下一个实验）
+- [ ] emergence_decomposition 全量跑完后，下个实验设计：测 "session N 是不是比 session 1 更聪明"（compounding gain）
+- [ ] witcheer 指出这是现有所有 memory benchmark 的空白——AXL 护城河的天然论文立足点
+- [ ] 提前写 spec 草稿，等 emergence 全量结果 + 自由参数初版 validate 后启动
+- 依据：radar [2026-04-16] 第 3 条连接 + `notes/research/agent-evolution-free-parameters.md` + `seven-layer-memory-design.md` L7
+
+### `@cc` 深读 Thoth（145⭐ 小项目）
+- [ ] Thoth 4 阶段 dream cycle：duplicate merging 0.93 sim / enrichment / relationship inference / confidence decay 90 天
+- [ ] 10 entity types + 67 typed relations 的 schema 设计值得抄
+- [ ] 评估能否作为 AXL Phase 3（L3 语义 + L4 程序记忆）的参考实现
+- 依据：radar [2026-04-16] 第 4 条连接
+
+### `@cc` 深读 ALIVE（witcheer 自己的项目）
+- [ ] 访问 alivecontext.com + @AliveContext_ 推特看架构
+- [ ] 评估 "walnuts" 作为 portable context container 的设计——可能对应 KPAX 的"每用户决策历史可导出单位"
+- 依据：radar [2026-04-16] 第 5 条连接
+
 ---
 
 ## 🔵 P3 —— 记一笔，以后做
