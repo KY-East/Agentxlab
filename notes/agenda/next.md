@@ -97,8 +97,9 @@
 - 依据：wisland note B.1 + B.6（均已改）
 
 ### `@cc` KPAX 论文注入路径选型
-- [ ] **绝不**用 OCR-based 方案（mineru / Marker / 其它）
+- [ ] **绝不**用 OCR-based 方案（mineru / Marker / Firecrawl Fire-PDF 整体栈 / 其它）
 - [ ] 走 `pdfminer.six` 或 `unstructured` 的 pdfminer 后端
+- [ ] **评估：`firecrawl/pdf-inspector`**（纯 Rust，无 ML，只做分类 + 文本抽取，和规则不冲突）作为 pdfminer.six 的潜在替代。如果某页分类为 scanned 直接丢弃，不 OCR。—— 依据 radar [2026-04-16] Fire-PDF 条目
 - [ ] 写 `PaperSource` 抽象层：arXiv API + Semantic Scholar + Crossref + Unpaywall + Europe PMC + OpenAlex（fallback 顺序）
 - [ ] 依据：wisland note B.3 + B.7（OpenAlex 60% abstract 缺失）
 - 触发时机：KPAX 开始做论文注入那一刻，不是现在
