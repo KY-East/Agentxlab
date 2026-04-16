@@ -1,0 +1,22 @@
+{
+  "experiments": [
+    {
+      "id": "emergence_decomposition",
+      "name": "涌现来源分解实验",
+      "status": "checkpoint_0_complete",
+      "spec": "emergence_decomposition/spec.md",
+      "results_dir": "emergence_decomposition/results/",
+      "created_by": "cursor",
+      "executed_by": "claude_code",
+      "reviewed_by": "ken",
+      "created_at": "2026-04-14",
+      "last_updated": "2026-04-15",
+      "dry_run_report": "emergence_decomposition/results/dry_run_20260414_173832/dry_run_report.md",
+      "mini_dry_run_report": "emergence_decomposition/results/dry_run_20260415_171016/mini_dry_run_report.md",
+      "scaleup_report": "emergence_decomposition/results/dry_run_20260416_083829/scaleup_report.md",
+      "current_checkpoint": "0 — 已确定关闭；20 场扩样（15 + 5 补）mean $0.99 / stdev $0.17 / 20/20 成功 / CV 17%；900 场点估 $891，95% CI $741-$1041",
+      "next_checkpoint": "1 — pilot（baseline + A 组 × 20 题 × 2 run = 80 场，估 ~$79，wall ~27h）",
+      "blocker": null
+    }
+  ]
+}
