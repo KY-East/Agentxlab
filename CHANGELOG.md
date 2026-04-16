@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-04-15 (晚) — 冗长重复修复 + runner 韧性落地 + Checkpoint 0 真关闭
+
+### 代码变更
+- **`projects/knowledge-graph/backend/app/services/debate_engine.py`**：
+  - `depth_tokens["quick"]`：`(1500, 1000)` → `(800, 600)`（只动 quick，不影响 standard/deep/max 的生产 KPAX 调用）
+  - `_build_agent_system_prompt` 中文输出规则新增两条硬约束：严禁复述本轮他人已提论点（要回应必须升级/反驳/补新证据）、严禁凑字数
+- **`experiments/emergence_decomposition/runner.py`**（runner 韧性三项一次性落地）：
+  - `progress.jsonl` heartbeat（run_start / debate_start / debate_done）
+  - `asyncio.wait_for(..., timeout=2000s)` 单场 33 min 硬 cap
+  - debate 间 `await asyncio.sleep(65)` 缓和 Anthropic 分钟配额
+
+### 验证
+- **mini dry run（seed=42, n=3, 同题 cmp_06/cmp_04/dec_10）**：
+  - **cost**：$1.65 → **$0.91**（–45%）
+  - **total_tokens**：543k → **324k**（–40%）
+  - **wall_sec**：2004s → **901s**（–55%）
+  - **单条消息字数**：2089 → **1153**（–45%，跨 3 题一致）
+  - 0 失败，0 rate limit（Tier 1 自洽，不需要提 Anthropic tier）
+- **推演结论质量**：moderator summary 未降反锐（"AI 对话式编程高风险"从 disagreements 升为 consensus；冲突点从"终极价值"抽象层变为"资源分配优先级"可操作层）
+- 完整对比：`experiments/emergence_decomposition/results/dry_run_20260415_171016/mini_dry_run_report.md`
+
+### 全量外推调整
+- 900 场：$1,620 → **$815**（旧 report §4 的"砍题目/砍组/换 moderator"降本方案全部作废）
+- Opus moderator + run=3 + 6 组 50 题原设计可全保留
+
+## 2026-04-15 — 实验 Checkpoint 0 文档与 dry run 报告
+
+### 文档与注册表
+- **`experiments/emergence_decomposition/results/dry_run_20260414_173832/dry_run_report.md`**：基于 5 条成功 `raw/*.json` 汇总单次 token/USD/时长，外推 900 次成本与 runner 必改项；`experiment_registry.json` 状态更新为 `checkpoint_0_report_ready`，增加 `dry_run_report` 路径字段
+- **`experiments/emergence_decomposition/spec.md`**：文首状态与 registry 对齐
+- **`experiments/README.md`**：说明 `status` 允许 `checkpoint_*` 粒度
+- **`AGENTS.md`**：当前快照更新（runner 已存在、KPAX HTTP-only、Checkpoint 0 待 Ken 批）
+- **`notes/agenda/next.md`**：P0 改为 runner 三项 + Ken 审批；**`PROGRESS.md`**：修正「零测试」表述为后端已有 pytest、E2E 仍薄
+- **KPAX**：`kpax_svc/main.py` 注册 **`v1_analyze`** 路由（`/api/v1/analyze`），与 legacy `analyze` 并存直至退役
+
 ## 2026-04-14 — Memory System Phase 1 实施
 
 ### 代码变更

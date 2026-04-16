@@ -260,6 +260,8 @@ def _build_agent_system_prompt(
             f"- 使用**要点列表**（bullet points）格式，不写长段落\n"
             f"- 引用你学科的具体理论、学者或研究发现\n"
             f"- **必须点名回应**其他学科的具体论点——赞同、反驳或发展\n"
+            f"- **严禁复述本轮他人已提过的论点或角度**；要回应就必须**升级、反驳或补新证据**，不是换个说法重复\n"
+            f"- **严禁凑字数**：宁可短而锐利，不要长而啰嗦。只说本轮有增量的内容\n"
             f"- 每次发言结尾：你的学科对核心问题的独特贡献是什么，其他学科做不到的"
         )
     else:
@@ -621,7 +623,7 @@ async def run_round_stream(debate: Debate, db: Session, *, user_id: int | None =
             continue
 
         depth_tokens = {
-            "quick":    (1500, 1000),
+            "quick":    (800, 600),
             "standard": (4000, 3000),
             "deep":     (8000, 6000),
             "max":      (12000, 10000),
