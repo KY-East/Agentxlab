@@ -168,11 +168,15 @@
 
 ### `@cc` 建 KPAX 知识源架构笔记（Ken 2026-04-16 晚 提醒 cc 漏了这层）
 - [ ] 新建 `notes/research/kpax-knowledge-source-architecture.md`
-- [ ] 写清三条输入线：(a) 学术论文 arXiv/OpenAlex/S2 (b) 行业 curated awesome-lists/YC/a16z/Sequoia (c) 社区经验 Reddit/知乎/Quora 爬虫
+- [ ] 写清三条输入线：(a) 学术论文 arXiv/OpenAlex/S2 (b) 行业 curated awesome-lists/YC/a16z/Sequoia (c) 社区经验 Reddit/知乎/Quora
 - [ ] 7 位顾问在辩论时如何从三类源调证据，每类对应哪些学科
 - [ ] Ken 的小伙伴爬虫现状、覆盖度、哪些类目缺口
 - [ ] KPAX 初版可以从 awesome-ceo 开始 ingest 行业 curated 层，验证调用链路
-- 依据：radar [2026-04-16] awesome-ceo 纠正 + Ken 多次强调 KPAX 不只吃论文
+- [ ] **第三线（社区经验）候选参考池**（按需 vs 预缓存两种模式都要）：
+  - autocli（radar [2026-04-16]）—— 按需 Chrome-login-state 本地 skill，55+ 平台
+  - yupi-hot-monitor（radar [2026-04-16]）—— 预缓存定时 poll 服务端，8+ 平台，AI pipeline 参考
+  - graphify（radar [2026-04-16]）—— 文件夹→知识图谱，适合行业 curated 层
+- 依据：radar [2026-04-16] awesome-ceo / autocli / yupi-hot-monitor / graphify 四条
 
 ### `@cc` 深读 ALIVE（witcheer 自己的项目）
 - [ ] 访问 alivecontext.com + @AliveContext_ 推特看架构

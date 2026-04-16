@@ -63,6 +63,27 @@
 
 ---
 
+### [2026-04-16] 程序员鱼皮 yupi-hot-monitor（KPAX 第三知识线的 full-stack 参考）
+- **链接**：https://github.com/liyupi/yupi-hot-monitor（Node.js / Express 5 / React 19 / OpenRouter / Socket.io，开源 + 付费教程）
+- **推文来源**：https://x.com/yupi996/status/2044824052179890407
+- **是什么**：AI 热点监控工具 full-stack 实现。6 大功能：(1) 关键词配置 (2) 8+ 数据源定时抓（Twitter / Bing / HN / 搜狗 / B 站 / 微博 等），AI 做查询扩展 + 真假识别 + 相关性 + 摘要 + 低质量过滤 (3) 多维度筛选排序 (4) 全网搜索 (5) WebSocket 实时推送 + 邮件通知 (6) 打包成 Agent Skills（Cursor / VSCode Copilot / Claude Code 通用）
+- **对 AXL / KPAX**：**直接对应 KPAX 知识架构第三条线（社区经验 / 实时热点）的完整 full-stack 参考**。和 autocli / graphify 并列为第三线候选池
+- **和 autocli 的关系**：**互补，不是重复**
+  - autocli = 按需查询（用户问题进来→实时拉），Chrome 登录态，本地 skill
+  - yupi-hot-monitor = 预缓存（后台 poll 30min+推），API key 式，服务端架构
+  - KPAX 真做起来两种都要——按需 + 预缓存
+- **实际价值**：
+  1. 8 数据源的聚合代码可直接参考（省接平台 API 的苦活）
+  2. AI 二次加工 pipeline（查询扩展 / 真假识别 / 相关性 / 摘要）KPAX 完全适用
+  3. Agent Skills 打包手法值得抄
+- **局限**：
+  - 教程项目，代码质量未验证（"demo 跑通"级可能多于"生产级"）
+  - 后端 Node.js，我们是 Python FastAPI，**看架构思路，不直接用代码**
+- **对 Ken 个人**：中国开发者教程生态产物，看中国市场 vibe coding 教程走向
+- **动作**：**track + fork 参考**（KPAX 知识层第三线设计时必看）
+
+---
+
 ### [2026-03-28] Leo 的 Polymarket 玩家策略扒取 Skill
 - **链接**：https://x.com/runes_leo/status/2037871828149129466 （Solana Agent Economy Hackathon 参赛作品，$30k 奖金池）
 - **是什么**：Claude Code skill，装上后 AI 能扒 Polymarket 任意玩家的交易策略。展示案例：9 大品类排行榜第一名分析，有人 9 万笔交易覆盖 1181 个市场，有人靠 SPLIT 套利闷声赚 $21 万
