@@ -53,7 +53,7 @@
 
 ---
 
-### [2026-04-16] Firecrawl Fire-PDF v2（**触发 wisland OCR 禁令**）+ pdf-inspector 子组件（符合规则）
+### [2026-04-16] Firecrawl Fire-PDF v2（**规则复查后由 skip 改为 track**，2026-04-16 晚）
 - **链接**：
   - 整体栈：https://www.firecrawl.dev/blog/fire-pdf-launch
   - 纯 Rust 子组件：https://github.com/firecrawl/pdf-inspector
@@ -63,18 +63,18 @@
   - 文本页走 native text extraction 快路径，不碰 GPU
   - 扫描页走 **GPU 神经布局模型 + GLM-OCR vision-language model**
   - 速度 5x，每页 < 400ms，表格 / 公式 preserve
-- **规则冲突**：
-  - `notes/agenda/next.md` + wisland note 硬规则："绝不 OCR-based 方案（mineru / Marker / 其它）"
-  - Fire-PDF **整体栈**带 OCR fallback，和 Marker 是同类——**违反规则，skip**
-  - `pdf-inspector` **子组件**（纯 Rust 文本路径 + 分类）不带 OCR——**符合规则**
+- **评估过程（含 cc 自我纠错记录）**：
+  - cc 第一版判断：Fire-PDF 整体栈有 OCR fallback → 触发 "绝不 OCR" 规则 → skip
+  - Ken 质疑规则来源：发现 "绝不 OCR" 是 cc 从 wisland deck 外推的（Ken 从未说过），被错误固化为硬规则
+  - Ken 立场澄清："我们没有这个积累，有了立马就用"——能力约束型，不是战略回避
+  - 规则改为 "不自建板式解析模型"（保留），放开 OCR 限制。相关文档已同步修正（wisland B.3 / PROJECT §5.5 / next.md 反向清单）
 - **对 AXL / KPAX**：
-  - Fire-PDF 完整栈：**skip**，直接违反硬规则
-  - pdf-inspector：**track**。KPAX 论文注入阶段可以用它做"快速分类 + 文本抽取"，如果某页 `pdf-inspector` 分为 scanned，**按规则直接丢弃该页或整篇**，不调 OCR。比 pdfminer.six 快且识别扫描 PDF 更准
-- **对 Ken 个人**：无额外用
-- **动作**：Fire-PDF = **skip**；pdf-inspector = **track**
-- **理由**：
-  1. 这是 radar 流程第一次遇到明确的规则冲突。记在案，证明 radar 判断不是 "所有流行工具都 adopt"，硬规则优先
-  2. pdf-inspector 作为 pdfminer 替代值得后续评估——更新 next.md P2 的 "KPAX 论文注入路径选型" 任务：明确考虑 pdf-inspector 作为 pdfminer 的潜在替代
+  - **学术论文**（arXiv / S2）场景：仍优先 pdfminer.six / unstructured（纯文本够用，不需要 Fire-PDF 的 OCR 能力）
+  - **行业报告 / deck / 扫描版 / 社区截图**场景：Fire-PDF 是强候选（表格 / 公式 preserve 好、速度快、OCR 智能 fallback）
+  - `pdf-inspector` 单独也值得：做 "pages-are-text vs scanned" 预分类路由非常有用
+- **对 Ken 个人**：无
+- **动作**：**track**（非 skip）。KPAX 开始做第二 / 第三知识线 ingest 时重新评估
+- **理由**：Ken 明确说"有能力就上正面"，Fire-PDF 是开箱成熟方案，属于 "能用就用" 类别。未来在 KPAX 内容注入阶段对比候选池（pdfminer / unstructured / Fire-PDF / docling / Marker / mineru）按场景选，不预先 skip
 
 ---
 

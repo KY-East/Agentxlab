@@ -96,13 +96,14 @@
 - [ ] 主 judge 仍是 API，不替换
 - 依据：wisland note B.1 + B.6（均已改）
 
-### `@cc` KPAX 论文注入路径选型
-- [ ] **绝不**用 OCR-based 方案（mineru / Marker / Firecrawl Fire-PDF 整体栈 / 其它）
-- [ ] 走 `pdfminer.six` 或 `unstructured` 的 pdfminer 后端
-- [ ] **评估：`firecrawl/pdf-inspector`**（纯 Rust，无 ML，只做分类 + 文本抽取，和规则不冲突）作为 pdfminer.six 的潜在替代。如果某页分类为 scanned 直接丢弃，不 OCR。—— 依据 radar [2026-04-16] Fire-PDF 条目
+### `@cc` KPAX 内容注入路径选型（不止论文，三条知识线都涉及）
+- [ ] **硬规则**：不自建板式解析模型（没有 10 年积累）。开箱工具按内容类型分场景选
+- [ ] **学术论文**（arXiv / S2）走 `pdfminer.six` 或 `unstructured` pdfminer 后端
+- [ ] **行业报告 / deck / 扫描版 / 老文档 / 社区截图**：允许用 OCR-based 开箱方案（Fire-PDF / docling / mineru / Marker 等都在候选池），按"能扛住的最简方案"选
+- [ ] 评估 `firecrawl/pdf-inspector`（纯 Rust，无 ML，做分类 + 文本抽取）作为学术路径的 pdfminer 替代
 - [ ] 写 `PaperSource` 抽象层：arXiv API + Semantic Scholar + Crossref + Unpaywall + Europe PMC + OpenAlex（fallback 顺序）
-- [ ] 依据：wisland note B.3 + B.7（OpenAlex 60% abstract 缺失）
-- 触发时机：KPAX 开始做论文注入那一刻，不是现在
+- [ ] 依据：wisland note B.3（2026-04-16 晚修订版）+ B.7（OpenAlex 60% abstract 缺失）
+- 触发时机：KPAX 开始做内容注入那一刻
 
 ### `@cursor` + `@ken` KPAX decision domain tag
 - [ ] KPAX session 埋 `decision_domain` 字段（用户填 or LLM 自动打）
@@ -197,12 +198,14 @@
 
 - **自建文献索引**：用 arXiv + S2 API，不抓期刊
 - **Post-train 自研 base 模型**：只 fine-tune 小 judge
-- **自研 PDF 板式解析模型**：用 unstructured/pdfminer 开箱
+- **自研 PDF 板式解析模型**：用开箱工具（pdfminer / unstructured / Marker / mineru / Fire-PDF / docling 都行），不自己训
 - **DCA 端侧百万长序列**：没必要
 - **科研工具产品功能**（论文检索、学术写作、参考文献管理）：KPAX 保持在通用决策场景，不扩成科研工具
 - **把 KPAX 扩到帮研究者"省时间"那一类**：KPAX 帮用户做判断，不是替用户更快完成任务
 
-依据：`notes/research/` 对位分析笔记
+**立场澄清（Ken 2026-04-16 晚）**：上面的"不做 X"都是 **能力约束型**立场（没有积累，做不过人家），**不是战略回避**。有好工具就用，有能力就上正面。cc 以后写反向清单不要自带"避免竞争"叙事。
+
+依据：`notes/research/` 对位分析笔记（2026-04-16 修订）
 
 ---
 
