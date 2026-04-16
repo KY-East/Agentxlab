@@ -63,6 +63,26 @@
 
 ---
 
+### [2026-04-16] 歸藏的 Logo Generator Skill（KPAX v0 视觉产物工具）
+- **链接**：https://x.com/op7418/status/2044634498432962806（文章里会给 skill repo）
+- **是什么**：Claude Code / Gemini CLI skill，三步生成 Logo + 高级展示图
+  - 第一步：信息收集（产品名 / 行业 / 核心概念 / 设计偏好）
+  - 第二步：SVG 变体生成
+  - 第三步：配专业背景渲染高级展示图
+  - 作者推荐 Gemini CLI（SVG 能力强），Claude Code 也可用
+- **对 AXL / KPAX**：**直接命中 KPAX v0 视觉产物需求**。落地场景：
+  1. KPAX 主 Logo（主站 / 推特 / 分享卡 / 钱包内图标）
+  2. AXL Logo（GitHub / README / PROGRESS.md）
+  3. 7 学科抽象图标（座谈会场景 fallback / moderator 徽章 / 发言标识）
+  4. 代币图标（wallet 条 / 奖励弹窗）
+  5. UI 按钮图标（分享 / 有帮助 / 拍肩膀）
+- **互补关系**：和 Cocoon `architecture-diagram-generator`（已 adopt）正好配齐——一个画架构图，这个画 Logo/Icon，组合起来是 KPAX/AXL 文档+品牌视觉的完整工具栈
+- **对 Ken 个人**：任何小项目要 Logo 的默认起点
+- **动作**：**adopt**（KPAX v0 上线前视觉产物默认工具）
+- **理由**：low-cost high-value。solo dev 不找设计师不挑公版的最简方案
+
+---
+
 ### [2026-04-16] Hyperframes — Claude Code 本地视频生成 skill（KPAX 分享 loop 关键候选）
 - **链接**：推文里没给明确 repo 链接，搜索关键词 "Hyperframes Claude Code video render"
 - **推文来源**：https://x.com/billtheinvestor/status/2044855521132580966

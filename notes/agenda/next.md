@@ -114,6 +114,16 @@
 - [ ] 依据：radar [2026-04-16] Lawrence 日志方法论 + 我们现状"10+ 文件散落 logger，55 处调用，无统一配置"
 - 触发时机：KPAX v0 前端真跑起来之前
 
+### `@cc` KPAX + AXL v0 视觉产物（v0 上线前必做）
+- [ ] KPAX Logo（主站 / 推特头像 / 分享卡 / 钱包图标）
+- [ ] AXL Logo（GitHub / README / PROGRESS.md 头）
+- [ ] 7 学科抽象图标（座谈会 fallback UI / moderator 徽章）
+- [ ] 代币图标
+- [ ] UI 按钮图标：分享、有帮助、拍肩膀
+- [ ] 生成工具：**歸藏 Logo Generator Skill**（radar [2026-04-16]）— Gemini CLI 三步生成 SVG + 高级展示图
+- [ ] 架构图配套：**Cocoon architecture-diagram-generator**（已 adopt）
+- 依据：radar Cocoon + 歸藏 两条
+
 ### `@cc` KPAX 分享激励 loop 设计（v0 上线前必接）
 - [ ] 每场辩论结束 → 生成 30 秒精华视频（7 顾问辩论高光 + 最终判决）
 - [ ] 视频生成候选：**Hyperframes**（radar [2026-04-16]）——Claude Code 预装 skill，HTML → MP4 本地渲染，零云端
