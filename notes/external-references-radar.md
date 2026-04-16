@@ -53,6 +53,17 @@
 
 ---
 
+### [2026-04-16] linux-android — Termux 脚本把旧安卓手机变 Linux 主机
+- **链接**：推文里没给明确 repo 链接，搜索关键词 "linux-android termux MIT"
+- **推文来源**：https://x.com/DtDt666/status/2044703758714905045
+- **是什么**：Termux 里跑的脚本，把旧安卓手机变成 Linux 桌面（XFCE4 / LXQt / MATE）/ Home Assistant 服务器 / 开发机。**无 root 无刷机**。GPU 支持（Turnip Vulkan 骁龙 / Mali fallback），SSH、Box64/Wine、PulseAudio。MIT。对比：树莓派 4 $35-75 / 二手迷你主机 $100+ / VPS $5/月
+- **对 AXL / KPAX**：**弱相关**。一个细弱 angle——之前 autocli radar 条目提到的"云 AXL + 用户本地 skill 辅助"混合架构，用户旧安卓手机可作为本地 skill 节点。非当前需要
+- **对 Ken 个人**：有旧安卓手机的话是个周末玩具
+- **动作**：**track（弱）**
+- **理由**：Ken 标注"有意思"，不是紧迫候选。记一笔，未来讨论 KPAX 用户本地部署模式时回来看
+
+---
+
 ### [2026-04-16] Firecrawl Fire-PDF v2（**规则复查后由 skip 改为 track**，2026-04-16 晚）
 - **链接**：
   - 整体栈：https://www.firecrawl.dev/blog/fire-pdf-launch
@@ -206,6 +217,29 @@
 ## 已落地的成果速查（adopt 状态）
 
 *（空。第一个 adopt 进来后这里同步一行。）*
+
+---
+
+## 市场信号（和工具分开，用于决定 GTM 时机）
+
+Ken 2026-04-16 说："和项目无关，和市场有关，决定我们什么时候推向市场"——这类记录和工具 radar 分开。定期更新，供 KPAX v0 上线时机参考。
+
+### [2026-04-15 快照] BTC True Market Mean 状态
+- **来源**：https://x.com/CryptoVizArt/status/2044645603355885635 / Glassnode TMM 指标
+- **TMM 定义**：活跃投资人平均成本基准 = Investor Capitalization / (Liveliness × Circulating Supply)。过滤死币 / 休眠钱包 / Satoshi 份额
+- **当前状态**（截至 2026-04-15）：
+  - BTC 于 2026-01-31 跌破 TMM，现已 **75 天**
+  - max 回撤 -20%，当前 -5%
+  - 轨迹**比历史同期均值温和**，但 75 天**仍早**（历史底部 5-9 月）
+- **历史对照**：2018-19 熊（-57% / 282 天）/ COVID 2020（-40% / 49 天）/ 2022-23 Luna-FTX（-56% / 339 天）
+- **对 KPAX GTM 的解读**：
+  - KPAX 有代币经济 + 钱包身份 → 加密市场情绪直接影响用户接受度
+  - 底部附近用户更警觉 + 更愿意用"决策工具"（被教训过）；峰值用户 FOMO 冲昏头
+  - 如果 2026 Q2–Q3 真是底部区间，**KPAX v0 给朋友测试的窗口可能在这附近**
+  - 信号是"watch closely"，不是"all clear"——不急着上，但别睡过去
+- **下次更新触发**：BTC 重回 TMM 之上 OR 最大回撤突破 -30% OR Ken 给新信号
+
+---
 
 ---
 
