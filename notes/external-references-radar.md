@@ -53,6 +53,22 @@
 
 ---
 
+### [2026-04-16] Anthropic claude-cookbooks（38.9k⭐）
+- **链接**：https://github.com/anthropics/claude-cookbooks
+- **推文来源**：https://x.com/rwayne/status/2044738322988232718 （@rwayne，2026-04-16 上午 4:23）
+- **是什么**：Anthropic 官方 notebook 示例库。目录：`capabilities/`（classification / RAG / summarization）/ `tool_use/` / `third_party/`（Pinecone 等）/ `multimodal/` / `misc/`（sub-agents / moderation filters / JSON mode / prompt caching）/ `claude_agent_sdk/` / `extended_thinking/` / `patterns/agents/` / `skills/` / `finetuning/`。
+- **对 AXL / KPAX 有没有用**：不是可集成工具，是参考库。四个场景会直接用到：
+  1. KPAX `question_classifier.py` 接真 LLM → 看 `capabilities/classification`
+  2. AXL debate_engine pattern review → 看 `patterns/agents/` + `misc/sub-agents`
+  3. AXL deep-depth 深推演 → 看 `extended_thinking/`
+  4. KPAX report_generator tool use → 看 `tool_use/` + `claude_agent_sdk/`
+- **不直接解决的问题**：多 agent cross-discipline debate with Opus moderator synthesis（AXL 独门设计）、七层记忆、agent evolution——cookbook 都没覆盖。我们还是在做 Anthropic 官方没做的地方。
+- **对 Ken 个人有没有用**：Claude 相关代码的"查 Anthropic 官方怎么写"默认起点。开发效率提升。
+- **动作**：**track + bookmark**
+- **理由**：参考库性质，不是工具。下次写 Claude 相关代码前先翻对应 notebook，避免重造轮子。
+
+---
+
 ### [2026-04-16] Qwen3.5-9B-GLM5.1-Distill-v1
 - **链接**：https://huggingface.co/Jackrong/Qwen3.5-9B-GLM5.1-Distill-v1
 - **推文来源**：https://x.com/berryxia/status/2044792772100853842 （Berryxia.AI 转引 @leftcurvedev_）
