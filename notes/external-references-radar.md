@@ -53,6 +53,46 @@
 
 ---
 
+### [2026-04-16] Cocoon-AI architecture-diagram-generator + Hermes Agent Skills 生态
+- **链接**：
+  - 主：https://github.com/Cocoon-AI/architecture-diagram-generator （MIT）
+  - 集成方：https://hermes-agent.nousresearch.com/docs/skills/ （Hermes Agent Skills Hub）
+- **推文来源**：https://x.com/Teknium/status/2044190761609244986 （@Teknium = NousResearch 联创 + Head of Post Training，Hermes 系列开源模型的团队）
+- **是什么**：Claude Code / Hermes skill，`/architecture-diagram <prompt>` 一条命令生成暗色主题的系统架构图（HTML/SVG 单文件输出，零外部依赖）。Hermes Agent 官方 port MIT 版进来作为 built-in skill。
+- **对 AXL / KPAX**：
+  1. **立刻可用于项目文档**：生成 AXL↔KPAX HTTP 边界图 / 七层记忆 L1-L7 图 / 座谈会管线图 / 三条知识线架构图。cc 可以马上装上配图 `kpax-v0-deliberation-room.md`、`seven-layer-memory-design.md`、`kpax_api_spec.md`
+  2. **Hermes Agent 值得单独 track**：witcheer 24/7 setup 用的就是它，这是 Mac Mini M4 本地 agent infrastructure 的一个重要参照。Skills Hub 里可能还有更多我们用得上的
+- **对 Ken 个人**：想做技术 deck / blog 配图也直接用
+- **动作**：**adopt（立刻装，用于项目文档配图）+ track（Hermes Agent 作为 Camp 2 context substrate 实作参照）**
+- **理由**：低成本 high-value。一个 skill 下午就能把所有设计文档配上像样架构图，显著提升可读性。Hermes Agent 值得花时间研究——witcheer 的 Two-Camps 文章已经指向它
+
+**Side find（同次搜索意外发现，单独值得一条）**：
+
+### [2026-04-16] safishamsi/graphify — 文件夹转可查询知识图谱（KPAX 第二知识线关键工具）
+- **链接**：https://github.com/safishamsi/graphify
+- **是什么**：Claude Code / OpenClaw / Cursor 等多 agent 通用 skill。把**任意文件夹**（code / docs / papers / images / videos）转成**可查询的知识图谱**
+- **对 AXL / KPAX**：**直接打中 KPAX 知识架构第二条线（行业 curated）的 ingest 处理工具**。流程：
+  - Ken 把 awesome-ceo essays / YC 文章 / a16z playbooks / Sequoia pitch decks 下载到本地文件夹
+  - `graphify` ingest → 变成知识图谱
+  - AXL 的 agents 查询时直接拉 graph edge + 相关文档片段
+- 和前面 witcheer 文章里 Camp 2 的 Thoth（10 entity types / 67 typed relations / A* graph expansion）是同一范式
+- **对 Ken 个人**：自己读书做笔记 / 沉淀多年资料的工具，纯个人用也值得试
+- **动作**：**strongly track + 等 KPAX 知识架构笔记写完再决定 adopt / 自建**
+- **理由**：要等 `notes/research/kpax-knowledge-source-architecture.md` 写出来（P2 agenda 已挂），再对照 graphify / Thoth / ALIVE 三家做选型。是选型池的重点候选
+
+---
+
+### [2026-04-16] Android APK 反编译 Claude Code skill
+- **链接**：https://github.com/Sinnenagoghi/android-reverse-engineering-skill
+- **推文来源**：https://x.com/axiaisacat/status/2044324733479432425
+- **是什么**：Claude Code skill，`/decompile app.apk` 一条命令反编译 APK/XAPK/JAR/AAR，自动抽 Retrofit/OkHttp 接口、Activity→ViewModel→Repository→HTTP 调用链、分析 Manifest + 架构、解 ProGuard/R8 混淆。用途：安全研究 / 竞品分析 / 逆向学习
+- **对 AXL / KPAX**：**不相关**，我们不做 Android、不涉及逆向
+- **对 Ken 个人**：如果哪天要 RE 某个竞品 Android app 可能用，当前无实际场景
+- **动作**：**skip**
+- **理由**：记一笔防止重复评估，非当前需要
+
+---
+
 ### [2026-04-16] AutoCLI / autocli-skill（KPAX 知识架构第三线的关键候选）
 - **链接**：https://github.com/nashsu/autocli-skill （Claude Code skill 包装）+ 底层 AutoCLI Rust CLI
 - **推文来源**：https://x.com/mnmn94253156337/status/2044583527824719978 （2026-04-15，撸毛吃猪脚饭）
