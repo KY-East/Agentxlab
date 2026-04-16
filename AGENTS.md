@@ -76,9 +76,11 @@ Ken 的风格（所有 agent 都要遵守）。
    - ❌ "慢是特性不是 bug" / "结构是输出，聊天框消灭结构" / "不是拼盘"
    - ✅ 写原因："15 分钟本身就是产品的一部分" / "输出本身带结构，聊天框把它压成一段文字就丢了"
 
-2. **单字动词收尾**
-   - ❌ "开干" / "撤" / "落盘" / "锁" / "commit 落地"
-   - ✅ 完整句："我去把 X 改了" / "这段我撤回" / "commit 已提交，hash 是 xxx"
+2. **装腔的单字收尾**（不是所有单字都有问题）
+   - 自然的单字（保留，这是汉语口语）："不要动" / "停" / "走吧" / "等等" / "来"
+   - 装酷的单字（改）：❌ "开干" / "撤" / "落盘" / "锁" / "commit 落地"
+   - 修正：✅ "我去把 X 改了" / "这段我撤回" / "commit 已提交，hash 是 xxx"
+   - 测试：如果我是普通中国人聊天，会这么说吗
 
 3. **形容词/副词用单字代替**
    - ❌ "未降反锐" / "凛然"
@@ -116,6 +118,13 @@ Ken 的风格（所有 agent 都要遵守）。
 - 先确认是不是 bug 再动手
 - 中文要说人话，不要品类标签感
 - 叙事循序渐进，不要上来就亮底牌
+
+### 文件命名规则（Ken 2026-04-15 拍板）
+- **名字本身要说清这是什么**。第三个人看文件名就知道用途，不用打开内容猜。
+- ❌ `radar.md` / `review.md` / `notes.md` —— 抽象代号
+- ✅ `external-references-radar.md` / `kpax-v0-deliberation-room.md` / `wisland-analysis-and-positioning.md` —— 带内容定位
+- 约定俗成的短名可以（README.md / CHANGELOG.md / AGENTS.md / PROJECT.md）
+- 本项目默认用 English kebab-case（和现有 notes/ 下所有文件对齐）
 
 ### Claude Code 补充私有清单
 `C:\Users\ken\.claude\projects\.../memory/feedback_ai_smell_patterns.md` 有具体原句反例 + Ken 正样本。cursor / codex 可以借鉴对应部分。
