@@ -53,6 +53,26 @@
 
 ---
 
+### [2026-04-16] AutoCLI / autocli-skill（KPAX 知识架构第三线的关键候选）
+- **链接**：https://github.com/nashsu/autocli-skill （Claude Code skill 包装）+ 底层 AutoCLI Rust CLI
+- **推文来源**：https://x.com/mnmn94253156337/status/2044583527824719978 （2026-04-15，撸毛吃猪脚饭）
+- **是什么**：4.7 MB Rust 单二进制（零依赖），用**复用 Chrome 登录态**的方式把 55+ 平台（B站 / 知乎 / 微博 / 小红书 / 豆瓣 / 雪球 / Reddit / X / YouTube / HackerNews / Yahoo Finance / Cursor / Notion / Discord 等）变成 CLI。**不需要 API Key**，用户 Chrome 登录过就能用。三种模式：Public（API）/ Browser（Chrome 扩展协助）/ Desktop（应用控制）。是 opencli 的 Rust 重写版，速度快 12×、内存省 10×。
+- **安装**：`npx skills add https://github.com/nashsu/AutoCLI-skill`——**直接是 Claude Code skill**
+- **对 AXL / KPAX**：**直接解决 KPAX 知识架构第三条线（社区经验）**。原本 Ken 的小伙伴在爬 Reddit / 知乎 / Quora，autocli 把这活做成零维护 skill。应用示例：
+  - 用户问 "小米汽车值不值得买" → CS + 经济顾问调 autocli 拉微博 + 小红书 + 雪球实时讨论
+  - 用户问 "ETH 2026 破 10k 吗" → 经济顾问调 Twitter + 雪球 + HackerNews 取情绪样本
+  - 用户问 "该不该辞职创业" → 经济 + 心理顾问调 Reddit r/startups + 知乎 + HackerNews
+- **优劣判断**：
+  - ✅ 快上线（一个 skill 安装）/ 覆盖广（55+ vs 自建爬 3-4）/ 中文平台覆盖全
+  - ❓ 依赖 Chrome 登录态——**服务端部署不行，只能单机或用户本地**（对 KPAX 商业化是个挑战）
+  - ❓ 平台 ToS 风险——商业化时可能违规
+  - ❓ 可靠性 / 被限流的情况未知
+- **对 Ken 个人**：cc 立刻可以装上做 radar 抓取升级（本地工作流）
+- **动作**：**adopt（探索性：我自己先装，验证 radar 工作流是否受益）+ strongly track（KPAX 知识层集成候选，重点议题是部署模式）**
+- **理由**：这是 KPAX 知识架构三线之一（社区经验）的现成 drop-in。装上之后先评估稳定性和 ToS 安全性，再决定要不要深度集成进 KPAX。部署模式限制（Chrome 本地）可能需要 KPAX 走"轻前端 + 云 AXL + 用户本地 skill 辅助"的混合架构
+
+---
+
 ### [2026-04-16] awesome-ceo —— Ken 个人 + KPAX 知识层候选内容源（2026-04-16 晚 Ken 纠正 cc 的第一判断）
 - **链接**：https://github.com/kuchin/awesome-ceo
 - **推文来源**：https://x.com/Bitturing/status/2044328380326379618
