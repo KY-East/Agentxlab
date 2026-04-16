@@ -105,6 +105,22 @@
 - [ ] 依据：wisland note B.3（2026-04-16 晚修订版）+ B.7（OpenAlex 60% abstract 缺失）
 - 触发时机：KPAX 开始做内容注入那一刻
 
+### `@cc` AXL + KPAX 最低可用 trace 日志体系（KPAX v0 启动前必做）
+- [ ] FastAPI middleware：每请求生成 `request_id`，注入 contextvars
+- [ ] 关键服务统一 logger format：`[req_id=xxx step=yyy | msg...]`
+- [ ] stdout → JSON Lines（方便 cc / cursor / 未来 AI 读）
+- [ ] debate_engine / classifier / expert_builder / ledger / axl_client 五个组件加关键节点 log
+- [ ] 工时估：1-2 天。**不做全栈 observability**（Sentry / DataDog / Jaeger），只做最低可用 trace
+- [ ] 依据：radar [2026-04-16] Lawrence 日志方法论 + 我们现状"10+ 文件散落 logger，55 处调用，无统一配置"
+- 触发时机：KPAX v0 前端真跑起来之前
+
+### `@cc` KPAX 分享激励 loop 设计（v0 上线前必接）
+- [ ] 每场辩论结束 → 生成 30 秒精华视频（7 顾问辩论高光 + 最终判决）
+- [ ] 视频生成候选：**Hyperframes**（radar [2026-04-16]）——Claude Code 预装 skill，HTML → MP4 本地渲染，零云端
+- [ ] 分享流程：用户点"分享" → 下载 MP4 / 直传 X / Telegram → 钱包 +20 token
+- [ ] 设计"精华"抽取规则：哪些消息入选高光（ranked by 论点锐度？冲突密度？引用密度？）
+- [ ] 依据：`notes/design/kpax-v0-deliberation-room.md` §5 用户动作流 + KPAX 六条代币规则
+
 ### `@cursor` + `@ken` KPAX decision domain tag
 - [ ] KPAX session 埋 `decision_domain` 字段（用户填 or LLM 自动打）
 - [ ] 领域枚举：medical / legal / investment / consumer / career / relationship / other

@@ -53,6 +53,31 @@
 
 ---
 
+### [2026-04-16] Lawrence 日志体系方法论（方法论，非工具）
+- **链接**：https://x.com/LawrenceW_Zen/status/2044437995269591195
+- **是什么**：推文方法论提示——"Vibe Coding 时必须让 AI 写完整可追溯日志体系。查问题省 token，提高 AI 排查效率"。回复补充（@webb_dever）："A good log system shrinks the search space for the next agent run. Without observability, vibe coding turns into repeated guessing."
+- **对 AXL / KPAX**：**直接命中我们的现状短板**。cc 快速 grep：AXL backend 10+ 文件散落 `logger = logging.getLogger(__name__)`，55 处 logger 调用，**无统一配置 / 无 request_id / 无结构化 JSON / 无 trace**。KPAX 复合系统（classifier + expert_builder + AXL + ledger 跨 4-5 组件）一出 bug 定位将非常痛
+- **动作**：**adopt（理念）**。next.md P2 加任务 "AXL + KPAX 最低可用 trace 日志体系"，KPAX v0 启动前落地。工时 1-2 天，做最低可用（FastAPI middleware 注入 request_id + 统一 logger format + stdout JSON Lines + 5 组件关键节点 log），**不做全栈 observability**
+- **对 Ken 个人**：发推可用的方法论 take
+- **理由**：这条是**时机对位**——我们正要从原型（靠 print 和 progress.jsonl 够用）过渡到产品（跨组件调试需要 trace），Lawrence 在这个 momeent 提醒我们正在进入的坑
+
+---
+
+### [2026-04-16] Hyperframes — Claude Code 本地视频生成 skill（KPAX 分享 loop 关键候选）
+- **链接**：推文里没给明确 repo 链接，搜索关键词 "Hyperframes Claude Code video render"
+- **推文来源**：https://x.com/billtheinvestor/status/2044855521132580966
+- **是什么**：Claude Code 预装 skill（也兼容 Cursor / Gemini CLI，100% 开源）。描述视频内容 → Claude Code 写 HTML composition → 本地渲染 MP4。三条命令、无云端调用
+- **对 AXL / KPAX**：**未来必用**。四个落地场景（从重要到次要）：
+  1. **KPAX 用户分享激励**（核心）：每场辩论结束 → 自动生成 30 秒"我的决策过程"精华视频（7 顾问辩论高光 + 最终判决）→ 用户分享 → 奖励 20 token。这是代币经济 social loop 的关键环节，没有视频只有文字传播力极弱
+  2. **KPAX v0 产品 demo 视频**：上线前发 Twitter / Telegram / 朋友圈的宣发内容
+  3. **AXL 实验结果可视化**：涌现分解论文的 supplementary 视频材料
+  4. **Ken 个人 Twitter 建设**：讲 KPAX / AXL 进展的默认配图视频起点
+- **对 Ken 个人**：Twitter 发推/做 thread 时直接生成
+- **动作**：**track + v0 上线前必 adopt + 加到 KPAX 分享机制设计候选栈**
+- **理由**：Ken 原话"未来肯定有"——这条是"肯定有的"那类。加到 next.md P2 KPAX 分享机制设计里作为视频生成候选
+
+---
+
 ### [2026-04-16] linux-android — Termux 脚本把旧安卓手机变 Linux 主机
 - **链接**：推文里没给明确 repo 链接，搜索关键词 "linux-android termux MIT"
 - **推文来源**：https://x.com/DtDt666/status/2044703758714905045
