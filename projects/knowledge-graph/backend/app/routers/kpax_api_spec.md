@@ -602,11 +602,257 @@ v0 联调通过后，启动：
 
 ---
 
-## 12. 向后兼容与版本控制
+## 12. 向后兼容与版本控制（v1.2 阶段）
 
-- 本文件是 v1.1（原）+ v1.2（2026-04-17 补充 §7-§11，cc）。**没有破坏性修改**，只是补充。
+- 本文件 v1.1（原）+ v1.2（2026-04-17 下午补充 §7-§11，cc）。**没有破坏性修改**，只是补充。
 - `expert_lenses` 字段扩展新加 `expert_key` / `name_zh` 是**新增字段**，不破坏已 parse 的 KPAX 前端。
 - SSE 从 v0.1 提前到 v0 必做是**范围扩张**，不是协议变更。
 - Followup endpoint 是**新 URL**，不影响原 3 endpoint。
 
 未来真的要破坏性修改，走 `/axl/v2/`，不在 v1 路径下改 schema。
+
+---
+
+## 13. Platform 定位与商业模式修订（v1.3，cc 2026-04-17 晚根据 Ken 拍板补订）
+
+### 13.1 背景与对 v1.2 的反思
+
+v1.1 和 v1.2 的 PRD 假设 KPAX 是 "付费决策工具产品"——代币扣费、用户端到端消费。Ken 2026-04-17 晚明确指出这个假设根本错：
+
+> "我不准备产品收费，而是走腾讯模式，未来可以卖这种厉害的 skill，用户接自己的大模型，如果嫌麻烦，可以充值，我们可赚可不赚这个差价。" 
+> "所以这些角色，未来可能能出很多，用户也可以自己建，平台思维，未来我们再去中心化，发币，解决 token=token 的问题，打通算力和币的价值。"
+
+**KPAX 不是付费产品，是 platform / marketplace 基础设施**。本节修订 §7-§12 里所有基于"付费产品"假设做的决策，并为 platform 架构添加必要字段预留。
+
+**v0 策略**（Ken 2026-04-17 晚拍板）：**完全中心化开发，先验证商业模式**。v0 代码不引入任何链上复杂度，但 schema 和数据结构为 platform + 去中心化**迁移做好预留**。
+
+### 13.2 KPAX 平台定位（Ken 2026-04-17 晚原话为锚）
+
+| 维度 | Ken 拍板 |
+|---|---|
+| **产品身份** | Platform / Marketplace 基础设施，不是单产品 |
+| **主产品收费策略** | **免费**（化身召唤 + 讨论功能本身不收费） |
+| **收入来源** | (a) skill marketplace（平台分成 / 上架费） (b) 代币经济（发链代币后的价值捕获） |
+| **LLM 成本承担方式** | **默认 BYOM（Bring Your Own Model / API Key）**——用户接自己的 LLM。嫌麻烦可充值让 KPAX 代付，平台可赚可不赚这个差价 |
+| **用户角色** | 消费者 + 创作者（自建 skill 化身）。未来第三方开发者可上架付费 skill |
+| **Web2 兼容** | 不强制上链。Web2 用户可接入传统支付（法币）使用代付服务，和 Web3 用户共存 |
+| **开发阶段** | **v0 完全中心化开发**，先验证商业模式；v1 引入 skill marketplace；v2+ 去中心化 + 发币 + 链上算力/价值结算 |
+| **核心长期命题** | "token=token 问题"——用户持有的 KPAX 代币应该和 LLM 消耗的 prompt/completion token 价值直接打通（链上结算后成立），不是 opaque 抽象代币 |
+
+### 13.3 对 §7-§12 的具体修订
+
+#### § 7.3 修订（disciplines 选择）
+
+**v1.2 原文错**：v0 硬编码 7 学科 baseline。
+
+**v1.3 修订**：v0 必须有**最简动态学科选择**。具体：
+- 新建 `app/services/kpax_discipline_selector.py`
+- 函数签名：`select_disciplines(question: str, user_context: dict) -> tuple[list[int], int]`
+- 实现：一次便宜 LLM call（DeepSeek / Claude Haiku / GPT-4o-mini，~$0.01/题），prompt 给问题 + 学科候选池 + 要求"选 2-7 个最相关学科 + 建议人数（奇数便于辩论决断）"
+- **v0 候选池**：实验 7 学科起步（物理 / 数学 / 经济 / 心理 / 社科 / CS / 艺术人文）
+- **v0.1 候选池扩展**：全学科（`knowledge_graph.db` 的 2.4 亿学科条目里 top-level 类别）
+- 缓存：同一 question 归一化 hash 命中直接返回，省 LLM call
+- 工时：独立 2-3 小时，不阻塞 MVP
+
+**错误根因**：实验里 "固定 7 学科" 是为 controlled comparison。KPAX 生产里是产品用户输入真问题，按问题选相关学科才对。v1.2 把实验约束倒灌成产品配置。
+
+#### §7.4 修订（evidence_ref source_id 格式）
+
+**v1.2 原文**：`source_id = "agent_{discipline_id}"`（例 `agent_4183` 表示经济学家）
+
+**v1.3 修订**：`source_id = {expert_key}` 统一使用 §8 定义的 expert_key 格式。
+
+**错误根因**：v1.2 的 source_id 格式只适合"学科 agent"，一旦 v1 加名人化身（skill_munger 这种），格式要重改。expert_key 本来就是为这个设计的——复用它统一 source_id，v1 扩展零成本。
+
+#### §8.2 修订（expert_key 格式扩展）
+
+**v1.2 原文**：`expert_key = "debate_{debate_id}_agent_{agent_id}"`
+
+**v1.3 修订**：expert_key 支持**两种格式**：
+- `debate_{debate_id}_agent_{agent_id}` —— 某场 debate 产生的**临时**化身实例（v0 必有）
+- `skill_{skill_id}` —— **全局持久** skill 化身（v1 人物化身，如 `skill_munger`、`skill_feynman`、`skill_zhang_yiming`）
+
+**v0 Response 里只会出现前者**（v0 化身池全是学科 agent）。但 `expert_key` 字段的 **schema 约束必须允许两种格式**（regex：`^(debate_\d+_agent_\d+|skill_[a-z0-9_]+)$`），否则 v1 上线要改 protocol。
+
+**对应 KPAX 前端的影响**：前端拿到 expert_key 后，点击续聊 / 查看化身详情时，按 prefix 分支路由（debate_ 前缀 vs skill_ 前缀）。v0 前端只处理 debate_ 分支，v1 加 skill_ 分支。
+
+#### §8.x 新增字段：`skill_source`（Platform 分层标识）
+
+**新增要求**：`expert_lenses[]` 里每个化身对象必须带 `skill_source` 字段。
+
+```json
+"expert_lenses": [
+  {
+    "expert_key": "debate_1234_agent_5678",
+    "discipline_id": 4183,
+    "name_en": "Economics",
+    "name_zh": "经济学",
+    "skill_source": "platform_discipline"  // NEW
+  }
+]
+```
+
+**`skill_source` enum**：
+- `platform_discipline` — 平台预置学科 agent（v0 唯一值）
+- `platform_skill` — 平台预置 skill 化身（v1：开源名人 skill，比如 fork 自 alchaincyf 的 munger / feynman / paul-graham）
+- `user_created` — 用户自建 skill（v2）
+- `third_party_creator` — 第三方创作者上架 skill（v2，skill marketplace）
+
+**v0 实装**：所有 `expert_lenses[].skill_source` 都填 `"platform_discipline"`。但 schema 允许全部 4 个值，v1/v2 扩展时不改 protocol。
+
+**战略含义**：`skill_source` 字段是 platform 身份的第一个 schema 实锤——KPAX 不是单产品，是化身生态。
+
+#### §9 修订（Followup URL 扩展 + request 加 BYOM 字段）
+
+**v1.2 原文**：
+```
+POST /axl/v1/debate/{debate_id}/agent/{expert_key}/ask
+```
+假设 followup 必发生在某场 debate 上下文里。
+
+**v1.3 修订**：加**第二个 v1 预告 endpoint**：
+```
+POST /axl/v1/skill/{skill_id}/ask
+```
+支持"脱离某场 debate 直接召唤某 skill 化身独立对话"的场景——用户想和巴菲特 skill 聊 10 分钟，不必先跑一场 debate。
+
+**v0 两个都返回 501**，schema 字段 + URL 先定死。
+
+**Request schema 补充 BYOM 字段**（§9.1 Request 的 v1 版本里加）：
+```json
+{
+  "question": "...",
+  "user_context": {...},
+  "depth": "quick",
+  "stream": false,
+  "llm_provider_override": null
+}
+```
+
+**`llm_provider_override`** v1.3 新增：
+- v0：**必须是 null**，非 null 抛 501 not_implemented_in_v0
+- v1：支持 `{"provider": "openai", "api_key": "sk-...", "model": "gpt-4o"}`（BYOM），此时 AXL 用用户的 key 调 LLM，不走平台 quota
+- v2：支持链上代币支付（通过 wallet 签名消息代替 api_key）
+
+**关于 followup 的 depth 字段**（v1 语义）：v0 标注为 "depth 字段 v1 语义 TBD——followup 可能不是轮次制，是纯 1v1 chat_completion，届时改为 `max_turns` 或保持 depth 含义不同"。v0 不实现 followup 所以不受影响。
+
+#### §10 修订（Voice 预留里 voice_id 绑 expert_key 的格式扩展）
+
+**v1.2 原文**：voice 映射 expert_key → ElevenLabs voice_id。
+
+**v1.3 修订**：因 §8.2 expert_key 扩展为两种格式，voice 映射也分两路：
+- `debate_{...}_agent_{...}` 的化身（学科 agent）——voice 随每场 debate 动态分配（保持同一 debate 内某学科 voice 一致即可）
+- `skill_{...}` 的化身（v1 人物化身）——voice 绑定到 skill 本身（skill 定义时就指定 voice_id，召唤时固定）。巴菲特 skill 绑一个特定嗓音，所有用户召唤时都听同一个 voice
+
+v0 不实装 voice，但 expert_lenses 里 v1 可加 `voice_id` 字段（v0 不填）。
+
+#### §10 修订（SSE "v0 必做" 范围限定）
+
+**v1.2 原文**：v0 必做 SSE 前 5 种 event。
+
+**v1.3 明确范围**：v0 必做 = **AXL 后端 SSE endpoint ready + 能用 curl / httpx 验证 event 流**。
+
+**不算 v0 必做**：
+- KPAX 前端 SSE 消费 UI（排到 KPAX 前端工作流——v0 后端完成后并行做）
+- 按语义切段推 message（v0 可以先整条推，v1 前端做 TTS 时再要求按语义切段）
+
+**v0 cursor 验收标准**：一条 curl 命令跑通，看到完整 SSE event 流，最后收到 final event 含完整 Response JSON。
+
+#### §11 修订（v0 成功判据）
+
+**v1.2 §11.3 v0 不验证列表修订**：
+
+原 "v0 不验证：动态 expert_builder" 改为：
+- **v0 验证**：最简动态学科选（LLM 一次 call 基础版，候选池从 7 学科起步）
+- **v0 不验证**：完整 expert_builder（全学科候选池 + relevance_score + user 历史 aware）—— 推到 v0.1
+
+**v1.3 §11 新增**（v0 技术层判据）：
+- [ ] `expert_lenses[].skill_source` 字段所有 Response 都有，v0 值为 `platform_discipline`
+- [ ] `expert_key` schema 允许两种格式（regex 验证通过），v0 实际只出现 `debate_{...}` 前缀
+- [ ] Request `llm_provider_override` 传 null 正常走，传非 null 抛 501
+- [ ] Followup endpoint `/axl/v1/skill/{skill_id}/ask` 占位也返回 501
+
+**v1.3 §11 新增**（v0 明确**不验证**的，为避免范围膨胀）：
+- 付费意愿（平台主产品免费，付费验证在 skill marketplace v1 才开始）
+- BYOM 真用用户 key 调 LLM（v1）
+- Skill marketplace（v1）
+- 用户自建 skill（v2）
+- 去中心化 / 链上结算 / 代币上链（v2+）
+
+### 13.4 `user_id` → `wallet_address` 命名迁移（v0 中心化阶段预留格式）
+
+**v1.2 token_ledger.py 里用 `user_id`**，内部是自增整数或 UUID。
+
+**v1.3 修订**：v0 开始所有新代码用 `wallet_address` 字段名（而非 `user_id`）。值本身可以是：
+- v0 中心化阶段：任意字符串（本地生成，格式不限）
+- v1 过渡：EVM 兼容地址格式（0x 开头 42 字符）但仍中心化签发
+- v2 去中心化：真正的链上钱包地址（用户自己的 wallet 签发）
+
+**实装要求**：
+- `kpax_pipeline.py` 里的 session 参数、`token_ledger.py` 里的 ledger key、request schema 的 user 标识——所有字段名改为 `wallet_address`
+- v0 格式 check 不强制（任意字符串都接受）
+- 文档和代码注释都用 "wallet" 语义，不用 "user"
+
+**为什么 v0 就改名**：v0 到 v1、v1 到 v2 的迁移，如果字段名一路 `user_id`，去中心化时要全链路改命名；v0 就用 `wallet_address`，值允许弱格式，自然过渡。
+
+### 13.5 代币账本（token_ledger）的 platform 定位
+
+**v1.2 默认**：token_ledger 是"用户消费代币扣钱"逻辑。
+
+**v1.3 修订**：token_ledger 的**语义分层**：
+
+| 层 | 含义 | v0 形态 | v2 形态 |
+|---|---|---|---|
+| **平台代币（KPAX token）** | 平台价值单位 / 用户权益 / 未来可上链 | 中心化账本 | 链上代币 |
+| **LLM 算力 token** | prompt / completion 消耗的外部 API 资源 | KPAX 按调用量记账 | 链上价格发现 + 直接映射 |
+| **法币通道**（Web2 用户） | 传统支付转换 | 不实装（v0 主产品免费） | 代付服务入口 |
+
+**v0 实装要求**：
+- `token_ledger.py` 记录两类 event：
+  - `kpax_token_delta`（用户持有的平台代币变化）
+  - `llm_cost_usd`（这次调用实际烧的 LLM API 成本，记 USD 值用于审计）
+- v0 主产品免费 → 用户不扣 `kpax_token_delta`，但 `llm_cost_usd` 每次记录（平台自己承担成本，记账审计用）
+- v1 marketplace 上线后，creator 上架付费 skill → 用户召唤时扣 `kpax_token_delta`，分成给 creator
+- v2 去中心化后，两个字段都上链，算力和代币价值直接打通
+
+**v0 不实装**：BYOM（用户自己付 LLM）/ skill 付费分成 / 法币支付通道 / 链上结算——全部推到 v1+。但 `token_ledger.py` 的 event 格式从 v0 就按上面分层设计，v1/v2 扩展时只加新 event 类型，不改旧 schema。
+
+### 13.6 修订后的 v0 实装顺序
+
+原 §6 + §7 + §13.x 合并后的 v0 实装顺序：
+
+1. `routers/kpax_router.py` — 3 endpoint 保持 mock，能让 KPAX 前端先联调
+2. `services/kpax_discipline_selector.py` **新增** — 最简动态学科选（§13.3 §7.3 修订）
+3. `services/kpax_pipeline.py` — 主编排，四步 pipeline，持久化走主 DB（§8）
+4. `services/kpax_renderers.py` — render_{verdict|estimate|plan}，内部调 structured_extractor（§7.2）
+5. `services/kpax_router.py` 改真 — 每个 endpoint 调 pipeline；expert_lenses 带 expert_key + skill_source（§13.3 §8.x）
+6. Followup endpoint 占位返回 501，两个 URL 都要有（§13.3 §9）
+7. Request 加 `llm_provider_override` 字段，v0 校验 null，非 null 抛 501（§13.3 §9）
+8. `user_id` → `wallet_address` 全链路改名（§13.4）
+9. `token_ledger.py` event 分层（§13.5），v0 只记 `llm_cost_usd`
+10. SSE endpoint 实装（§13.3 §10）—— curl 能验证即可，前端 UI 不做
+
+**合计 v0 工时**：**10-14 小时**（比 v1.2 估的 6-11 小时多 4 小时，主要是 platform 字段预留 + discipline selector）。
+
+### 13.7 v0 完成后并行启动（修订 §11.4）
+
+v0 后端完成 → **并行（不是串行）** 启动三件：
+1. KPAX 前端最简 SSE 消费 UI（让 Ken 浏览器能看到化身们流式讨论）
+2. `judge.py` 实装（Lucas 量化闭环 A 步）
+3. v1 产品形态设计（含 skill marketplace UX + BYOM UI + wallet 流程）
+
+**cc 要在 v0 完成前完成**（不阻塞 cursor 的 v0 实装）：
+- 写 v1 skill marketplace PRD（MVP 级：creator 上架 / 用户召唤 / 分成流程）
+- 写 v1 BYOM UX PRD（用户 API key 输入 + 代付选项切换）
+- 写 v1 wallet 预留 PRD（user_id → wallet 迁移的具体路径）
+
+### 13.8 向后兼容声明（v1.3）
+
+v1.3 对 v1.2 的**所有修订都是字段扩展 / 新增 / 命名改进**，**无 breaking change**：
+- `expert_lenses[]` 加 `skill_source` 字段—— KPAX 前端没读这个字段不受影响
+- `expert_key` 允许更多格式—— v0 Response 里仍然只出现原格式
+- Request 加 `llm_provider_override` 字段——默认 null，老 client 不传也 OK
+- `user_id` → `wallet_address` —— v0 是内部实现命名改动，不改外部 Request / Response schema
+- Skill followup endpoint 是新 URL
+
+v0 实装严格按 §13 修订版做，cursor 不需要来回对照 v1.1 / v1.2。v1.2 §7-§12 作为**历史记录保留**（便于追溯设计演进），但 v0 真实实装以 v1.3（§13）为准。
