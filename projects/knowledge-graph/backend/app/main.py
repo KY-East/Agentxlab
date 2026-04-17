@@ -2,9 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.utils.logging_setup import configure_logging, RequestIdMiddleware
 import logging
 
-from app.routers import disciplines, intersections, scholars, papers, graph, ai, gaps, openalex, debate, discovery, paper_gen, sparks
+# Install structured JSON logging + request_id filter before any app code runs.
+# See app/utils/logging_setup.py for design notes. Ken 2026-04-16 after Lawrence
+# methodology tweet.
+configure_logging(level=getattr(settings, "log_level", "INFO"))
+
+from app.routers import disciplines, intersections, scholars, papers, graph, ai, gaps, openalex, debate, discovery, paper_gen, sparks, kpax_router
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +19,10 @@ app = FastAPI(
     version="0.1.0",
     description="Interdisciplinary knowledge graph for Agent X Lab",
 )
+
+# Request-scoped trace id. Must be added BEFORE CORS so even preflight requests
+# get a request_id logged.
+app.add_middleware(RequestIdMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,6 +44,7 @@ app.include_router(debate.router)
 app.include_router(discovery.router)
 app.include_router(paper_gen.router)
 app.include_router(sparks.router)
+app.include_router(kpax_router.router)
 
 try:
     from app.routers import auth, forum, points, subscription

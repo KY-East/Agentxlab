@@ -125,6 +125,44 @@ Ken 的风格（所有 agent 都要遵守）。
 - 中文要说人话，不要品类标签感
 - 叙事循序渐进，不要上来就亮底牌
 
+## AXL 日志规范（2026-04-16 晚起施行）
+
+AXL backend 已安装结构化 JSON 日志基建（`projects/knowledge-graph/backend/app/utils/logging_setup.py`）。
+
+**所有 agent 在 AXL 代码里写 logging 时的规范**：
+
+1. **获取 logger 的方式不变**：`logger = logging.getLogger(__name__)` 或 `logging.getLogger("axl.xxx")`
+2. **带结构化字段用 `extra=`**：
+   ```python
+   logger.info("round complete", extra={"step": "round_end", "round": 2, "debate_id": 5})
+   ```
+   `extra` 里的字段会自动出现在 JSON 输出里
+3. **不要手工把结构字段拼到 msg 里**。❌ `logger.info(f"round {n} complete")` → ✅ `logger.info("round complete", extra={"round": n})`
+4. **request_id 自动继承**。FastAPI 请求里任何 logger 调用都会自动带上 req_id。跨 await 也保持
+5. **后台任务或实验 runner 手动设 req_id**：
+   ```python
+   from app.utils.logging_setup import set_request_id
+   token = set_request_id(f"exp_{question_id}")
+   try:
+       ...  # 所有内部 log 会带这个 id
+   finally:
+       # 不强制 reset，ContextVar 生命周期自然结束
+       pass
+   ```
+6. **异常用 `logger.exception(...)`**：自动把 traceback 抓到 `exc` 字段
+
+**输出形态**：每条 log 一行 JSON，字段包括 `ts` / `level` / `logger` / `req_id` / `msg` / 以及 `extra=` 里传的任何字段。可直接用 `jq` 或 grep 查询。
+
+**不要做的事**：
+- ❌ 不要 `import logging; logging.basicConfig(...)` —— 会冲突
+- ❌ 不要 `print()` —— 日志不出现在 JSON 流里
+- ❌ 不要在日志里 f-string 拼结构化数据 —— 用 `extra=`
+
+**例子**：好的 log 一行大约这样：
+```json
+{"ts":"2026-04-17T01:31:13.263Z","level":"INFO","logger":"app.services.debate_engine","req_id":"abc123def456","msg":"agent response","step":"round_1_speak","agent_id":42,"tokens":512}
+```
+
 ### 文件命名规则（Ken 2026-04-15 拍板）
 - **名字本身要说清这是什么**。第三个人看文件名就知道用途，不用打开内容猜。
 - ❌ `radar.md` / `review.md` / `notes.md` —— 抽象代号
