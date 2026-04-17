@@ -25,6 +25,13 @@
 
 ## 🔥 P0 —— 阻塞态，先做这些
 
+### `@cc` meta_01 rubric v0.1 落地三步（Ken 2026-04-16 拍板，ABC 全做）
+- [ ] **A（先做）**：把 DB 里 meta_01 的完整 transcript（17 条 message）导到 `results/dry_run_20260416_165636/raw/baseline_meta_01.json`；Round 2 moderator 综合（6199 字）写成 `results/dry_run_20260416_165636/pilot_judge_rubric_v0.1.md` 正式归档；挂进 `spec.md` §4 Judge 设计章节作为 pilot rubric v0.1
+- [ ] **B（之后做）**：改 runner 的 timeout：standard depth 从 2000s 拉到 4800s；meta_01 用同 prompt 重跑完整 4 rounds 拿 v0.2（对比 v0.1 看 2 rounds vs 4 rounds 精炼度差距）
+- [ ] **C（并行）** `@cursor`：独立审 `pilot_judge_rubric_v0.1.md`，写出 v0.1-reviewed（识别 AXL 自偏置风险，修订维度 / 评分 anchor / 合成规则）
+- [ ] 最终 pilot rubric = v0.1 + cursor 审修 + v0.2 对照优化后的版本
+- 依据：`results/dry_run_20260416_165636/progress.jsonl` + Round 2 moderator 综合（DB msg id=75）
+
 ### `@cc` Checkpoint 1 pilot 启动（Checkpoint 0 已真关闭 2026-04-15 晚）
 - [ ] 启动 pilot：baseline + A 组 × 20 题 × 2 run = 80 场
 - [ ] 新配置下 pilot 预估：**~$73**，wall ~20 h（mean $0.91/场 × 80）
@@ -37,9 +44,19 @@
 - [ ] 每人 2–3 variant，挑稿。同时看 7 张拼一起是否像"同一个世界的人"
 - [ ] 定稿后回 cc，进 Rodin/Meshy 4/Tripo 2 对比
 
-### `@cc` KPAX 后端现状 survey（和 v0 前端并行）
-- [ ] 读 `kpax/backend/kpax_svc/services/{context_collector,expert_builder,question_parser,report_generator}.py`
-- [ ] 输出一段话给 Ken：当前 KPAX 能真实跑通的最短路径是什么（classifier 接真 LLM / kpax_router 真调 debate_engine / 前端现状）
+### ✅ `@cc` KPAX 后端 survey（2026-04-16 晚完成）
+发现 5 处 monorepo import 违反硬规则 #6。见 `notes/journal/2026-04.md` 2026-04-16 深夜 cc 条目。
+
+### `@cc` KPAX v0 最短可跑路径（路 2：绕开违规 services）
+- [ ] `question_classifier._chat_fn` 接真 LLM（DeepSeek 或 Anthropic SDK 直调，不走 AXL），~30 min
+- [ ] AXL `kpax_router.py` mock 改真调 `debate_engine.py`（产出真 debate + moderator summary），~2-3h
+- [ ] 前端 v0 从零（按 Claw3D 架构模板 + Spark 2.0 + R3F + Rodin/Meshy/Tripo 人物生成），三周节奏见 `notes/design/kpax-v0-deliberation-room.md`
+- [ ] **三个违规 services（question_parser / expert_builder / report_generator）暂不动**，留到 v1 决定重写成 HTTP-only 还是弃用
+
+### `@cursor` KPAX v1 清账：decide 三个违规 services 命运
+- [ ] 等 v0 上线、真实使用数据反馈后再评估
+- [ ] 每个文件评估：重写成 HTTP-only（拆掉 `from app.services.ai_provider`，改用 KPAX 自己的 LLM client 或通过 axl_client）/ 弃用（功能被 v0 简化链替代）
+- [ ] 依据：`notes/journal/2026-04.md` 2026-04-16 深夜 survey + KPAX 硬规则 #6
 
 ---
 
