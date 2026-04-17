@@ -29,6 +29,126 @@
 
 ## 条目（新到旧）
 
+### [2026-04-17] EvoMap / Evolver — 自进化 agent 框架（GEP 协议 + 10 步循环）
+- **触发来源**：@GoSailGlobal https://x.com/GoSailGlobal/status/2044358918185562180?s=20 （Ken 2026-04-17 转）
+- **是什么**：开源 Node.js agent 自进化框架。核心概念：
+  - **GEP 协议（Gene Evolution Protocol）**：把 agent 的行为 / 能力编码成可演化的"基因"，每轮运行后按反馈更新
+  - **10 步进化循环**：Scan → Select → Mutate → Validate → Solidify（+其他辅助步骤，构成完整闭环）
+  - **三层记忆架构**：短期工作区 / 中期反思池 / 长期固化知识
+  - **reflection 周期**：强制 agent 周期性回看自己的决策轨迹，产出 diff 进入下一轮基因
+- **争议背景**：外部有 Hermes 生态"架构级抄袭 EvoMap"的指控。Ken 2026-04-17 定调：**不介入站队，技术可用就用，一视同仁**。
+- **对 AXL / KPAX 有没有用**：**adopt 作为候选**。
+  1. AXL 自由参数 L7 元进化的"agent 该如何更新自己"部分，EvoMap 的 **GEP 协议 + 10 步循环**是开源圈目前最完整的参考实现之一，写进 `agent-evolution-free-parameters.md` 时并列 Hermes 做对照
+  2. KPAX 化身层（`notes/research.md §human-skill-distillation-layer`）的"化身用久了怎么演化"环节——EvoMap 的 reflection + mutation 机制直接可以嫁接在每个化身的个体记忆层
+  3. EvoMap 三层记忆架构 vs AXL 七层记忆设计——写 Phase 3 前做一次对位表
+- **对 Ken 个人有没有用**：自进化 agent 是 2026 最活跃的开源方向之一，值得跟进
+- **动作**：**adopt** 作为化身层候选技术栈之一（和 Hermes 并列）
+- **理由**：Ken 2026-04-17 定调"所有有利的都用"；GEP 协议的形式化程度在当前开源项目里算前列
+- **关联**：`notes/research.md §human-skill-distillation-layer` / `agent-evolution-free-parameters.md` / `KPAX.md §技术来源`
+
+---
+
+### [2026-04-17] 腾讯混元 HY-World 2.0 —— 3D 世界生成开源模型
+- **主推文**：https://x.com/berryxia/status/2044611121605460364（Berryxia.AI 转发，2026-04-15 发布）
+- **仓库地址（Ken 提醒"不能只看主推特"——作者在推文 reply 里贴了 repo）**：`github.com/Tencent-Hunyuan/HY-World-2.0`（截至 2026-04-17 抓取：620 stars / 33 forks / 2 contributors / 2 issues）
+- **作者**：Tencent-Hunyuan（腾讯混元）
+- **是什么**：多模态世界模型。从文本 / 图像 / 视频生成、重建、模拟**可交互 3D 世界**。
+  - **一键世界生成**：文字或图片输入 → 自动创建可交互 3D 世界
+  - **引擎就绪输出**：直接支持 Unity 和 Unreal Engine，产出 mesh / 3DGS / 点云等标准 3D 格式
+- **和 Spark 2.0（World Labs）的关系**：**互补不是竞争**。HY-World 做**生成**（文字 / 图像 → 3D 世界），Spark 做**浏览器流式渲染**（splat → WebGL2 LoD）。完整 pipeline：HY-World 生成场景 → 导出 .RAD splat / mesh → Spark 流式渲染到 KPAX 前端 → R3F composite worlds 叠加化身
+- **对 AXL / KPAX 有没有用**：**时间博物馆多场景生成的直接基础设施**
+  - v0 默认场景（维多利亚书房厅）可手扫 or 用 Spark 现成 captured_space
+  - v1 扩展的其他厅（现代会议厅 / 东方庭院 / 竞技场）——**用 HY-World 文字生成，省掉 3D 建模工时**
+  - 印证 Ken 2026-04-17 原话："场景不用做了，不管是 spark 还是这个，关键是最后封装或者怎么实现"
+- **战略层意义**：和昨天对化身的判断是同一逻辑模式——
+  - 化身层：现成（alchaincyf / 女娲 / Hermes）→ KPAX 自建是**编排层 + 野生识别 + 反馈飞轮**
+  - 场景层：现成（Spark 2.0 / HY-World 2.0）→ KPAX 自建是**集成封装 + 交互设计 + 化身-场景联动**
+  - 两层合起来，KPAX 真正自建只剩编排 + 反馈飞轮两件事。这是侧翼战场策略的自然延伸。
+- **对 Ken 个人有没有用**：任何想生成 3D 场景的用途（pitch 视频 / personal 项目 / 演示背景）都可用
+- **动作**：**track** + bookmark 官方 repo；v1 前端实装多厅时 evaluate 接入路径
+- **关联**：`notes/design.md §3.1 时间博物馆` + `notes/design.md §4.1 环境渲染 Spark 2.0`（建议 cursor 下次改 design.md 时把 HY-World 2.0 加入 §4.1 作为 Spark 的并列候选）
+
+---
+
+### [2026-04-17] alchaincyf 开源名人 skill 生态（12 名人 + 女娲自动蒸馏工具）
+- **触发来源**：Ken 2026-04-17 口述，关联 LuBtc888 汇总帖
+- **是什么**：开源 GitHub 仓库集合（2026-04-17 cc 从 LuBtc888 主推文正文抓取每个 skill 的 github URL 补全——此前 "具体列表待确认" 是因为 cursor 写 radar 时没看完整推文正文）：
+  - **12 个名人 skill 模块**（均在 `github.com/alchaincyf/*-skill`）：
+    1. `steve-jobs-skill`（乔布斯 / 思维模型 + 现实扭曲力场 + 决策风格）
+    2. `elon-musk-skill`（马斯克 / 第一性原理 + 硬核执行力 + 推文风格）
+    3. `munger-skill`（芒格 / 多元思维模型 + 反向思考 + 投资决策）
+    4. `feynman-skill`（费曼 / 讲课方法 + 复杂问题拆解 + 学习/物理教学）
+    5. `naval-skill`（纳瓦尔 / 财富 + 幸福 + 人生哲学）
+    6. `taleb-skill`（塔勒布 / 黑天鹅 + 反脆弱 + 风险评估）
+    7. `zhangxuefeng-skill`（张雪峰 / 升学吐槽 + 志愿填报）
+    8. `paul-graham-skill`（Paul Graham / 创业思维 + 写作 + 产品哲学）
+    9. `zhang-yiming-skill`（张一鸣 / 算法思维 + 组织管理 + 产品迭代）
+    10. `karpathy-skill`（Karpathy / AI + 深度学习教学 + 技术直觉）
+    11. `ilya-sutskever-skill`（Ilya Sutskever / AI 前沿 + 模型底层哲学）
+    12. `mrbeast-skill`（MrBeast / 内容病毒传播 + 增长黑客）
+    13. `trump-skill`（特朗普 / 谈判风格 + 推文艺术 + 现实扭曲）—— 注：这条 alchaincyf 也做了，算 13 个。原 LuBtc888 列表里"名人系列 13 个"其中 11 个来自 alchaincyf + 2 个其他作者
+  - **女娲.skill（Nuwa）**（`github.com/alchaincyf/nuwa-skill`）：自动蒸馏工具——给它一批文本（访谈 / 著作 / 推文 / 演讲稿），自动提取出可复用的 skill 文件
+  - **另外两个 alchaincyf 工具 skill**（不在名人类）：`x-mentor-skill`（X/Twitter 运营导师，分析账号数据 + 写推文 + 诊断报告）
+- **对 AXL / KPAX 有没有用**：**KPAX 化身层 v1 货架的直接候选**。
+  1. **v1 真人化身初始池**：KPAX 化身分三类（学科 / 真人 / 野生），真人化身 v1 的最小启动池可以直接用 alchaincyf 的 13 个里符合我们领域分布（中西混合 / 多领域，不全部押商业）的 5-7 位。节省自建时间
+  2. **女娲蒸馏工作流**：KPAX 野生化身识别后，下一步"把野生人物蒸馏成 skill"可以参考女娲的 pipeline
+  3. **License 预审**：adopt 前必须逐一审每个 skill 文件的 license、原作者对二次使用的条款、以及所引用名人的肖像 / 言论权边界（在世名人尤其敏感）
+- **对 Ken 个人有没有用**：了解当前 skill 生态的开源成熟度，避免重复造轮子
+- **动作**：**track** → adopt 待 license 预审完成
+- **理由**：货架已经有，不用自己从零做 13 个 skill；但 license + 伦理边界必须过关
+- **关联**：`notes/research.md §human-skill-distillation-layer` / `notes/next.md`（v1 shopping list + license 预审任务）
+
+---
+
+### [2026-04-17] 反蒸馏.skill（Anti-distillation skill）
+- **触发来源**：Ken 2026-04-17 口述（alchaincyf / skill 生态相关的反向工具）
+- **是什么**：一个"对抗蒸馏"的 skill——给 skill 文档注入**混淆 / 噪声 / 误导性模板**，使得外部工具（比如女娲）很难从已发布的 skill 反向抽取原作者的核心知识。本质是**知识保护 / 竞争对抗层**的工具。
+- **对 AXL / KPAX 有没有用**：
+  - 直接用不上（我们做的是化身编排层，不是 skill 保护层），但是**信号极强**：
+  - skill 生态已经从"免费开源分享"阶段进入"知识保护 vs 抽取"对抗阶段。说明 skill 作为独立商业单元的价值被验证到了——**有人愿意花力气保护**
+  - 对 KPAX 的战略启示：KPAX 不要陷入"比谁的名人 skill 蒸馏得更像"的军备竞赛（这一层正在被军备化），专注在"跨化身编排 + 时间博物馆场景"这层，绕开红海
+- **对 Ken 个人有没有用**：理解 skill 赛道的博弈动态
+- **动作**：**track**（不采纳工具，但留意生态演化）
+- **理由**：反蒸馏的出现本身证明 skill 单体已被商品化；KPAX 的差异化必须在更上游（编排 / 场景 / 化身组合），不在单 skill 品质
+- **关联**：`notes/research.md §human-skill-distillation-layer`（"单 skill vs 跨化身编排"的边界论证）
+
+---
+
+### [2026-04-17] @LuBtc888 的 26 skill 汇总推文（skill 生态全景信号）
+- **触发来源**：Ken 2026-04-17 转 https://x.com/LuBtc888/status/2042994080796307502?s=20
+- **是什么**：一条汇总推文，列出社区当前流通的 26 个 skill（名人 skill 为主，也包含工具型 skill 如女娲、反蒸馏等）。作者立场是"skill 化是 2026 agent 生态的一个主轴，值得系统化梳理"。
+- **原推文列出的 26 skill 完整清单（github URL，2026-04-17 Ken 提醒"不能只看主推特"后 cc 从正文抓取）**：
+
+  **职场 & 自媒体系列（9 个）**：
+  1. 同事.skill：`github.com/titanwings/colleague-skill`（"SKILL 流"源头）
+  2. 女娲.skill：`github.com/alchaincyf/nuwa-skill`（自动蒸馏引擎）
+  3. X 导师.skill：`github.com/alchaincyf/x-mentor-skill`
+  4. 老板.skill：`github.com/vogtsw/boss-skills`
+  5. 前任.skill：`github.com/therealXiaomanChu/ex-skill`
+  6. 自己.skill：`github.com/notdog1998/yourself-skill`（数字永生 / 第二大脑）
+  7. 博主.skill：`github.com/YourongZhou/chat_with_me`（社媒语料 → Persona skill）
+  8. 蒸馏.skill：`github.com/YIKUAIBANZI/forge-skill`（人格蒸馏引擎，另一作者的女娲平替）
+  9. 反蒸馏.skill：`github.com/leilei926524-tech/anti-distill`（知识投毒防抽取）
+
+  **名人复刻系列（13 个，11 个出自 alchaincyf，见上条 radar）**：
+  10-22. 见上条 `alchaincyf` radar 条目（乔布斯 / 马斯克 / 芒格 / 费曼 / 纳瓦尔 / 塔勒布 / 张雪峰 / Paul Graham / 张一鸣 / Karpathy / Ilya / MrBeast / 特朗普）
+
+  **玄学 & 传统文化系列（4 个）**：
+  23. 赛博算命.skill（八字）：`github.com/jinchenma94/bazi-skill`
+  24. 月老·姻缘测算.skill：`github.com/Ming-H/yinyuan-skills`
+  25. 奇门遁甲 / 紫微斗数.skill：`github.com/FANzR-arch/Numerologist_skills`（低幻觉 + 固定排盘）
+  26. 大师.skill：`github.com/xr843/Master-skill`（汉传佛教 + 祖师大德）
+- **对 AXL / KPAX 有没有用**：
+  1. **市场扫描**：KPAX 化身层 v1 选人时，这 26 个的命中 / 缺席直接反映社区热点和空缺——命中的领域（商业 / 投资 / 科技创业）说明已内卷，空缺的领域（比如艺术 / 科学 / 东方思想家 / 历史政治家）说明有机会做差异化
+  2. **对手 scanning**：了解 KPAX 如果走单 skill 路线会遇到的直接对比对象
+  3. **信号**：skill 生态正在从"单兵分发"向"合集分发"演化，这和 KPAX 的"化身团编排"方向其实相似但低一层——单合集还是静态打包，KPAX 做的是动态按问题召集
+- **对 Ken 个人有没有用**：skill 赛道的快速扫描
+- **动作**：**track** + 扫描 26 个里哪些适合作为 KPAX v1 真人化身候选，产出 shopping list
+- **理由**：是市场现状的诊断材料，不是直接可用工具
+- **关联**：`notes/next.md`（v1 化身 shopping list 任务）/ `notes/research.md §human-skill-distillation-layer`
+
+---
+
 ### [2026-04-16] @witcheer 的 AI 记忆工具全景扫描文（Two Camps）
 - **原文链接**：https://x.com/witcheer/status/2044456778843238689
 - **转引**：https://x.com/nash_su/status/2044646757741793751 （nash_su 推荐）
