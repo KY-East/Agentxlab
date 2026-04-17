@@ -50,6 +50,12 @@ remediation-plan-multi-agent.md      ← 6. 修改方案：4 个修改点 P0/P1
 **核心判断**：对项目核心假设 (d)「学科标签激发不同推理模式」的诚实审视。可能是幻觉，必须用对照实验证明或证伪。
 **直接产出**：`experiments/emergence_decomposition/` 的实验设计（特别是 A 组 去标签）。
 
+### `kpax-knowledge-source-architecture.md`
+**主题**：KPAX 的三条知识输入线（学术论文 / 行业 curated / 社区经验）架构。
+**核心判断**：KPAX 不能只吃论文，三条线少一条腿都不够。v0 做 A+B，C 推迟到 v1。
+**关键方案**：Line B 走 graphify + awesome-ceo 种子；Line C 未来走 autocli（按需）+ yupi-hot-monitor 架构参考（预缓存）两种并存。
+**触发**：Ken 2026-04-16 晚纠正 cc 漏掉此层。
+
 ### `remediation-plan-multi-agent.md`
 **主题**：基于上文产出的修改方案。
 **核心判断**：4 个修改点（KPAX 流水线 / 立场身份 / L5 二次校验 / 对照实验），P0 × 2 / P1 × 2。

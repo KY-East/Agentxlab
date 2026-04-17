@@ -183,7 +183,10 @@
 - [ ] 评估能否作为 AXL Phase 3（L3 语义 + L4 程序记忆）的参考实现
 - 依据：radar [2026-04-16] 第 4 条连接
 
-### `@cc` 建 KPAX 知识源架构笔记（Ken 2026-04-16 晚 提醒 cc 漏了这层）
+### ✅ `@cc` 建 KPAX 知识源架构笔记（2026-04-16 深夜完成）
+落地：`notes/research/kpax-knowledge-source-architecture.md`。v0/v1/v2 phasing 已给出，等 Ken 拍板第 8 节 4 个决策点。
+
+### `@cc` 建 KPAX 知识源架构笔记（archived above）
 - [ ] 新建 `notes/research/kpax-knowledge-source-architecture.md`
 - [ ] 写清三条输入线：(a) 学术论文 arXiv/OpenAlex/S2 (b) 行业 curated awesome-lists/YC/a16z/Sequoia (c) 社区经验 Reddit/知乎/Quora
 - [ ] 7 位顾问在辩论时如何从三类源调证据，每类对应哪些学科
