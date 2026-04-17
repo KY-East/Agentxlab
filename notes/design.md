@@ -1,4 +1,20 @@
-# KPAX v0 — 座谈会形态设计（Deliberation Room）
+# Design Notes — AXL/KPAX 设计文档集合
+
+**用途**：产品 / 系统 / UI 设计方案。和 `notes/research.md` 的区别：research 回答 "为什么 / 是否成立"（理论 / 假设 / 论证），design 回答 "怎么做 / 长什么样"（方案 / 架构 / 交互 / 视觉）。
+
+**历史**：2026-04-17 前此文件位于 `notes/design/kpax-v0-deliberation-room.md`（独立文件）。通过 git mv 合并到本位置保留 git 历史，当前只有 1 个设计（KPAX v0 座谈会），未来新增设计在本文件里新增 `## 大节`，文件命名沿用 kebab-case anchor。
+
+**写作约定**：
+1. 设计决策必须带**关联文件**（上游依据 / 下游影响），不要孤岛
+2. 关键决策写**可回滚的版本**：大改版在本文件新增 v2 节（例："## KPAX v0 座谈会 v2"），旧版保留对比
+3. 代码落地后在对应代码顶部注释 link 回设计节
+4. TODO 不写在本文件里，抽到 `notes/next.md`
+
+---
+
+## kpax-v0-deliberation-room KPAX v0 座谈会形态设计
+
+> **原文件**：`notes/design/kpax-v0-deliberation-room.md`（2026-04-17 前位置）
 
 **日期**：2026-04-15 晚
 **设计人**：Ken + cc 对话产出
@@ -355,8 +371,8 @@ L7 是 Ken 相对 WisLand 的核心差异点，不能是黑箱。在 KPAX 前端
 - `KPAX.md` — 产品承诺与硬规则
 - `projects/knowledge-graph/backend/app/routers/kpax_api_spec.md` — AXL HTTP API v1.1
 - `projects/knowledge-graph/backend/app/routers/kpax_router.py` — AXL mock router（v0 要换成真 debate_engine 调用）
-- `notes/research/seven-layer-memory-design.md` — L1-L7 记忆体系
-- `notes/research/agent-evolution-free-parameters.md` — 5 类自由参数（在 AXL 层）
+- `notes/research.md#seven-layer-memory-design` — L1-L7 记忆体系
+- `notes/research.md#agent-evolution-free-parameters` — 5 类自由参数（在 AXL 层）
 - `notes/research/` 下的对位分析笔记（项目研究上游，非对外定位参考）
 
 ---

@@ -39,7 +39,7 @@
   - 关键断言：现有 benchmark 只测 recall（"记得用户搬到旧金山了吗"），**没人测 compounding**（session 10 是不是比 session 1 更聪明）。这是真正的研究空白。
   - 预测：6 个月内 "context engineering" 取代 "memory" 成为默认词
 - **对 AXL / KPAX 有没有用**：**极度有用，这是对 AXL 研究方向的最直接对位文章**。五条具体连接：
-  1. **Zep 刚从"memory"改名"context engineering"**——AXL 七层记忆建在 Zep 上。我们现在的 backend 供应商自己在改造，必须读他们 Graphiti framework 新 positioning，更新 `notes/research/seven-layer-memory-design.md` 的 backend 部分
+  1. **Zep 刚从"memory"改名"context engineering"**——AXL 七层记忆建在 Zep 上。我们现在的 backend 供应商自己在改造，必须读他们 Graphiti framework 新 positioning，更新 `notes/research.md#seven-layer-memory-design` 的 backend 部分
   2. **OpenClaw 的 6 个加权信号**（relevance 0.30 / frequency 0.24 / query diversity 0.15 / recency 0.15 / consolidation 0.10 / conceptual richness 0.06）= **AXL 自由参数 L7 元进化的理论默认值**。别人 hard-code，AXL 在做让它可学习。直接写进 `agent-evolution-free-parameters.md`
   3. **compounding benchmark 的空缺** = AXL 护城河的直接对位。emergence_decomposition 实验的**下一个天然续作**可以做 `compounding_gain_benchmark`，是学术论文的真正立足点
   4. **Thoth 的 4 阶段 dream cycle**（duplicate merging 0.93 sim / enrichment / relationship inference / confidence decay 90 天）——比 AXL 当前 session 压缩完整。Phase 3 设计必须参考
@@ -49,7 +49,7 @@
   - 这篇是 AXL 研究论文 literature review 的**必收录参考**
   - 提到的"文件即记忆"哲学呼应 AXL MEMORY.md 现状（本地 memory 本就是 markdown）
 - **动作**：**adopt**（研究输入，要写进 research notes）+ **track**（Zep rebrand / ALIVE / Thoth 三个子链）
-- **理由**：这不是个工具链接，是整个记忆工具生态的地图，并且指出了**现有 benchmark 的根本缺陷 = AXL 护城河的立足点**。必须马上：(a) 把 Zep rebrand 信息加进 seven-layer-memory-design.md，(b) 把 OpenClaw 6 信号加进 agent-evolution-free-parameters.md，(c) 把 compounding benchmark 作为 emergence_decomposition 的续集候选加进 notes/agenda/next.md P2
+- **理由**：这不是个工具链接，是整个记忆工具生态的地图，并且指出了**现有 benchmark 的根本缺陷 = AXL 护城河的立足点**。必须马上：(a) 把 Zep rebrand 信息加进 seven-layer-memory-design.md，(b) 把 OpenClaw 6 信号加进 agent-evolution-free-parameters.md，(c) 把 compounding benchmark 作为 emergence_decomposition 的续集候选加进 notes/next.md P2
 
 ---
 
@@ -190,7 +190,7 @@
 - 和前面 witcheer 文章里 Camp 2 的 Thoth（10 entity types / 67 typed relations / A* graph expansion）是同一范式
 - **对 Ken 个人**：自己读书做笔记 / 沉淀多年资料的工具，纯个人用也值得试
 - **动作**：**strongly track + 等 KPAX 知识架构笔记写完再决定 adopt / 自建**
-- **理由**：要等 `notes/research/kpax-knowledge-source-architecture.md` 写出来（P2 agenda 已挂），再对照 graphify / Thoth / ALIVE 三家做选型。是选型池的重点候选
+- **理由**：要等 `notes/research.md#kpax-knowledge-source-architecture` 写出来（P2 agenda 已挂），再对照 graphify / Thoth / ALIVE 三家做选型。是选型池的重点候选
 
 ---
 
@@ -237,7 +237,7 @@
 - **对 Ken 个人**：融资 / 产品 / marketing / 管理翻起来顺手
 - **动作**：**track（短期）→ adopt（当 KPAX 开始 ingest curated 知识源时）**
 - **理由**：**cc 第一版判断"skip 项目"是因为把 KPAX 窄化成了只吃学术——错**。这是一条需要回头修的认知：KPAX 知识架构 = 论文 + 行业 curated + 社区经验 三线并行。awesome-ceo 在第二线里是一个完整的种子清单
-- **后续**：需要在 `notes/research/seven-layer-memory-design.md` 或新建 `notes/research/kpax-knowledge-source-architecture.md` 把三条线写清楚
+- **后续**：需要在 `notes/research.md#seven-layer-memory-design` 或新建 `notes/research.md#kpax-knowledge-source-architecture` 把三条线写清楚
 
 ---
 
@@ -278,7 +278,7 @@
 - **作者**：Jackrong（HuggingFace），之前蒸馏过 Claude Opus 4.6 得到 Qwopus
 - **是什么**：9B 参数开源模型，用 GLM-5.1 reasoning 蒸馏，声称推理深度超基础版，**8GB VRAM 可跑**，MLX 原生版已发。27B 大版本在路上。Benchmarks 未发。
 - **对 AXL / KPAX 有没有用**：不立刻 adopt，但 track。三个潜在角色：
-  1. 本地 L3–L6 记忆层候选模型（对应 `notes/research/wisland-analysis-and-positioning.md` B.10）
+  1. 本地 L3–L6 记忆层候选模型（对应 `notes/research.md#wisland-analysis-and-positioning` B.10）
   2. structured tagger 的 base model 候选（对应 wisland note B.6，pilot 后云租 GPU 微调 tagger 的方向）
   3. 开发期本地 mock AXL（写 KPAX 时避免 API 钱）
   - **不能当 judge**：Ken 硬规则 judge 能力 ≥ 被判模型，9B 判 Opus 太弱

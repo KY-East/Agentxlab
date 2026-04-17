@@ -4,7 +4,7 @@
 **执行者**：Claude Code
 **审阅者**：Ken
 **状态**：checkpoint_0_report_ready（与 `experiments/config/experiment_registry.json` 同步；以 registry 为准）
-**上游依据**：`notes/research/role-labels-vs-orchestrator.md` 第三节
+**上游依据**：`notes/research.md#role-labels-vs-orchestrator` 第三节
 
 ---
 
@@ -159,7 +159,7 @@ AXL 多 agent 推演产出高于单 agent 的现象，收益到底来自哪里�
 
 **来源与版本路径**：
 - v0.1：AXL 自己跑 meta_01 元任务产出（递归 dogfooding，recursive validation of the engine on a real academic question）
-- v0.1-reviewed：`@cursor` 独立审修订版（识别 AXL 自偏置，见 `notes/agenda/next.md` P0 Rubric C 任务）
+- v0.1-reviewed：`@cursor` 独立审修订版（识别 AXL 自偏置，见 `notes/next.md` P0 Rubric C 任务）
 - v0.2：meta_01 跑完整 4 轮 standard depth 产出的精炼版（需 runner timeout 调整到 4800s）
 - v1.0：pilot 校准数据 + A/B 回归测试后的稳定版
 
@@ -358,7 +358,7 @@ emergence_decomposition/results/
    - 自动合并输出 `scores_combined.json`
 6. **Checkpoint 5 — 最终分析**：
    - 最终 `summary.md`：组间对比表 + Wilcoxon p 值 + Cliff's delta + 质量/机制双报告
-   - 对 `notes/research/remediation-plan-multi-agent.md` 的反馈
+   - 对 `notes/research.md#remediation-plan-multi-agent` 的反馈
    - 更新 `experiment_registry.json` 状态
 
 不需要：

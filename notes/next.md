@@ -6,9 +6,15 @@
 
 **优先级**：P0 必须先做（blocker）；P1 本周内；P2 本月内；P3 记一笔以后做
 
-**最后更新**：2026-04-15 晚 by cc（KPAX v0 任务 + pilot 状态清理）
+**最后更新**：2026-04-17 凌晨 by cc（新分工生效 + Lucas 量化闭环 + 文件合并整合）
 
-**总导航**：先读 `PROJECT.md` 了解项目全貌，再回本文件找 owner 任务。
+**总导航**：先读 `PROJECT.md` 了解项目全貌 + §6 角色分工，再回本文件找 owner 任务。
+
+**新分工**（Ken 2026-04-17 拍板，详见 `PROJECT.md` §6）：
+- `@cc`：战略规划 / PRD / 任务分工 / 逻辑闭环 / UX 审核。不直接写业务代码。
+- `@cursor`：所有业务代码开发。接 cc 的 PRD + 本文件任务清单 → 实现。
+- `@codex`：code review / 代码质量审核。
+- `@ken`：战略终审 / 产品终审 / 外部决策 / 关键 UX 拍板。
 
 ---
 
@@ -25,38 +31,65 @@
 
 ## 🔥 P0 —— 阻塞态，先做这些
 
-### `@cc` meta_01 rubric v0.1 落地三步（Ken 2026-04-16 拍板，ABC 全做）
-- [ ] **A（先做）**：把 DB 里 meta_01 的完整 transcript（17 条 message）导到 `results/dry_run_20260416_165636/raw/baseline_meta_01.json`；Round 2 moderator 综合（6199 字）写成 `results/dry_run_20260416_165636/pilot_judge_rubric_v0.1.md` 正式归档；挂进 `spec.md` §4 Judge 设计章节作为 pilot rubric v0.1
-- [ ] **B（之后做）**：改 runner 的 timeout：standard depth 从 2000s 拉到 4800s；meta_01 用同 prompt 重跑完整 4 rounds 拿 v0.2（对比 v0.1 看 2 rounds vs 4 rounds 精炼度差距）
-- [ ] **C（并行）** `@cursor`：独立审 `pilot_judge_rubric_v0.1.md`，写出 v0.1-reviewed（识别 AXL 自偏置风险，修订维度 / 评分 anchor / 合成规则）
-- [ ] 最终 pilot rubric = v0.1 + cursor 审修 + v0.2 对照优化后的版本
-- 依据：`results/dry_run_20260416_165636/progress.jsonl` + Round 2 moderator 综合（DB msg id=75）
+**以下任务按 Ken 2026-04-17 新分工 re-owner。cc 不再直接写代码，归 cursor；代码完成后自动挂 codex review。**
 
-### `@cc` Checkpoint 1 pilot 启动（Checkpoint 0 已真关闭 2026-04-15 晚）
+### `@cursor` meta_01 rubric v0.1 独立审（出 v0.1-reviewed）
+- [ ] 读 `experiments/emergence_decomposition/results/dry_run_20260416_165636/pilot_judge_rubric_v0.1.md`
+- [ ] 独立审视，识别 AXL 自偏置风险（rubric 是 AXL 自己生成的，有 self-preference bias）
+- [ ] 修订或质疑：(a) 8 个维度是否覆盖完整 / (b) 评分 anchor 是否区分度够 / (c) hybrid 合成规则是否合理 / (d) 偏差鲁棒性校验层是否必要 / (e) 是否漏掉什么没有人类 reviewer 介入却应该介入的点
+- [ ] 输出 `pilot_judge_rubric_v0.1-reviewed.md` 在同目录
+- [ ] `@codex` 审 v0.1-reviewed 的修订是否合理（meta-review）
+
+### `@cursor` 修 5 处 KPAX monorepo 硬规则违反（走路 1：改 HTTP）
+- [ ] `kpax/backend/kpax_svc/services/question_parser.py`：去掉 `from app.services.ai_provider`，改为通过 `axl_client.py` 走 HTTP 或独立接 LLM SDK
+- [ ] `kpax/backend/kpax_svc/services/expert_builder.py`：同上处理
+- [ ] `kpax/backend/kpax_svc/services/report_generator.py`：同上处理
+- [ ] `kpax/backend/kpax_svc/routers/analyze.py`（legacy）：评估是重写还是弃用（可能被 `v1_analyze.py` 替代）
+- [ ] `kpax/backend/kpax_svc/routers/report.py`（legacy）：同上评估
+- [ ] 每改一个文件后跑 smoke test 确保无 regression
+- [ ] `@codex` review 每个 PR
+- 依据：`notes/journal/2026-04.md` 2026-04-16 深夜 KPAX survey + `PROJECT.md` §5.1 KPAX 硬规则 #6
+
+### `@cursor` 实现 judge.py 给已有 20+ 场 baseline 打分（Lucas 量化闭环 A 步）
+- [ ] 实现 `experiments/emergence_decomposition/judge.py`，读 raw transcript JSON，调用独立强模型（GPT-5 或 Gemini 2.x，spec §4.1 指定），按 `pilot_judge_rubric_v0.1-reviewed.md` 给每场的 4 段 moderator summary 打分
+- [ ] 输入范围：3 场 mini run + 15 场 scaleup + 5 场 supplement + 1 场 meta_01 = 24 场
+- [ ] 输出：`experiments/emergence_decomposition/results/<dir>/judge_scores.json`，每场含 4 段各 5 维 + 总分 + 偏差鲁棒性标记
+- [ ] 估算成本：24 场 × 约 $0.5 per judge ≈ $12
+- [ ] 输出汇总 `baseline_scored_pool_v0.md`：24 场得分分布 + 发现的 pattern
+- [ ] `@codex` review judge.py 代码
+- [ ] `@ken` review 最终 scored pool，给 2-3 场样本做人工锚点评分校准 judge
+- 依据：`notes/research.md#quantification-gap` A 步骤 + `pilot_judge_rubric_v0.1.md`
+
+### `@cursor` Checkpoint 1 pilot 实现（上面三个前置完成后启动）
+- [ ] 前置条件：monorepo 修完 + rubric v0.1-reviewed + judge.py 实现 + 24 场 baseline scored
+- [ ] 在 runner.py 加 group 参数支持 A 组（去 discipline label 的 baseline）
 - [ ] 启动 pilot：baseline + A 组 × 20 题 × 2 run = 80 场
-- [ ] 新配置下 pilot 预估：**~$73**，wall ~20 h（mean $0.91/场 × 80）
-- [ ] moderator：Opus（Ken 硬要求），**不需要提 Anthropic tier**（Tier 1 自洽已验证）
-- [ ] 输出 `pilot_analysis.md`：方差 / judge 自一致性 / (d) 标签效应首次量化
-- 依据：`experiments/emergence_decomposition/results/dry_run_20260415_171016/mini_dry_run_report.md`
+- [ ] 成本预估：~$79，wall ~27 h（mean $0.99/场 × 80）
+- [ ] moderator：Opus 4.6（Ken 硬要求）
+- [ ] pilot 跑完后自动调 judge.py 给每场打分
+- [ ] 输出 `pilot_analysis.md`：方差 / judge 自一致性 / (d) 标签效应首次量化 / 学科分化 pattern 在 A 组是否消失
+- [ ] `@codex` review pilot 代码
+- [ ] `@ken` review 分析报告
+- 依据：`experiments/emergence_decomposition/results/dry_run_20260416_083829/scaleup_report.md` + `spec.md`
 
-### `@ken` KPAX v0 第一步：生角色图
-- [ ] 按 `notes/design/kpax-v0-deliberation-room.md` §7.2 的 7 张 prompt + §7.1 视觉锚丢给 Grok
+### `@ken` KPAX v0 角色图设计（Ken 2026-04-16 晚标注"不急，要好好设计"）
+- [ ] 状态：不急。Ken 在好好设计视觉风格 + 7 角色细节
+- [ ] 按 `notes/design.md#kpax-v0-deliberation-room` §7.2 的 7 张 prompt + §7.1 视觉锚丢给 Grok
 - [ ] 每人 2–3 variant，挑稿。同时看 7 张拼一起是否像"同一个世界的人"
-- [ ] 定稿后回 cc，进 Rodin/Meshy 4/Tripo 2 对比
+- [ ] 定稿后回 cc，cc 把角色定稿写进 design.md，下发 cursor 进 Rodin/Meshy 4/Tripo 2 3D 转化
+- 无前置依赖
 
-### ✅ `@cc` KPAX 后端 survey（2026-04-16 晚完成）
-发现 5 处 monorepo import 违反硬规则 #6。见 `notes/journal/2026-04.md` 2026-04-16 深夜 cc 条目。
+### `@ken` 拍板：项目可视化路径 A / B / C（Ken 2026-04-17 识别痛点）
+- [ ] 路 A：cursor 做本地 HTML dashboard 读 repo 各 markdown 渲染成 kanban / timeline
+- [ ] 路 B：接外部工具（Linear / Notion / GitHub Projects）定期 sync
+- [ ] 路 C：recursive dogfooding，KPAX 座谈会 UI 扩展一个"项目 domain"（野但有趣，可能是 v1 之后）
+- 依据：`PROJECT.md` §6 末尾 + `notes/journal/2026-04.md` 04-17 凌晨条目
 
-### `@cc` KPAX v0 最短可跑路径（路 2：绕开违规 services）
-- [ ] `question_classifier._chat_fn` 接真 LLM（DeepSeek 或 Anthropic SDK 直调，不走 AXL），~30 min
-- [ ] AXL `kpax_router.py` mock 改真调 `debate_engine.py`（产出真 debate + moderator summary），~2-3h
-- [ ] 前端 v0 从零（按 Claw3D 架构模板 + Spark 2.0 + R3F + Rodin/Meshy/Tripo 人物生成），三周节奏见 `notes/design/kpax-v0-deliberation-room.md`
-- [ ] **三个违规 services（question_parser / expert_builder / report_generator）暂不动**，留到 v1 决定重写成 HTTP-only 还是弃用
-
-### `@cursor` KPAX v1 清账：decide 三个违规 services 命运
-- [ ] 等 v0 上线、真实使用数据反馈后再评估
-- [ ] 每个文件评估：重写成 HTTP-only（拆掉 `from app.services.ai_provider`，改用 KPAX 自己的 LLM client 或通过 axl_client）/ 弃用（功能被 v0 简化链替代）
-- [ ] 依据：`notes/journal/2026-04.md` 2026-04-16 深夜 survey + KPAX 硬规则 #6
+### `@ken` 拍板：Lucas 量化闭环后续决策点
+- [ ] A 步骤（judge.py 给现有 baseline 打分）何时启动？建议 cursor 修 monorepo 完成后立刻启动
+- [ ] 人工评分锚点（C 步骤）由谁打？Ken + cursor 各一批？还是 Ken 独立？
+- [ ] Meta-learner（E 步骤）是否从 Phase 3 开始纳入研究路线图？
+- 依据：`notes/research.md#quantification-gap` 决策点
 
 ---
 
@@ -81,7 +114,7 @@
 - [ ] `experiments/emergence_decomposition/spec.md` 4.1 节
 - [ ] 确认：主 judge 固定 API 模型（GPT-5 或 Gemini 2.x，选一个不换），**不**搞本地 fine-tune judge
 - [ ] 理由：judge 模型能力必须 ≥ 被判模型；Claude Opus 4.6 的输出 7B 判不动。900 次 judge 总成本 ≈ $8，省这个是省零头
-- [ ] 依据：`notes/research/wisland-analysis-and-positioning.md` B.1（已改）
+- [ ] 依据：`notes/research.md#wisland-analysis-and-positioning` B.1（已改）
 
 ### `@cursor` dry run 内容层观察落 spec（来自 dry_run_report §8，n=3 观察非结论）
 - [ ] agent prompt 加"不得复述本轮他人已提论点"；收紧 agent `max_tokens`（观察：每条 2000–4000 字，同轮重复攻击角度）
@@ -146,7 +179,7 @@
 - [ ] 视频生成候选：**Hyperframes**（radar [2026-04-16]）——Claude Code 预装 skill，HTML → MP4 本地渲染，零云端
 - [ ] 分享流程：用户点"分享" → 下载 MP4 / 直传 X / Telegram → 钱包 +20 token
 - [ ] 设计"精华"抽取规则：哪些消息入选高光（ranked by 论点锐度？冲突密度？引用密度？）
-- [ ] 依据：`notes/design/kpax-v0-deliberation-room.md` §5 用户动作流 + KPAX 六条代币规则
+- [ ] 依据：`notes/design.md#kpax-v0-deliberation-room` §5 用户动作流 + KPAX 六条代币规则
 
 ### `@cursor` + `@ken` KPAX decision domain tag
 - [ ] KPAX session 埋 `decision_domain` 字段（用户填 or LLM 自动打）
@@ -162,12 +195,12 @@
 ### `@cc` 跟进 Zep 从 memory 改名 context engineering 的技术含义
 - [ ] 读 Zep 的 Graphiti framework 新文档，看 temporal knowledge graph 的 valid_at / invalid_at 实现
 - [ ] 评估：AXL 当前七层记忆用 Zep 的 add_memory / search_knowledge 接口，Zep 新 positioning 是否要求我们改接口使用方式
-- [ ] 输出一段话更新 `notes/research/seven-layer-memory-design.md` 的 backend 部分
-- 依据：`notes/external-references-radar.md` [2026-04-16] witcheer Two-Camps 第 1 条连接
+- [ ] 输出一段话更新 `notes/research.md#seven-layer-memory-design` 的 backend 部分
+- 依据：`notes/radar.md` [2026-04-16] witcheer Two-Camps 第 1 条连接
 
 ### `@cc` OpenClaw 6 加权信号做 agent-evolution-free-parameters 默认值
 - [ ] 读 OpenClaw 的 dreaming process 源码（light sleep / REM / deep sleep 三阶段）
-- [ ] 把 6 个信号（relevance 0.30 / frequency 0.24 / query diversity 0.15 / recency 0.15 / consolidation 0.10 / conceptual richness 0.06）作为 AXL 自由参数 L7 元进化的 prior，写进 `notes/research/agent-evolution-free-parameters.md`
+- [ ] 把 6 个信号（relevance 0.30 / frequency 0.24 / query diversity 0.15 / recency 0.15 / consolidation 0.10 / conceptual richness 0.06）作为 AXL 自由参数 L7 元进化的 prior，写进 `notes/research.md#agent-evolution-free-parameters`
 - [ ] AXL 差异化写明：别人 hard-code，我们让它 per-user 可学习
 - 依据：同上，第 2 条连接
 
@@ -175,7 +208,7 @@
 - [ ] emergence_decomposition 全量跑完后，下个实验设计：测 "session N 是不是比 session 1 更聪明"（compounding gain）
 - [ ] witcheer 指出这是现有所有 memory benchmark 的空白——AXL 护城河的天然论文立足点
 - [ ] 提前写 spec 草稿，等 emergence 全量结果 + 自由参数初版 validate 后启动
-- 依据：radar [2026-04-16] 第 3 条连接 + `notes/research/agent-evolution-free-parameters.md` + `seven-layer-memory-design.md` L7
+- 依据：radar [2026-04-16] 第 3 条连接 + `notes/research.md#agent-evolution-free-parameters` + `seven-layer-memory-design.md` L7
 
 ### `@cc` 深读 Thoth（145⭐ 小项目）
 - [ ] Thoth 4 阶段 dream cycle：duplicate merging 0.93 sim / enrichment / relationship inference / confidence decay 90 天
@@ -184,10 +217,10 @@
 - 依据：radar [2026-04-16] 第 4 条连接
 
 ### ✅ `@cc` 建 KPAX 知识源架构笔记（2026-04-16 深夜完成）
-落地：`notes/research/kpax-knowledge-source-architecture.md`。v0/v1/v2 phasing 已给出，等 Ken 拍板第 8 节 4 个决策点。
+落地：`notes/research.md#kpax-knowledge-source-architecture`。v0/v1/v2 phasing 已给出，等 Ken 拍板第 8 节 4 个决策点。
 
 ### `@cc` 建 KPAX 知识源架构笔记（archived above）
-- [ ] 新建 `notes/research/kpax-knowledge-source-architecture.md`
+- [ ] 新建 `notes/research.md#kpax-knowledge-source-architecture`
 - [ ] 写清三条输入线：(a) 学术论文 arXiv/OpenAlex/S2 (b) 行业 curated awesome-lists/YC/a16z/Sequoia (c) 社区经验 Reddit/知乎/Quora
 - [ ] 7 位顾问在辩论时如何从三类源调证据，每类对应哪些学科
 - [ ] Ken 的小伙伴爬虫现状、覆盖度、哪些类目缺口
@@ -221,7 +254,7 @@
 ### `@cc` L7 元进化实验设计
 - 七层记忆 L7 层：自由参数自我改写
 - 这是 Ken 相对 WisLand 的核心差异点（他们没有也不会有这层）
-- 依据：`notes/research/seven-layer-memory-design.md` + `wisland-analysis-and-positioning.md` C.2 维度 1
+- 依据：`notes/research.md#seven-layer-memory-design` + `wisland-analysis-and-positioning.md` C.2 维度 1
 
 ### `@cc` 本地 L1/L2 记忆层
 - Qwen-2.5-14B 或 GLM-4-9B 本地跑 L1 工作记忆 + L2 情节记忆
