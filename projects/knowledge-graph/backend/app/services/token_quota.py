@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.models.subscription import Subscription
 from app.plan_config import get_plan
 
@@ -54,6 +55,9 @@ def check_quota(user_id: int, db: Session) -> Subscription:
     sub = get_or_create_sub(user_id, db)
     maybe_reset_quota(sub, db)
 
+    if settings.auth_bypass_dev_mode:
+        return sub
+
     if sub.status not in ("active",):
         raise HTTPException(403, "Subscription is not active")
 
@@ -67,6 +71,9 @@ def check_quota(user_id: int, db: Session) -> Subscription:
 
 
 def validate_model(sub: Subscription, requested_model: str | None) -> str:
+    if settings.auth_bypass_dev_mode:
+        return requested_model or sub.preferred_model or "deepseek/deepseek-chat"
+
     allowed = []
     if sub.allowed_models:
         try:

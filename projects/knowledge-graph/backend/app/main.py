@@ -20,6 +20,17 @@ app = FastAPI(
     description="Interdisciplinary knowledge graph for Agent X Lab",
 )
 
+if getattr(settings, "auth_bypass_dev_mode", False):
+    logger.warning(
+        "=" * 70 + "\n"
+        "AUTH_BYPASS_DEV_MODE=True — ALL AUTH + QUOTA CHECKS ARE DISABLED.\n"
+        "Every request runs as the lowest-id user (dev account).\n"
+        "Token limits and allowed_models are bypassed (any LLM in .env is OK).\n"
+        "DO NOT deploy with this flag enabled. Set AUTH_BYPASS_DEV_MODE=false\n"
+        "or remove the line from .env to restore authentication.\n"
+        + "=" * 70
+    )
+
 # Request-scoped trace id. Must be added BEFORE CORS so even preflight requests
 # get a request_id logged.
 app.add_middleware(RequestIdMiddleware)
@@ -45,6 +56,7 @@ app.include_router(discovery.router)
 app.include_router(paper_gen.router)
 app.include_router(sparks.router)
 app.include_router(kpax_router.router)
+app.include_router(kpax_router.followup_router)
 
 try:
     from app.routers import auth, forum, points, subscription

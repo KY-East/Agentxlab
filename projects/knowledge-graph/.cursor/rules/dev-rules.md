@@ -56,6 +56,15 @@ projects/knowledge-graph/
 - **API 路由**: `/api/` 前缀，kebab-case 路径（`/api/debate/start`）
 - **数据库表**: snake_case 复数（`disciplines`, `papers`, `scholars`）
 
+### 辩论/推演 术语分层
+
+本质是同一件事（多 Agent 跨学科对抗），但对外对内用不同词：
+
+- **代码 / 内部文档**：debate（变量名、文件名、API 路径一律不改）
+- **产品对外 / 用户可见文案**：**多维推演**（强调多角度）、**碰撞推演**（强调对抗性）
+- **AXL 前端 UI**：学科碰撞（已有，保持）
+- 禁止在对外文案里出现"辩论"——听起来像学校社团活动
+
 ## 后端规范
 
 - 所有 API 路由使用 `/api/` 前缀

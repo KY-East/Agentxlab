@@ -77,10 +77,29 @@ def decode_jwt(token: str) -> int:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid token") from exc
 
 
+def _dev_bypass_user(db: Session) -> User | None:
+    """DEV-ONLY: return the lowest-id user when AUTH_BYPASS_DEV_MODE=True.
+
+    This lets Ken test UIs locally without logging in. Controlled by a single
+    .env flag; defaults to False in Settings so production is unaffected.
+    """
+    if not settings.auth_bypass_dev_mode:
+        return None
+    user = db.query(User).order_by(User.id.asc()).first()
+    if user is None:
+        logger.warning(
+            "auth_bypass_dev_mode=True but no users exist in DB — cannot bypass"
+        )
+    return user
+
+
 def get_current_user(
     creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
     db: Session = Depends(get_db),
 ) -> User:
+    bypass = _dev_bypass_user(db)
+    if bypass is not None:
+        return bypass
     if creds is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Not authenticated")
     user_id = decode_jwt(creds.credentials)
@@ -95,6 +114,9 @@ def get_verified_user(
     db: Session = Depends(get_db),
 ) -> User:
     """Like get_current_user but also requires email_verified=True."""
+    bypass = _dev_bypass_user(db)
+    if bypass is not None:
+        return bypass
     user = get_current_user(creds, db)
     if not user.email_verified:
         raise HTTPException(
@@ -109,6 +131,9 @@ def get_optional_user(
     db: Session = Depends(get_db),
 ) -> User | None:
     """Same as get_current_user but returns None instead of 401."""
+    bypass = _dev_bypass_user(db)
+    if bypass is not None:
+        return bypass
     if creds is None:
         return None
     try:

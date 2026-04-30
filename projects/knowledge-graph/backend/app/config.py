@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     # Auth — Google OAuth + JWT
     google_client_id: str = ""
     jwt_secret: str = "change-me-in-production"
+    # DEV-ONLY: when True, all auth dependencies return the lowest-id user
+    # (Ken) without checking JWT. MUST be False in production. Startup logs
+    # a loud WARNING if this is True so it won't leak to prod unnoticed.
+    auth_bypass_dev_mode: bool = False
 
     # SMTP for email verification / password reset
     smtp_host: str = ""
