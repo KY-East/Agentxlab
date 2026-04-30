@@ -365,6 +365,10 @@ uvicorn kpax_svc.main:app --port 8001 --reload
 | `GOOGLE_CLIENT_ID` | No | Google OAuth login / Google 登录 |
 | `AUTH_BYPASS_DEV_MODE` | No (dev only) | Short-circuit auth + quota for local dev / 本地开发短路认证和配额 |
 
+**Hitting deployment problems?** See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the full step-by-step guide and 12 troubleshooting entries (alembic stamps, port conflicts, OneDrive lock, LiteLLM provider prefix, KPAX↔AXL connection, etc.).
+
+**部署遇到问题？** 看 **[DEPLOYMENT.md](./DEPLOYMENT.md)** —— 完整分步指南 + 12 条 troubleshooting 条目（alembic stamp / 端口占用 / OneDrive 锁 / LiteLLM provider 前缀 / KPAX↔AXL 连接等）。
+
 ---
 
 ## Repository / 仓库结构
