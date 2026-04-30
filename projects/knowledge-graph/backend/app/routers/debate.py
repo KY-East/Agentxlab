@@ -97,12 +97,25 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user:
     valid_depths = ("quick", "standard", "deep", "max")
     depth = body.depth if body.depth in valid_depths else "standard"
 
+    dims_json = None
+    if body.suggested_dimensions:
+        dims_json = _json.dumps(
+            [d.model_dump() for d in body.suggested_dimensions],
+            ensure_ascii=False,
+        )
+
+    raw_q = (body.raw_question or "").strip() or None
+    if body.mode == "debate" and not raw_q:
+        raw_q = body.proposition
+
     debate = Debate(
         title=title,
         mode=body.mode,
         language=lang,
         depth=depth,
         proposition=body.proposition,
+        raw_question=raw_q,
+        suggested_dimensions=dims_json,
         status="active",
         intersection_id=resolved_intersection_id,
         created_by=user.id,
@@ -111,10 +124,16 @@ async def create_debate(body: DebateCreate, db: Session = Depends(get_db), user:
     db.add(debate)
     db.flush()
 
+    dims_for_agents = (
+        [d.model_dump() for d in body.suggested_dimensions]
+        if body.suggested_dimensions else None
+    )
     agent_specs = await generate_agents(
         disciplines, body.mode, body.proposition,
         user_weights=body.discipline_weights,
         language=lang,
+        raw_question=raw_q,
+        suggested_dimensions=dims_for_agents,
         user_id=user.id,
         db=db,
     )
@@ -177,10 +196,7 @@ async def next_round_stream(debate_id: int, db: Session = Depends(get_db), user:
         raise HTTPException(400, f"Maximum round limit ({MAX_ROUNDS}) reached")
 
     agent_map = {a.id: a.agent_name for a in debate.agents}
-    total_speakers = sum(
-        1 for a in debate.agents
-        if not (a.persona == "moderator" and current == 1)
-    )
+    total_speakers = len(debate.agents)
     _user_id = user.id
 
     async def event_generator():
@@ -249,6 +265,7 @@ async def api_suggest_mode(
         raise HTTPException(400, "At least 2 discipline names required")
     result = await suggest_mode(
         body.discipline_names,
+        user_question=body.user_question,
         user_id=user.id if user else None,
         db=db,
     )

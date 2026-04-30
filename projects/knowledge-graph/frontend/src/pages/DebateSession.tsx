@@ -1,9 +1,21 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
 import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Play, Square, ArrowLeft, BookOpen, Share2, FlaskConical } from "lucide-react";
+import {
+  Loader2,
+  Play,
+  Square,
+  ArrowLeft,
+  BookOpen,
+  Share2,
+  FlaskConical,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { api } from "../api/client";
 import { useAuth } from "../contexts/AuthContext";
 import type { Debate, DebateAgent, DebateMessage, DraftBrief, Spark, SparkStats } from "../types";
@@ -779,35 +791,293 @@ function MessageBlock({
   );
 }
 
-function SummaryBlock({ debate }: { debate: Debate }) {
-  const { t } = useTranslation();
-  const sections = [
-    { id: "consensus", titleKey: "debateSession.consensus", color: "border-green-500", content: debate.summary_consensus },
-    { id: "disagreements", titleKey: "debateSession.disagreements", color: "border-red-500", content: debate.summary_disagreements },
-    { id: "openQuestions", titleKey: "debateSession.openQuestions", color: "border-yellow-500", content: debate.summary_open_questions },
-    { id: "directions", titleKey: "debateSession.directions", color: "border-cyan-400", content: debate.summary_directions },
-  ].filter((s) => s.content);
+// SummaryBlock 设计语言（2026-04-24 PM cursor v2 → 2026-04-27 Phase 2 实装）
+// Ken 拍板：参考 designdotmd.directory 报告/出版物调性，单色 amber + 1px 细线 +
+// serif 大标题 + mono micro-label + ReactMarkdown 渲染。
+//
+// Phase 2 拆分（2026-04-27）：
+//   - <FinalAnswerLayer>   Hero Direct Answer + 三段 supporting (Why / Conditions / NextSteps)
+//   - <DetailedAnalysis>   原 4 段综述（Consensus / Disagreements / OpenQuestions / Directions），默认折叠
+//   - <SummaryBlock>       外层壳：包两个组件 + 折叠状态 + 顶部 / 底部 micro-label
+//
+// design.md §axl-debate-mode-design > Final Answer Layer 子节是上位约束。
+// LLM prompt 在 backend/app/services/final_answer_layer.py。
+
+const SUMMARY_SECTION_META: Record<string, { numLabel: string }> = {
+  consensus:     { numLabel: "01" },
+  disagreements: { numLabel: "02" },
+  openQuestions: { numLabel: "03" },
+  directions:    { numLabel: "04" },
+};
+
+// Final Answer Layer supporting 元数据（Hero Direct Answer + why 单独处理，不在此列）
+// Phase 2.5（2026-04-28）：UI 视觉压成 3 段——
+//   段 1: Direct Answer hero + why 作为下方轻量支撑（不单独成段，灰度补充）
+//   段 2: Key Conditions（① 圆圈，对应 conditions 字段）
+//   段 3: User Takeaway（② 圆圈，对应 next_steps 字段）
+// 数据层 4 字段不变（summary_direct_answer / summary_why / summary_conditions / summary_next_steps），
+// 仅 UI 渲染压缩。why 字段留给 hero 下方的轻量补充段。
+const FINAL_ANSWER_SUPPORTING: Array<{
+  id: "conditions" | "next_steps";
+  numLabel: string;
+  titleZh: string;
+  titleEn: string;
+}> = [
+  { id: "conditions", numLabel: "①", titleZh: "关键条件",  titleEn: "KEY CONDITIONS" },
+  { id: "next_steps", numLabel: "②", titleZh: "用户可做", titleEn: "USER TAKEAWAY" },
+];
+
+// Markdown 报告排版（debate summary / paper drafts 共用）
+// 三层 marker 系统由全局 CSS 控制（见 src/index.css "Markdown report typography"）：
+//   一级 ul → amber 实心圆点
+//   二级 ul → amber 短破折号 ─
+//   三级 ul → amber 中心点 ·
+//   一级 ol → mono 数字编号 01. 02.
+// JSX 这里只挂语义 class（.md-list / .md-list-ordered），不再 inline before:
+const MD_COMPONENTS = {
+  p: ({ children }: { children?: ReactNode }) => (
+    <p className="text-[15px] leading-[1.75] text-neutral-200 mb-3 last:mb-0">{children}</p>
+  ),
+  strong: ({ children }: { children?: ReactNode }) => (
+    <strong className="font-semibold text-white">{children}</strong>
+  ),
+  em: ({ children }: { children?: ReactNode }) => (
+    <em className="italic text-neutral-100">{children}</em>
+  ),
+  ul: ({ children }: { children?: ReactNode }) => (
+    <ul className="md-list space-y-1.5 mb-3 last:mb-0">{children}</ul>
+  ),
+  ol: ({ children }: { children?: ReactNode }) => (
+    <ol className="md-list md-list-ordered space-y-1.5 mb-3 last:mb-0">{children}</ol>
+  ),
+  li: ({ children }: { children?: ReactNode }) => (
+    <li className="text-[15px] leading-[1.7] text-neutral-200">{children}</li>
+  ),
+  code: ({ children }: { children?: ReactNode }) => (
+    <code className="font-mono text-[13px] text-amber-300 bg-amber-400/10 px-1.5 py-0.5">
+      {children}
+    </code>
+  ),
+  h1: ({ children }: { children?: ReactNode }) => (
+    <h1 className="font-serif text-xl text-white mb-2 mt-4 first:mt-0">{children}</h1>
+  ),
+  h2: ({ children }: { children?: ReactNode }) => (
+    <h2 className="font-serif text-lg text-white mb-2 mt-4 first:mt-0">{children}</h2>
+  ),
+  h3: ({ children }: { children?: ReactNode }) => (
+    <h3 className="font-mono text-[11px] uppercase tracking-[0.15em] text-amber-400/70 mb-2 mt-3 first:mt-0">
+      {children}
+    </h3>
+  ),
+};
+
+// FinalAnswerLayer：3 段 UI（Phase 2.5 视觉压缩，数据层仍是 4 字段）
+// 段 1: Hero Direct Answer + why 作为轻量支撑说明（紧贴下方，灰度小字，不单独成段）
+// 段 2: ① Key Conditions（对应 conditions 字段）
+// 段 3: ② User Takeaway（对应 next_steps 字段）
+// 数据源不变：debate.summary_direct_answer / summary_why / summary_conditions / summary_next_steps
+function FinalAnswerLayer({ debate }: { debate: Debate }) {
+  const isZh = i18n.language?.startsWith("zh");
+  const direct = debate.summary_direct_answer?.trim();
+  const why = debate.summary_why?.trim();
+  const supporting = FINAL_ANSWER_SUPPORTING.map((meta) => ({
+    ...meta,
+    content: (() => {
+      const v = debate[`summary_${meta.id}` as keyof Debate];
+      return typeof v === "string" ? v.trim() : "";
+    })(),
+  })).filter((s) => s.content);
+
+  // 全部字段为空 → 不显示 FinalAnswerLayer（Phase 2 LLM 失败兜底，让 DetailedAnalysis 顶上）
+  if (!direct && !why && supporting.length === 0) return null;
 
   return (
-    <div className="mt-6 space-y-3">
-      <div className="flex items-center gap-3 py-2">
-        <div className="h-[2px] flex-1 bg-cyan-400/30" />
-        <span className="font-mono text-[10px] text-cyan-400 uppercase tracking-[0.2em]">
-          {t("debateSession.summary").toUpperCase()}
-        </span>
-        <div className="h-[2px] flex-1 bg-cyan-400/30" />
-      </div>
-      {sections.map((s) => (
-        <div key={s.id} className={`pl-3 border-l-2 ${s.color}`}>
-          <h4 className="font-mono text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">
-            {t(s.titleKey).toUpperCase()}
-          </h4>
-          <p className="text-sm text-neutral-400 leading-relaxed whitespace-pre-wrap">
-            {s.content}
-          </p>
+    <div className="px-8 pb-7">
+      {direct && (
+        <div className="border-l-2 border-amber-400/70 pl-5 -ml-px">
+          <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-amber-400/80 mb-2.5">
+            {isZh ? "直接回答" : "DIRECT ANSWER"}
+          </div>
+          <h2 className="font-serif text-[26px] leading-[1.35] text-white tracking-tight">
+            {direct}
+          </h2>
+          {why && (
+            // why 紧贴 Direct Answer 作为轻量支撑说明（小字号 / 灰度 / 不抢主标题）
+            // Phase 2.5 视觉决策：why 不单独成段，作为 Direct Answer 的"为什么"补充
+            <div className="mt-3 pt-3 border-t border-amber-400/15">
+              <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-400/55 mb-1.5">
+                {isZh ? "为什么" : "WHY"}
+              </div>
+              <div className="text-[14px] text-neutral-400/90 leading-[1.7]">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                  {why}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
         </div>
-      ))}
+      )}
+
+      {supporting.length > 0 && (
+        <div className="mt-7 space-y-6">
+          {supporting.map((s) => (
+            <section key={s.id} className="grid grid-cols-[auto_1fr] gap-x-6">
+              <div className="flex flex-col items-end pr-1 min-w-[62px]">
+                <div className="font-serif text-[20px] text-amber-400/75 leading-none">
+                  {s.numLabel}
+                </div>
+                <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-400/80 mt-1.5 text-right leading-tight">
+                  {(isZh ? s.titleZh : s.titleEn).toUpperCase()}
+                </div>
+              </div>
+              <div className="pt-0.5">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                  {s.content}
+                </ReactMarkdown>
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+// DetailedAnalysis：原 4 段综述（Consensus / Disagreements / OpenQuestions / Directions）
+// 默认折叠，由父级 SummaryBlock 控制展开状态。
+function DetailedAnalysis({ debate, expanded }: { debate: Debate; expanded: boolean }) {
+  const { t } = useTranslation();
+  const isZh = i18n.language?.startsWith("zh");
+  const sections = [
+    { id: "consensus",     titleKey: "debateSession.consensus",     content: debate.summary_consensus },
+    { id: "disagreements", titleKey: "debateSession.disagreements", content: debate.summary_disagreements },
+    { id: "openQuestions", titleKey: "debateSession.openQuestions", content: debate.summary_open_questions },
+    { id: "directions",    titleKey: "debateSession.directions",    content: debate.summary_directions },
+  ].filter((s) => s.content);
+
+  if (sections.length === 0) return null;
+  if (!expanded) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="overflow-hidden"
+    >
+      <div className="mx-8 border-t border-neutral-800" />
+      <div className="px-8 py-7 space-y-7">
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500 -mt-1">
+          {isZh ? "详细分析 · 四段综述" : "DETAILED ANALYSIS · FOUR-SECTION SUMMARY"}
+        </div>
+        {sections.map((s) => {
+          const meta = SUMMARY_SECTION_META[s.id] || { numLabel: "·" };
+          return (
+            <section key={s.id} className="grid grid-cols-[auto_1fr] gap-x-6">
+              <div className="flex flex-col items-end pr-1 min-w-[62px]">
+                <div className="font-mono text-[10px] text-amber-400/60 tracking-wider">
+                  {meta.numLabel}
+                </div>
+                <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-400/80 mt-1 text-right leading-tight">
+                  {t(s.titleKey).toUpperCase()}
+                </div>
+              </div>
+              <div className="pt-0.5">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
+                  {s.content || ""}
+                </ReactMarkdown>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function SummaryBlock({ debate }: { debate: Debate }) {
+  const isZh = i18n.language?.startsWith("zh");
+  const [detailedExpanded, setDetailedExpanded] = useState(false);
+
+  // 是否有 Final Answer Layer 数据（Phase 2 字段）
+  const hasFinalAnswer = !!(
+    debate.summary_direct_answer ||
+    debate.summary_why ||
+    debate.summary_conditions ||
+    debate.summary_next_steps
+  );
+
+  // 是否有 4 段综述（任一字段非空）
+  const hasDetailed = !!(
+    debate.summary_consensus ||
+    debate.summary_disagreements ||
+    debate.summary_open_questions ||
+    debate.summary_directions
+  );
+
+  if (!hasFinalAnswer && !hasDetailed) return null;
+
+  // Final Answer 缺席时，DetailedAnalysis 默认展开兜底（用户至少能看到 4 段综述）
+  const effectiveExpanded = !hasFinalAnswer ? true : detailedExpanded;
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="my-10 border border-neutral-700/70 bg-gradient-to-b from-amber-50/[0.02] to-transparent"
+    >
+      {/* Top label band */}
+      <div className="flex items-baseline justify-between px-8 pt-7 pb-2">
+        <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-amber-400/80">
+          {isZh ? "辩论 · 最终答案" : "DEBATE · FINAL ANSWER"}
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-neutral-600">
+          {isZh ? `Debate #${debate.id}` : `№ ${debate.id}`}
+        </div>
+      </div>
+
+      {hasFinalAnswer && <FinalAnswerLayer debate={debate} />}
+
+      {hasDetailed && (
+        <>
+          {/* Toggle button: 仅当 FinalAnswerLayer 存在时才显示折叠控件 */}
+          {hasFinalAnswer && (
+            <div className="px-8 pt-1 pb-1">
+              <button
+                type="button"
+                onClick={() => setDetailedExpanded((v) => !v)}
+                className="group flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-500 hover:text-amber-400/90 transition-colors py-3 w-full border-t border-neutral-800"
+              >
+                <span>
+                  {effectiveExpanded
+                    ? (isZh ? "收起详细分析" : "COLLAPSE DETAILED ANALYSIS")
+                    : (isZh ? "展开详细分析（共识 / 分歧 / 开放问题 / 研究方向）" : "EXPAND DETAILED ANALYSIS (CONSENSUS / DISAGREEMENTS / OPEN QUESTIONS / DIRECTIONS)")}
+                </span>
+                <span className="ml-auto">
+                  {effectiveExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                </span>
+              </button>
+            </div>
+          )}
+          <AnimatePresence initial={false}>
+            {effectiveExpanded && (
+              <DetailedAnalysis debate={debate} expanded={effectiveExpanded} />
+            )}
+          </AnimatePresence>
+        </>
+      )}
+
+      {/* Footer caption */}
+      <div className="px-8 pb-6 pt-2 border-t border-neutral-900">
+        <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-700 text-center">
+          {hasFinalAnswer
+            ? (isZh ? "FIG · 最终答案 + 详细分析（默认折叠）" : "FIG · FINAL ANSWER + DETAILED ANALYSIS (COLLAPSED BY DEFAULT)")
+            : (isZh ? "FIG · 详细分析（最终答案层未生成）" : "FIG · DETAILED ANALYSIS (FINAL ANSWER NOT GENERATED)")}
+        </div>
+      </div>
+    </motion.article>
   );
 }
 

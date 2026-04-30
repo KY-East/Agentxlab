@@ -161,8 +161,15 @@ export interface DebateBrief {
   created_at: string;
 }
 
+export interface DimensionSuggestion {
+  discipline: string;
+  angles: string[];
+}
+
 export interface Debate extends DebateBrief {
   proposition: string | null;
+  raw_question: string | null;
+  suggested_dimensions: DimensionSuggestion[] | null;
   intersection_id: number | null;
   disciplines: DisciplineBrief[];
   agents: DebateAgent[];
@@ -171,6 +178,11 @@ export interface Debate extends DebateBrief {
   summary_disagreements: string | null;
   summary_open_questions: string | null;
   summary_directions: string | null;
+  // Phase 2 (2026-04-27): Final Answer Layer
+  summary_direct_answer: string | null;
+  summary_why: string | null;
+  summary_conditions: string | null;
+  summary_next_steps: string | null;
 }
 
 export interface ModeSuggestion {
@@ -178,6 +190,7 @@ export interface ModeSuggestion {
   reason_en: string;
   reason_zh: string;
   suggested_proposition: string | null;
+  suggested_dimensions: DimensionSuggestion[] | null;
 }
 
 // ── Discovery types ──

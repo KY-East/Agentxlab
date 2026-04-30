@@ -120,14 +120,20 @@ export default function Debate() {
       const names = leaves
         .filter((d) => selected.has(d.id))
         .map((d) => d.name_en);
-      const s = await api.suggestMode(names);
+      const userQuestion = proposition.trim() || undefined;
+      const s = await api.suggestMode(names, userQuestion);
       setSuggestion(s);
       setMode(s.mode as "free" | "debate");
-      if (s.suggested_proposition) setProposition(s.suggested_proposition);
     } catch (err) {
       showToast(err instanceof Error ? err.message : t("debate.modeSuggestFailed"));
     } finally {
       setSuggestLoading(false);
+    }
+  };
+
+  const applySuggestedProposition = () => {
+    if (suggestion?.suggested_proposition) {
+      setProposition(suggestion.suggested_proposition);
     }
   };
 
@@ -143,10 +149,23 @@ export default function Debate() {
           dw[Number(id)] = role === "core" ? 60 : 30;
         }
       }
+
+      // Phase 1 (2026-04-24): proposition 永远等于输入框内容，不再暗中替换成 AI 改写版。
+      // 用户点「采用此改写」按钮时，applySuggestedProposition() 已经同步把
+      // suggestion.suggested_proposition 写进了输入框——此时 inputText 自然就是改写版。
+      // 用户没点 → 输入框里是原话 → proposition 就是原话。
+      // 见 notes/journal/appendix-2026-04-24-debate-free-mode-semantic-fix-handoff.md §4.2 改动 5
+      const inputText = proposition.trim();
+      const discoveryOriginal = (navCtx.discoveryQuestion || "").trim();
+      const rawUser = discoveryOriginal || inputText;
+      const finalProposition = inputText;
+
       const debate = await api.createDebate({
         discipline_ids: [...selected],
         mode,
-        proposition: proposition.trim() || undefined,
+        proposition: finalProposition || undefined,
+        raw_question: rawUser || undefined,
+        suggested_dimensions: suggestion?.suggested_dimensions || undefined,
         intersection_id: intersectionId ? Number(intersectionId) : undefined,
         discipline_weights: Object.keys(dw).length > 0 ? dw : undefined,
         language: debateLang,
@@ -353,17 +372,72 @@ export default function Debate() {
                 </button>
               </div>
               {suggestion && (
-                <div className="mt-3 p-3 border-2 border-cyan-400/40 bg-cyan-400/5">
+                <div className="mt-3 p-3 border-2 border-cyan-400/40 bg-cyan-400/5 space-y-3">
                   <p className="text-xs text-cyan-400 font-mono">
                     <Sparkles size={12} className="inline mr-1" />
                     {t("debate.suggestionWithReason", { reason: i18n.language?.startsWith("zh") ? suggestion.reason_zh : suggestion.reason_en })}
                   </p>
+
+                  {suggestion.suggested_proposition &&
+                    suggestion.suggested_proposition.trim() !== proposition.trim() && (
+                      <div className="border-t border-cyan-400/20 pt-3">
+                        <p className="font-mono text-[10px] uppercase tracking-wider text-cyan-400 mb-1">
+                          {i18n.language?.startsWith("zh")
+                            ? "学术化改写（可选采用，你的原问题会原样保留给学者）"
+                            : "Academic rephrasing (optional — your raw question stays)"}
+                        </p>
+                        <p className="text-sm text-white">
+                          {suggestion.suggested_proposition}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={applySuggestedProposition}
+                          className="mt-2 text-[11px] font-mono uppercase tracking-wider text-cyan-400 border border-cyan-400/40 px-2 py-1 hover:bg-cyan-400/10"
+                        >
+                          {i18n.language?.startsWith("zh")
+                            ? "采用此改写替换输入框"
+                            : "Use this rephrasing"}
+                        </button>
+                      </div>
+                    )}
+
+                  {suggestion.suggested_dimensions &&
+                    suggestion.suggested_dimensions.length > 0 && (
+                      <div className="border-t border-cyan-400/20 pt-3">
+                        <p className="font-mono text-[10px] uppercase tracking-wider text-cyan-400 mb-2">
+                          {i18n.language?.startsWith("zh")
+                            ? "方向菜单（非派活，学者自选）"
+                            : "Direction menu (options, not assignments)"}
+                        </p>
+                        <ul className="space-y-1.5">
+                          {suggestion.suggested_dimensions.map((dim, i) => (
+                            <li key={i} className="text-xs text-neutral-300">
+                              <span className="text-cyan-400 font-mono">{dim.discipline}:</span>{" "}
+                              {dim.angles.join(" · ")}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                 </div>
               )}
               <div className="mt-4">
                 <label className="font-mono text-[10px] uppercase tracking-wider text-neutral-400 mb-1 block">
                   {mode === "debate" ? t("debate.proposition") : t("debate.topic")}
                 </label>
+                {navCtx.discoveryQuestion && (
+                  <div className="mb-2 p-2 border border-amber-400/40 bg-amber-400/5 text-xs text-amber-300">
+                    <span className="font-mono uppercase tracking-wider text-[10px] text-amber-400 mr-1">
+                      {i18n.language?.startsWith("zh") ? "你的原话" : "Your raw question"}:
+                    </span>
+                    <span className="text-white">"{navCtx.discoveryQuestion}"</span>
+                    <span className="block mt-1 text-neutral-400">
+                      {i18n.language?.startsWith("zh")
+                        ? "会原样传给学者；下面输入框里是 Discovery 的学术化改写，可编辑。"
+                        : "Preserved as-is for scholars; the input below is Discovery's academic rephrasing — edit freely."}
+                    </span>
+                  </div>
+                )}
                 <textarea
                   value={proposition}
                   onChange={(e) => setProposition(e.target.value)}

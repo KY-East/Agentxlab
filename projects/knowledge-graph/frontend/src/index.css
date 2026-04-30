@@ -53,3 +53,119 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #404040;
 }
+
+/* ──────────────────────────────────────────────────────────
+ * Markdown report typography (debate summary, paper drafts)
+ * 设计原则（Ken 2026-04-24 PM 第二次反馈"我讨厌点"后定型）：
+ *   一级 ul  →  ①②③④⑤⑥⑦⑧⑨⑩  Unicode 圆圈数字（精致 + 自带顺序感）
+ *   一级 ol  →  01. 02. 03.        mono 编号（保留）
+ *   二级嵌套 →  ─ amber 短破折号
+ *   三级嵌套 →  完全无 marker，纯缩进
+ * 原则：能少用 marker 就少用；坚决不再用实心圆点 / 中心点。
+ * ────────────────────────────────────────────────────────── */
+
+@counter-style md-circled {
+  system: fixed;
+  symbols: "①" "②" "③" "④" "⑤" "⑥" "⑦" "⑧" "⑨" "⑩";
+  suffix: " ";
+}
+
+.md-list {
+  position: relative;
+  list-style: none;
+  padding-left: 0;
+  counter-reset: md-circled-item;
+}
+
+/* 一级 ul（排除 ol）：圆圈 Unicode ①②③ */
+.md-list:not(.md-list-ordered) > li {
+  counter-increment: md-circled-item;
+  position: relative;
+  padding-left: 1.7rem;
+}
+.md-list:not(.md-list-ordered) > li::before {
+  content: counter(md-circled-item, md-circled);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.4rem;
+  text-align: left;
+  color: rgb(251 191 36 / 0.85);
+  font-size: 0.95em;
+  line-height: 1.7;
+}
+
+/* 二级嵌套 ul（排除 ol），父容器是 .md-list：── 破折号 */
+.md-list .md-list:not(.md-list-ordered) {
+  margin-top: 0.4rem;
+  counter-reset: none;
+}
+.md-list .md-list:not(.md-list-ordered) > li {
+  counter-increment: none;
+  padding-left: 1rem;
+}
+.md-list .md-list:not(.md-list-ordered) > li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: auto;
+  color: rgb(251 191 36 / 0.5);
+  font-weight: 300;
+  font-size: 0.82em;
+  line-height: 2.05;
+}
+
+/* 三级嵌套 ul：极小 + 极弱的 amber 点（表达"最末端纯并列"，不是层级符号）
+ * 大小比一级实心点小 30%，透明度低到 40%——视觉接近隐形但保留"这是并列项"信号 */
+.md-list .md-list .md-list:not(.md-list-ordered) > li {
+  padding-left: 0.85rem;
+}
+.md-list .md-list .md-list:not(.md-list-ordered) > li::before {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.78em;
+  width: 0.22rem;
+  height: 0.22rem;
+  border-radius: 9999px;
+  background: rgb(251 191 36 / 0.4);
+  font-size: inherit;
+  line-height: inherit;
+  color: transparent;
+  font-weight: normal;
+}
+
+/* 四级及以上嵌套：彻底无 marker，纯缩进（避免无限嵌套都堆点） */
+.md-list .md-list .md-list .md-list:not(.md-list-ordered) > li {
+  padding-left: 0.7rem;
+}
+.md-list .md-list .md-list .md-list:not(.md-list-ordered) > li::before {
+  content: none;
+}
+
+/* ol：mono 编号 01. 02.（任意深度都走这条规则，不用 ① 圆圈） */
+.md-list-ordered {
+  list-style: none;
+  counter-reset: md-item;
+  padding-left: 0;
+  margin-top: 0.4rem;
+}
+.md-list-ordered > li {
+  counter-increment: md-item;
+  position: relative;
+  padding-left: 2.4rem;
+}
+.md-list-ordered > li::before {
+  content: counter(md-item, decimal-leading-zero) ".";
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.78em;
+  letter-spacing: 0.04em;
+  color: rgb(251 191 36 / 0.75);
+  width: 2rem;
+  text-align: right;
+  padding-right: 0.4rem;
+}

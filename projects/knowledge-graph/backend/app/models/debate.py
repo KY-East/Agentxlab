@@ -31,6 +31,8 @@ class Debate(Base):
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     mode: Mapped[str] = mapped_column(String(20), nullable=False)
     proposition: Mapped[str | None] = mapped_column(Text)
+    raw_question: Mapped[str | None] = mapped_column(Text)
+    suggested_dimensions: Mapped[str | None] = mapped_column(Text)
     language: Mapped[str] = mapped_column(String(5), default="zh")
     depth: Mapped[str] = mapped_column(String(20), default="standard")
     status: Mapped[str] = mapped_column(String(20), default="active")
@@ -45,6 +47,12 @@ class Debate(Base):
     summary_disagreements: Mapped[str | None] = mapped_column(Text)
     summary_open_questions: Mapped[str | None] = mapped_column(Text)
     summary_directions: Mapped[str | None] = mapped_column(Text)
+
+    # Phase 2 (2026-04-27): Final Answer Layer fields (debate/free shared schema)
+    summary_direct_answer: Mapped[str | None] = mapped_column(Text)
+    summary_why: Mapped[str | None] = mapped_column(Text)
+    summary_conditions: Mapped[str | None] = mapped_column(Text)
+    summary_next_steps: Mapped[str | None] = mapped_column(Text)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

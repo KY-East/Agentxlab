@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import json as _json
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class DisciplineBase(BaseModel):
@@ -190,10 +191,17 @@ class EdgeDetail(BaseModel):
 # ── Debate schemas ──
 
 
+class DimensionSuggestion(BaseModel):
+    discipline: str
+    angles: list[str]
+
+
 class DebateCreate(BaseModel):
     discipline_ids: list[int]
     mode: str = "free"
     proposition: str | None = None
+    raw_question: str | None = None
+    suggested_dimensions: list[DimensionSuggestion] | None = None
     intersection_id: int | None = None
     language: str = "zh"
     depth: str = "standard"
@@ -245,6 +253,8 @@ class DebateSummary(BaseModel):
 
 class DebateOut(DebateBrief):
     proposition: str | None = None
+    raw_question: str | None = None
+    suggested_dimensions: list[DimensionSuggestion] | None = None
     intersection_id: int | None = None
     disciplines: list[DisciplineBrief] = []
     agents: list[AgentOut] = []
@@ -254,7 +264,25 @@ class DebateOut(DebateBrief):
     summary_open_questions: str | None = None
     summary_directions: str | None = None
 
+    # Phase 2 (2026-04-27): Final Answer Layer fields
+    summary_direct_answer: str | None = None
+    summary_why: str | None = None
+    summary_conditions: str | None = None
+    summary_next_steps: str | None = None
+
     model_config = {"from_attributes": True}
+
+    @field_validator("suggested_dimensions", mode="before")
+    @classmethod
+    def _parse_dims(cls, v):
+        if v is None or isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            try:
+                return _json.loads(v)
+            except (ValueError, TypeError):
+                return None
+        return v
 
 
 class ModeSuggestion(BaseModel):
@@ -262,10 +290,12 @@ class ModeSuggestion(BaseModel):
     reason_en: str
     reason_zh: str
     suggested_proposition: str | None = None
+    suggested_dimensions: list[DimensionSuggestion] | None = None
 
 
 class SuggestModeRequest(BaseModel):
     discipline_names: list[str]
+    user_question: str | None = None
 
 
 # ── Discovery schemas ──

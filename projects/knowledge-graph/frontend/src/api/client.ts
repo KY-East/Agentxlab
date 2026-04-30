@@ -117,6 +117,8 @@ export const api = {
     discipline_ids: number[];
     mode: string;
     proposition?: string;
+    raw_question?: string;
+    suggested_dimensions?: import("../types").DimensionSuggestion[];
     intersection_id?: number;
     discipline_weights?: Record<number, number>;
     language?: string;
@@ -160,10 +162,13 @@ export const api = {
       { method: "POST" }
     ),
 
-  suggestMode: (disciplineNames: string[]) =>
+  suggestMode: (disciplineNames: string[], userQuestion?: string) =>
     request<import("../types").ModeSuggestion>("/api/debates/suggest-mode", {
       method: "POST",
-      body: JSON.stringify({ discipline_names: disciplineNames }),
+      body: JSON.stringify({
+        discipline_names: disciplineNames,
+        user_question: userQuestion || undefined,
+      }),
     }),
 
   shareDebateToForum: (debateId: number) =>
