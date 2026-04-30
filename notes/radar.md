@@ -29,6 +29,337 @@
 
 ## 条目（新到旧）
 
+### [2026-04-23] Roland.W《AI 实施科学：一个 2030 年之前必将诞生的领域》
+- **触发来源**：Roland.W @rwayne https://x.com/rwayne/status/2047290936179474818 （Ken 2026-04-23 转，附"非常重要的文章"）；6000 字原创长文，作者基于科研工作成果构思，AI 仅提供框架优化和事实核查
+- **是什么**：提出 "AI 实施鸿沟（AI Implementation Gap）" 概念，类比医学界 20 年前的 Implementation Science 学科演化路径，预测 2026-2030 年会有五个拐点诞生一门新学科
+- **三个核心概念**：
+  1. **AI 实施鸿沟**：从 "benchmark 上能做" 到 "企业里真的被做成" 中间的距离
+  2. **能力幻觉**：benchmark 越高，企业越容易高估（Klarna 栽在这里——以为买了 95 分 AI，其实是 benchmark 95 分但真实场景未知）
+  3. **落地税**：模型钱占总成本 15-20%，剩下 80% 是数据清洗 / 工作流改造 / champion 招募 / 合规 / 组织抵触
+- **两个硬案例**：
+  - **Klarna 2024-2025**：和 OpenAI 合作 AI 客服，宣称 4000 万美元利润提升。一年后 CEO 承认 "步子迈太大"，从全替代退回人机混合
+  - **麦当劳 2021-2024**：和 IBM 做 AI 语音点单 100+ 门店，顾客点薯条 AI 加 260 块麦乐鸡，三年后全撤
+- **核心数据（作者自标质疑）**：
+  - MIT：95% 企业 GenAI 试点零可衡量回报（自标"被质疑，折半到 50% 仍是问题"）
+  - 企业两年砸 300-400 亿美元
+  - 麦肯锡：88% 企业在至少一环节用 AI，只 39% 拿到企业级利润
+  - Gartner：2026 年 60% 缺 AI-ready 数据的项目会被放弃
+  - MIT NANDA：69% 企业员工在用公司禁止的 "影子 AI"
+- **方法论类比：医学界 Implementation Science**：
+  - 循证医学 vs 临床实践脱节 → 从论文到临床平均 17 年
+  - 催生 Implementation Science 学科，20 年积累 CFIR 5 维度（创新本身 / 外部环境 / 内部环境 / 人 / 实施过程）+ NPT + RE-AIM
+  - AI 版要改造三点：干预本身在漂移（药几十年不变，agent 三个月换一代）/ 角色模糊 / 监管漂移速度量级更大
+- **Roland 的三层方法论**：借用 CFIR + RE-AIM + champion 识别 / 改造 CFIR（加迭代速率、监管漂移频率、角色重叠度）/ 新造（模型漂移管理 / 影子 AI 治理 / 人机协作边界 / 多 agent 编排的组织架构）
+- **五个拐点预测**：2026 底 AI 部署失败进财报 → 2027 AI implementation 咨询品牌 → 2028 大学开课 → 2029 AI 实施师薪资超一线 AI 工程师 → 2030 AI 实施学成正式学科
+- **Roland 原文打到 AXL 核心的一段**：
+  > "多 agent 编排是最典型的新题。不是设计 agent 本身。对设计 agent 本身这件事，工具链已经成熟了，几行代码就能把几十个 agent 串起来。真正卡住的是组织问题：几十个 agent 之间的权限边界、责任归属、协作顺序，还没有现成答案。这一层没有医学可搬的。"
+- **对 Ken 现有设计的对应关系（客观事实陈述，不编战略叙事）**：
+  1. **六条第 3 条 "通用决策工具，不绑垂直"** vs Roland 框架：企业落地的实施鸿沟是垂直特异性最高的维度。通用路线和实施鸿沟在方法论层有张力——张力不等于矛盾，取决于 KPAX 是否面向企业用户
+  2. **六条第 5 条 "10 朋友 7 说有帮助"**：是个人用户验收。Roland 的失败案例都是企业级，个人级可能不在实施鸿沟射程内
+  3. **AXL 的 debate_engine** 在 Roland 眼里属于"工具链已成熟的那一层"
+  4. **AXL 的七层记忆 + 自由参数 + L7 元进化** 可能正好在做 Roland 说的"没有医学可搬的那一层"——这是客观观察
+  5. **Ken 三身份和五拐点对应**：AIxC Web3（2027 AI implementation 咨询赛道）/ AXL 研究平台（2028-2030 实施学进大学）/ KPAX 产品（2026-2027 个人 vs 企业分岔窗口）
+- **诚实问题**：
+  - Roland 自己标了 "读者有理由怀疑我是不是在发明一个我恰好是专家的问题"。自觉难得但偏差仍在
+  - MIT 95% 数据质量存疑（他自己标的）
+  - "benchmark 涨 / 部署死亡率涨" 剪刀差无具体数据源
+  - 17 年 → 17 个月 / 7 个月 的压缩系数没依据
+  - 核心诊断 "落地税占 80%" 待独立验证
+- **对 AXL / KPAX 的价值判断**：**adopt 作为战略参考级条目**（不是技术栈，是方法论 / 战略框架）
+- **cc 不做的事（严格守 `feedback_no_strategic_narrative.md`）**：
+  - 不替 Ken 把 "AI 实施科学" 塞进 PROJECT.md / KPAX.md 的战略叙事
+  - 不替 Ken 决定 KPAX 走个人 vs 企业分岔
+  - 不替 Ken 决定 AXL 是否宣称自己在做 "AI 实施学基础研究"
+  - 不替 Ken 评估要不要找 Roland 合作
+- **cc 可以做的事（Ken 明确要求时）**：
+  - 把 Roland 的 CFIR 五维度结构对 AXL 七层记忆做一次技术层面对照分析
+  - 基于 Roland 框架重新评估 KPAX v0 验收标准（10 朋友 vs 企业落地）
+  - 把 Roland 文章的数据源（Klarna 原始新闻 / MIT NANDA 报告 / Gartner 预测 / 麦肯锡报告）独立查一遍做事实核查
+- **动作**：**adopt 为战略参考级 radar**，待 Ken 明确升级指令再动正式文档
+- **理由**：核心概念（实施鸿沟 / 能力幻觉 / 落地税）直接对应你三个身份在未来五年的潜在交集点。是否纳入 AXL/KPAX 主叙事是你的战略决策，不是 cc 该替你做的
+- **关联**：`PROJECT.md §5.1`（KPAX 六条）/ `notes/research.md #agent-evolution-free-parameters`（Roland 说的"多 agent 编排组织问题"可能和自由参数空间相关）/ `KPAX.md`（产品定位是否面对企业是关键分岔）
+
+---
+
+### [2026-04-23] Avi Chawla：Agent memory 需要三层互补（Cognee 推介）
+- **触发来源**：Avi Chawla @_avichawla https://x.com/_avichawla/status/2047222861614686589 （Ken 2026-04-23 转）
+- **是什么**：诊断当前 agent memory 普遍架构缺陷（只用 vector DB），提出**三层互补记忆**（relational / vector / graph），并推介自家开源工具 Cognee
+- **核心论断**：
+  - "The more your agent remembers, the less it knows" —— 反直觉但直指当前 agent memory 建造方式的问题
+  - Agent memory 继承它 store 的 cognitive shape：vector DB 给 associative memory，graph 给 relational memory，大多数 agent 只用前者
+  - **任何跨 2+ 跳的问题都超出 similarity search 能力**
+  - 增大 context size 解决不了："lost in the middle" 问题 —— 相关事实在长 context 中间时准确率下降 30%+（待查原始论文 Liu et al. 2023 "Lost in the Middle"）
+- **失败案例（硬货）**：学习助手存三条事实（Mark 在 10 年级 / 10 年级 3 月有期末考 / 图书馆在期末考前 2 周关闭）。Mark 问"下周图书馆开吗"，Vector DB 漏掉中间那条连接事实（没提 Mark 也没提图书馆），Agent 给出似是而非答案
+- **三层互补架构**：
+
+  | 层 | 存什么 | 职能 |
+  |---|---|---|
+  | Relational | 事实从哪来 / 何时存 / 谁能访问 | provenance |
+  | Vector | 事实意味着什么 / 语义相似 | retrieval |
+  | Graph | 事实如何连接 / 谁依赖什么 | reasoning |
+
+- **推介工具 Cognee（开源）**：
+  - ECL pipeline（Extract, Cognify, Load）一次写入三个 store 并保持同步
+  - Vector 和 graph edges **在 indexing 时一起建**（重要，避免后粘合）
+  - Smarter entity resolution：给 domain vocabulary file，"car manufacturer" + "automobile maker" 合并为 canonical node
+  - Local-first：pip install 全本地；生产切 Postgres + Neo4j 不改 API
+- **诚实标记**：
+  - Avi 是 Cognee 联合创始人，文章本质是产品推广。"三层都要" 的绝对化论断带商业色彩
+  - "lost in the middle 30%" 数据要独立验证
+  - Cognee 代码质量和 AXL 场景匹配度都要独立评估
+  - 但**核心诊断（multi-hop 推理失败）是硬的真问题**，和营销无关
+- **对 AXL / KPAX 的价值判断**：**adopt 作为 AXL 七层记忆 Phase 3 核心技术对标**
+  1. **直接挑战 AXL 当前基建**：Phase 1+2 基于 Zep Cloud（主要 vector-based），按 Avi 诊断会导致 multi-hop 推理失败。AXL 场景例：debate 里 agent A 说"数学家认为 X"，agent B 说"经济学家反对 X"，moderator 回忆"A B 在 X 上有分歧"是 2 跳，Zep 可能漏
+  2. **七层记忆对照**：Cognee 三层互补是 AXL 七层记忆**整体架构层面**的开源参考实现；比 llm_wiki（L3 单层 slice）更值得深挖
+  3. **Lucas 量化闭环补指标**：Avi 框架下"图谱边连接度 / 跨跳可达性"可作为记忆质量的可量化度量。比 llm_wiki 的"每次交互新增实体数"更精细
+  4. **Phase 3 必读**：Ken 或 cursor 下次动 AXL Phase 3 前必读 Cognee 的 ECL pipeline 实现 + Liu et al. 2023 "Lost in the Middle" 原始论文
+- **动作**：**adopt**（AXL Phase 3 核心技术对标）
+- **理由**：核心诊断硬，直接挑战 AXL 当前 Zep-based 实现；三层互补架构是整体层面的开源参考，比 llm_wiki 定位更重要
+- **关联**：`notes/research.md #seven-layer-memory-design`（整体架构对标）/ `#quantification-gap`（Lucas 量化闭环 + "Lost in the Middle" 论文）/ radar 2026-04-20 llm_wiki 条目（升级为"Cognee 的子集参考"）
+
+---
+
+### [2026-04-23] 杨进《构建IP系统的底层架构》（Roland.W 转）
+- **触发来源**：Roland.W @rwayne https://x.com/rwayne/status/2047217777166238085 （Ken 2026-04-23 转，附"有没有什么有用的信息"）；原文来自杨进 @shaozhu93314 https://x.com/shaozhu93314/status/2047186395555590428
+- **是什么**：杨进个人 23 年末到 26 年初对 IP 底层架构的方法论文章。本意给 MCN 内容团队内培使用。贯穿三点：(1) IP 本质是连接产品与用户的渠道 (2) IP 核心作用是背书 (3) IP 要做的事是讲好故事、把产品内容化
+- **三个硬观点**：
+  1. **别以个人能力模型做账号**（反例：数学老师出完数学课下一个品是什么？出语文？数学讲完就完了。想要更多客户只剩投流 + 扣话术，边际效用递减。正解：围绕 IP 本身打造产品，如胡说老王从卖课到带货生活日用品）
+  2. **创作者两种处境的对策**：有产品没流量 → 产品为始点倒推 IP 身份和内容；有流量没产品 → 别分析人群画像（虚概念），拿差异化产品疯狂对受众测试。"标签是测出来的，不是想出来的"（谷爱凌母亲大量报兴趣班测出滑雪最优解）
+  3. **精准 vs 泛流量是最大骗局**——做精准没流量会说自己做泛也行，反之亦然。最后发现做泛不能变现，做精准池子小。本质是**个人素材创造能力不足**。付费流量和内容流量本质都是付费（前者打钱，后者磨时间），付费的目的是磨平素材创造能力带来的内容鸿沟
+- **对 AXL / KPAX 的价值判断**：**adopt 两个具体落地点（范围限定，不扩大到整套 IP 方法论，避免把 AXL 研究平台定位拖进自媒体叙事）**
+  1. **KPAX 化身设计原则**：化身要绑定"把问题想透"这个核心服务（杨进意义上的渠道），而非学科身份（杨进意义上的能力模型）。把 7 个化身锁死学科会踩"能力模型"坑——内容瓶颈 + 用户用几次觉得"就这些"
+  2. **KPAX 迭代方法论**：题型 / 化身 / 决策场景全部**测出来**，别在设计会议里想清楚。这给 KPAX 六条第 2 条（5 种题型关系是开放问题）+ "10 朋友 7 说有帮助" v0 验收标准方法论背书
+  3. **KPAX 通用路线的生命线警告**：KPAX 六条第 3 条"不绑垂直、通用决策工具" = 放弃精准流量路径 = 必须靠素材创造能力（= AXL 多学科辩论的输出质量）。之前 AXL vs 大模型对比暴露的 P0 bug（同学科 agent 输出雷同）在杨进框架下直接威胁 KPAX 商业模式 —— 修 debate_engine 不光是工程 bug，是 KPAX 路线的战略前提
+  4. **AIxC 代币机制的定位**（次要）：杨进把变现二分为付费流量 vs 内容流量。AIxC 代币机制是第三条路（多边激励），本质作用也是"磨平创作者-用户之间的鸿沟"
+- **文章本身的问题**：
+  - "用户需求亘古不变 + 小孩怕笨/女人怕丑/男人怕穷/老人怕死"是粗暴归类
+  - 评论区 Michell List 指出的内部张力：前面说人群画像是虚概念，后面又说拿差异化产品对受众测试 —— 后者本质就是人群画像做法，有矛盾
+  - 有自媒体导师金句套路感（"人若无名专心练剑"、"自媒体最快让人知道自己是个傻x"）
+  - Roland.W 评价"杨哥是我贵人、看完就知道他在什么层次"属于社交吹捧，不作为判断依据
+- **对 Ken 个人有没有用**：AIxC Web3 负责人角度，IP 方法论作为商业模式参考有价值；但要注意 Ken 自己的定位是学术研究者 + 产品负责人，不是自媒体 IP 操盘手，借鉴方法论层就够，不照搬路径
+- **动作**：**adopt 化身设计原则 + 迭代方法论两点**；整套 IP 方法论不进 AXL/KPAX 主叙事
+- **理由**：方法论层面"IP=渠道"对 KPAX 化身设计有直接结构性启示；"测出来"对 KPAX 迭代节奏有方法论背书。但全盘采纳 IP 叙事会稀释 AXL 研究平台定位，所以范围限定
+- **关联**：`PROJECT.md §5.1`（KPAX 六条第 2/3 条方法论背书）/ `notes/design.md #kpax-v0-deliberation-room`（化身设计原则）/ 之前 AXL vs 大模型对比暴露的 P0 bug（杨进框架下升级为战略级问题）
+
+---
+
+### [2026-04-23] AlexZ researcher CLI 工具（声称要开源）
+- **触发来源**：AlexZ @blackanger https://x.com/blackanger/status/2045650360900149446 （Ken 2026-04-23 转）
+- **是什么**：CLI 版 deep researcher 工具，能生成图文并茂报告。作者说"大家喜欢的话，我就开源"。推文配图/视频没完整加载，从评论区反应（"这也太精美了"、"期待开源"高频）看报告的**展示层美观度**是主要卖点
+- **关键评论**：zx xu "为什么 codex 不做这种卡片的展示呢，感觉好看很多" —— 暗示市场对 CLI 工具的展示层普遍不满意
+- **对 AXL / KPAX 的价值判断**：**track（等开源再评估）**
+  1. AXL 的 `pilot_judge_rubric_v0.1.md`、`scaleup_report.md` 都是纯文字报告，展示层粗糙。如果 AlexZ 这个 CLI 开源，可作为 AXL 实验报告 / 研究笔记的展示层工具
+  2. KPAX verdict / estimate / plan 三档输出的"可视化报告"形式，如果走 2D 平面路径可以参考这个。但 KPAX v0 主体是 3D 座谈会，平面报告是辅助而非主形态
+  3. **不匹配的地方**：这是纯展示层工具，和 AXL 核心研究假设（多 agent 碰撞涌现创造力）无关；和 KPAX 核心形态（3D 座谈会 + 黑神话质感）也不同
+- **对 Ken 个人有没有用**：研究者日常工具，Ken 自己做笔记 / 出报告可以直接用
+- **动作**：**track**（未开源就无法评估代码质量和架构）
+- **理由**：作者"大家喜欢才开源"的表态意味着现在不可用。先记入口，等开源后看具体技术栈和模板生成方式
+- **关联**：`experiments/emergence_decomposition/results/`（AXL 实验报告展示层可能的升级）/ 前端设计库 20 合集条目（KPAX 着陆页路径的展示层储备）
+
+---
+
+### [2026-04-20] llm_wiki — Karpathy LLM Wiki 模式的桌面实现（Geek Lite 转）
+- **触发来源**：Geek Lite @QingQ77 https://x.com/qingq77/status/2046161953568284963 （Ken 2026-04-20 转，附"草"）
+- **是什么**：github.com/nashsu/llm_wiki — 基于 Karpathy 的 LLM Wiki 模式的桌面应用
+- **核心机制**（两步链式）：
+  1. LLM 分析文档内容 → 提取实体和关联
+  2. 生成 wiki 页面 → 更新索引
+  - **关键差异**：和传统 RAG 对比，知识是**增量构建、持久化保存**的（不是每次重新检索）
+- **更大的语境**：这是 Karpathy 相关的第二条信号（Top 5 GitHub 榜里有 andrej-karpathy-skills，现在又来 LLM Wiki）。Karpathy 在这个赛道持续有影响力，值得追原始演讲 / 博客找思想源头
+- **两条对立路径的对照（评论区推荐信号）**：
+  - **llm_wiki 路径**：本地桌面应用，自己 LLM 建结构化 wiki（一次性写入成本高，读取便宜，数据在本地）
+  - **NotebookLM cache 路径**：资料扔 Google NotebookLM 白嫖算力（实践哥 MinLi "用好 NotebookLM 立省 80% Token"；劳伦斯在 atypica 评论区说过同样思路）
+  - 两条路都在**降低传统 RAG 每次检索的代价**，方向不同
+- **规模定位（Ken 2026-04-20 纠正 + 2026-04-23 更新）**：llm_wiki 是 AXL 的子集简化版。**2026-04-23 Cognee 条目进 radar 后，llm_wiki 进一步降级为 "Cognee 三层互补架构中 Graph 层的子集实现"——单层 vs 三层互补**。客观规模差（vs AXL）：
+
+  | 维度 | llm_wiki | AXL |
+  |---|---|---|
+  | agent 数 | 1（单 LLM 提取）| N（多学科专家碰撞）|
+  | 知识处理 | 实体 + 关联提取（静态抽取）| 多视角辩论 + moderator 收束（动态生成）|
+  | 演化层数 | 增量 wiki（≈ L3 语义层的一个 slice）| L1–L7 七层，含 L5 反思 / L6 人格 / L7 元进化 |
+  | 目标 | 整理已有文档 | 涌现创造力（产生单 agent 产生不了的新角度）|
+  | 输出 | 结构化知识库（文档中心）| 决策 / 推演 / 深度对话（过程中心）|
+
+  **本质差异**：llm_wiki = 单 agent 知识整理；AXL = 多 agent 视角碰撞 + 涌现。整理 vs 创造是两件事
+- **对 AXL / KPAX 有没有用**：**adopt 作为 L3 语义层的技术细节参考**（不是整体设计参考）
+  1. **L3 实现借鉴**：扫他们代码看 entity + relation 抽取具体 prompt 工程怎么做。AXL 七层记忆 L3 语义层正要落地，可以抄
+  2. **对 Lucas 量化闭环问题仍然有用**：`notes/research.md #quantification-gap` Lucas 指出自进化缺量化闭环。llm_wiki 的"每次交互后 wiki 新增实体 / 关联数"可作为**可观测中间指标**。这是独立于 llm_wiki 本身定位的 —— 即使它是小对标物，这个度量工具本身好用
+  3. **Karpathy 思想源头要追**：这是今天第二条 Karpathy 信号（Top 5 榜里 andrej-karpathy-skills 也是），值得追原始 LLM Wiki 演讲 / 博客找思想源头，不只看 llm_wiki 这一个实现
+- **对 Ken 个人有没有用**：桌面知识库工具，可以管自己的研究笔记
+- **动作**：**adopt 技术细节**（L3 抽取 prompt + 量化度量）+ **track Karpathy 原始思想**
+- **理由**：规模不对等，llm_wiki 不是 AXL 的同行验证。但它作为 L3 一个 slice 的具体实现 + 量化度量来源，有技术借鉴价值
+- **关联**：`notes/research.md #seven-layer-memory-design`（L3 L5 对照）/ `#quantification-gap`（可观测指标来源）/ `#kpax-knowledge-source-architecture`（化身记忆层技术选型）/ radar 2026-04-20 Top 5 GitHub 条目（Karpathy-Skills 也要扫，同一思想体系）
+
+---
+
+### [2026-04-20] 前端设计库 20 个合集（超级个体柿子转 Abraham John）
+- **触发来源**：@yaohui12138 https://x.com/yaohui12138/status/2046072236587852031 （Ken 2026-04-20 转）
+- **是什么**：20 个前端 / UI 设计参考站 bookmark 合集
+- **完整清单**：
+  - 设计库 → curations.supply
+  - 着陆页 → landing.love / lapa.ninja（进阶）/ landingfolio.com（组件）
+  - SaaS → saaspo.com / saasframe.io（组件）
+  - AI 移动应用构建器 → sleek.design
+  - 字体 → uncut.wtf
+  - 动画 → 60fps.design / appmotion.design
+  - 移动应用 → mobbin.com
+  - 品牌 → rebrand.gallery
+  - 图标 → hugeicons.com
+  - 设计系统 → component.gallery
+  - 网页设计 → curated.design
+  - 导航栏 → navbar.gallery
+  - CTA → cta.gallery
+  - 用户流程 → pageflows.com
+  - 极简网页 → minimal.gallery
+  - 通用灵感 → godly.website
+- **对 AXL / KPAX 有没有用**：**adopt 作为设计参考书签**
+  - KPAX v0 形态（3D 座谈会 + 维多利亚黑神话质感）和这批 SaaS/工具类 2D 平面资源**大部分不匹配**
+  - 例外有用：landing.love / lapa.ninja / minimal.gallery 对 KPAX 着陆页 / 对外宣传页；godly.website 做通用灵感储备；pageflows.com 看用户流程设计范式
+  - 不覆盖：KPAX 核心 3D 游戏感场景（这部分要另找虚幻引擎 / 黑神话 / 维多利亚美学素材库）
+- **对 Ken 个人有没有用**：AIxC Web3 角度，对 AIxC 产品官网设计也有参考价值
+- **动作**：**adopt**（作为书签备查，不主动动）
+- **理由**：KPAX v0 主体设计不对口，但着陆页 / 官网层有用。信息密度高（20 个站一次收下）
+- **关联**：`notes/design.md #kpax-v0-deliberation-room`（v0 形态主设计）/ KPAX 未来对外落地页
+
+---
+
+### [2026-04-20] Top 5 GitHub Repos This Week（Mario Nawfal 聚合榜）
+- **触发来源**：0xMarioNawfal @RoundtableSpace https://x.com/RoundtableSpace/status/2045906520672461309 （Ken 2026-04-20 转）
+- **是什么**：本周 GitHub Top 5 周榜聚合推文。五个仓库：
+  1. **ANDREJ-KARPATHY-SKILLS** → github.com/multica-ai/and...（Karpathy 风格 skills 集 / 未扫）
+  2. **HERMES-AGENT** → github.com/NousResearch/h...（NousResearch 出品 / 未扫详情。2026-04-17 EvoMap 条目提过"Hermes 生态架构级抄袭 EvoMap" 的指控，Ken 当时定调"不介入站队，技术可用就用"）
+  3. **CLAUDE-MEM** → github.com/thedotmack/cla...（Claude 记忆仓库 / 未扫）
+  4. **EVOLVER** → github.com/EvoMap/evolver（**已在 radar 2026-04-17 条目**，不重复）
+  5. **GENERIC AGENT** → github.com/lsdefine/Gener...（通用 agent / 未扫）
+- **对 AXL / KPAX 有没有用**：**track（聚合入口，需要独立扫描各 repo）**
+  - Hermes-Agent + Evolver 都在 AXL 自进化 / 记忆 / 化身层的候选技术栈视野里（`notes/research.md #agent-evolution-free-parameters`）
+  - Claude-Mem 和 AXL 七层记忆系统潜在对照
+  - Karpathy-Skills 如果是 skill 集合 + Andrej 品牌，对 KPAX skill marketplace 方向有参考价值
+  - Generic Agent 要看定位才能判断（如果是通用 coding agent，按 §5.3 侧翼战场原则不做，skip；如果是 agent 框架有可借鉴的机制，track）
+- **对 Ken 个人有没有用**：一次性抓到 4 个没看过的项目的入口
+- **动作**：**track 聚合条目**。独立 track 每个 repo 要 Ken 下次指定哪个优先扫
+- **理由**：聚合榜本身价值=导航。真正判断需要点进各 repo 的 README 做独立评估，本条只作为入口备忘
+- **关联**：`notes/radar.md` 2026-04-17 EvoMap 条目（Evolver 已有）/ `notes/research.md #agent-evolution-free-parameters`（自进化技术栈候选）
+
+---
+
+### [2026-04-20] Kimi K2.6 发布开源（月之暗面）
+- **触发来源**：AB Kuai.Dong @_FORAB https://x.com/_FORAB/status/2046253477756813497 （Ken 2026-04-20 转）
+- **是什么**：月之暗面 / Moonshot AI 开源 Kimi K2.6 大模型。官方宣称通用 Agent / 代码 / 视觉理解综合能力全面提升，多个基准测试持平或优于 GPT 5.4 / Claude Opus 4.6 / Gemini 3.1 Pro
+- **核心数据**（来自 @Kimi_Moonshot 官方）：
+  - HLE (Humanity's Last Exam) w/ tools: **54.0**（开源 SOTA）
+  - SWE-Bench Pro: 58.6
+  - SWE-bench Multilingual: 76.7
+  - BrowseComp: 83.2
+  - Toolathlon: 50.0
+  - Charxiv w/ python: 86.7
+  - Math Vision w/ python: 93.2
+- **关键特性**：
+  - **完全开源**
+  - 支持长达 **5 天**的持续自主运行（长期 agent 场景）
+- **评论区信号（分化）**：
+  - 正面：Aoke Quant "昨天已经用上 k2.6-code，感觉还可以" / 鲨鱼 "综合性价比最强"
+  - 负面：yunyimuhan 实测 "连基本静态性能代码分析都做不好，5 个 agent 跑超时 token 超限"
+  - 通胀质疑：KAU @web3_ai3 "没发现所有新模型都是持平 GPT 5.4、Claude Opus 4.6、Gemini 3.1 Pro 吗？" / waka "国产模型跑分都不差，但用起来差距大"
+- **对 AXL / KPAX 有没有用**：**track**
+  1. **AXL 模型池候选**：当前 moderator 用 Claude Opus 4.6。K2.6 开源 + 宣称持平，值得进模型池做对照实验。但要等实测
+  2. **KPAX BYOM 路径验证**：PRD v1.3 §13 的 BYOM（`llm_provider_override`）需要开源强模型生态存在才成立。K2.6 这类发布强化了 BYOM 路线的可行性
+  3. **长任务能力**：5 天持续自主运行对 AXL 未来的 L7 元进化实验、多轮辩论后的记忆沉淀有潜在价值（如果实测靠谱）
+  4. **涌现实验降本空间**：CP 2-4 全量 900 场估 $891。如果 K2.6 在学科碰撞任务上够用 + 本地部署成本低，有降本空间。但这要独立 benchmark，不能靠官方跑分
+- **对 Ken 个人有没有用**：AIxC Web3 角度，国产 AI 开源事件值得跟进；MiroFish 默认 qwen-plus，国产开源模型生态扩展是相关主题
+- **动作**：**track**（不 adopt）
+- **理由**：benchmark 通胀质疑合理 + 实测有分化（Aoke 正面 vs yunyimuhan 负面）。adopt 前需要在 AXL 实际学科碰撞任务上独立跑一轮对照。Ken 或 cursor 下次做模型对照时可以把 K2.6 纳入候选
+- **关联**：`projects/knowledge-graph/backend/app/routers/kpax_api_spec.md §13.6`（BYOM `llm_provider_override`）/ `notes/research.md §agent-evolution-free-parameters`（模型选型在 Phase 3 冻结前是自由参数之一）/ `experiments/emergence_decomposition/spec.md`（未来可加"moderator 模型消融"子实验）
+
+---
+
+### [2026-04-20] Amanda Askell "把 Claude 当聪明但敏感的同事" 7 条 tips（阿绎 AYi 整理）
+- **触发来源**：阿绎 AYi @AYi_AInotes https://x.com/AYi_AInotes/status/2046098017984344065 （Ken 2026-04-20 转）
+- **是什么**：Amanda Askell（Anthropic 内部哲学家）访谈里关于 Claude 使用的 7 条实践：(1) 正面指令 > 负面禁止 (2) 明确给"允许不同意见"权限 (3) 开场用尊重 (4) 出错时事实重定向不斥责 (5) 打断道歉螺旋（"没问题继续"）(6) 同时问执行+意见 (7) 长会话定期刷新正面框架
+- **对 AXL / KPAX 有没有用**：**skip（记录但不采纳）**
+  - 这是给外部用户的 Claude 使用 tips，Ken 本人是重度用户，大部分实践已经在做
+  - **可抽一条**：第 6 条"**同时问执行+意见**（别只说'做 X'，加：你会怎么做？哪里可能有摩擦？有什么遗漏？）"—— 作为未来 **KPAX 化身 prompt 设计**的参考（化身对用户发问的模板）
+  - **外部方法论分歧（值得观察，不必选边）**：第 1 条"正面指令 > 负面禁止"vs 评论区 Crypto Facts"Negative constraints are some of the most high value parts of a prompt"。Ken 现有实践（`feedback_ai_smell_patterns.md` 14 条负面清单）选边于 Crypto Facts 一侧。这是 prompt 工程学的开放问题，不是 Ken 体系内部的张力
+- **对 Ken 个人有没有用**：不大。Ken 的实践体系更精细
+- **动作**：**skip**（本条记录主要为了避免将来被同一迷因反复引用时重新评估）
+- **理由**：7 条 tips 是面向外部用户的通用最佳实践；Ken 的实践体系（反迎合 + 精细负面清单）比它更精细。承认里面第 6 条可借鉴，其余不动
+- **关联**：未来 KPAX 化身 prompt 设计（第 6 条模板）/ `feedback_ai_smell_patterns.md`（与 Amanda Askell 第 1 条在同一维度的外部方法论分歧）
+
+---
+
+### [2026-04-20] atypica.ai — AI research agent 模拟用户访谈做 PMF 验证
+- **触发来源**：余温 @gkxspace https://x.com/gkxspace/status/2046200648954192116 （Ken 2026-04-20 转）
+- **是什么**：AI research 产品。丢一个商业问题 → 先澄清研究目标（不是上来就生成）→ 搜公开信息 + 找 persona + 模拟用户做访谈 → 出结构化报告。定位 "AI research system"，不是单点搜索工具
+- **资产**：底层 100w+ 基于社媒内容合成的 AI personas + 10w+ 基于真实深度访谈的高质量 persona
+- **关键渊源**（本地扫盘后确认，`C:\Users\ken\OneDrive\Desktop\MiroFish-main`）：
+  - **MiroFish**（github.com/666ghj/MiroFish，盛大集团孵化）是多 agent 群体智能预测引擎。工作流：seed 提取（新闻 / 政策 / 金融信号 / 小说）→ GraphRAG 构建数字世界 → 千个 persona agent 自由交互社会演化 → ReportAgent 出推演报告 → 用户可和任意 agent 深度交互
+  - **MiroFish 的仿真引擎基于 CAMEL-AI 团队开源的 OASIS**（Open Agent Social Interaction Simulations，github.com/camel-ai/oasis）
+  - **AXL 的多 agent 辩论思想正来自这条链**：OASIS → MiroFish → AXL 分叉（从"群体社会预测"转向"多学科专家碰撞涌现创造力"）
+  - atypica 走的是同源另一应用分叉：**模拟真实用户人群 → 做市场研究 / PMF 验证**
+  - 三者关系：**同底座不同应用**。OASIS 是底层框架；MiroFish 在 OASIS 上做群体预测；atypica 做用户研究；AXL 做学科碰撞
+  - **意义**：atypica 在市场上跑通了这套思想在产品层的商业可行性，对 AXL 是**第三方验证信号**（不是竞争）
+- **已补文档**：`notes/research.md #axl-intellectual-lineage`（事实层 OASIS / MiroFish / atypica / AXL 四者关系图 + 架构对应表）
+- **主打场景**：
+  1. 创作者 / 营销人验证内容方向（受众想看教程、案例还是观点？）
+  2. 产品团队验证 PMF（某 AI 产品在真实 persona 眼里到底有没有吸引力）
+  3. 出海产品增长（卖点海外用户真的买账吗？在意价格 / 效率 / 信任感？）
+- **对 AXL / KPAX 有没有用**：**track**。不是直接竞品（垂直不同）但有重要对标点：
+  1. **产品语言学习**："AI research system" / "像研究团队规划研究" 这种"系统"级叙事，比"单点工具"叙事更好卖。KPAX 可能可以从"通用决策工具"升级成类似的"decision system" 表述
+  2. **澄清-优先的流程**：atypica 明确"不是上来就生成，先澄清研究目标" —— 和 KPAX 座谈会先澄清问题的做法同构，说明这个做法在市场上已经被认可为"专业感"的来源
+  3. **persona 数据库规模对标**：10w 深度访谈 + 100w 社媒合成的双层 persona 库 —— 如果 KPAX 未来上"野生化身 / 真人化身"层，这是可参考的数据资产量级（Ken 不一定要自己建，但要知道对手这个量级）
+  4. **不适合直接抄**：atypica 专精 market research（用户访谈模拟），KPAX 是多学科专家碰撞。功能正交，方法论可借鉴
+- **对 Ken 个人有没有用**：看一下他们的 demo（atypica.ai/?via=yuwen 有邀请码）可以感受"AI 模拟访谈"的产品体感，KPAX 的"化身对话"体验设计可以对照
+- **动作**：**track**
+- **理由**：不是竞品，但产品定位语言 + 澄清流程 + persona 数据建设三点值得对照。未升级 adopt 是因为功能正交不抢赛道
+- **关联**：`KPAX.md`（产品定位语言学习）/ `notes/research.md §kpax-knowledge-source-architecture`（persona 数据库对标 v2+ 规划）
+
+---
+
+### [2026-04-19] @grapeot "写作中的AI味是哪儿来的" — 翻译腔四套路
+- **触发来源**：鸭哥 @grapeot https://x.com/grapeot/status/2045652856766955855 （Ken 2026-04-19 转）原文 yage.ai
+- **是什么**：AI 中文的"AI 味"本质是**翻译腔**（英文句法骨架 + 中文皮）。四个套路：(1) 物理动作描述思考（catch → 接住 / sharp → 锋利）(2) 形容词 + 冒号抢判断（"逻辑很清晰："）(3) 抽象名词主语 + 形容词收尾（"X 的 Y 比 Z 更 W"）(4) 中英混合留着有稳定译法的英文词。修法：别修修补补，**重写**（翻译学里叫"归化"）
+- **评论区有用补充**：
+  - Tzeng Yuxio：「AI 味」≠「翻译腔」是两件事（论证 / 动机层不在翻译腔射程内）。github.com/tzengyuxio/skills 开源了"去 AI 味"和"去翻译腔"两个分开的 skill
+  - Tzeng Yuxio 另贴 **skillsmp.com（SkillsMP - Agent Skills Marketplace）**—— 和 KPAX skill marketplace 方向直接撞，值得单独扫描
+  - Tseng Hsiang：本质是形合 vs 意合。**有效方法：先文言后白话**。文言文可以压掉英文语法，然后针对文言的白话可大幅降低英式比例
+- **对 AXL / KPAX 有没有用**：**adopt 到写作规则**（已落地）
+  1. `PROJECT.md §8.0` 新增五层 AI 味框架（句法 / 词汇 / 论证 / 态度 / 动机）+ 层 1 展开鸭哥四套路
+  2. `.cursor/rules/writing-rules.md` 新建（alwaysApply）三 agent 入口
+  3. `feedback_ai_smell_patterns.md` 加模式 15 + "你比他**狠**" → "你比他**强**"具体反例
+- **对 Ken 个人有没有用**：Ken 的 `feedback_writing_rules.md` 本来就禁翻译腔，这篇是公开版的同一观察。可作为对外推荐的参考材料
+- **动作**：**adopt**（写作规则层）+ **track** SkillsMP（单独条目待扫）
+- **理由**：鸭哥的分析是句法层公共词典，Ken 的 14 模式补上了论证 / 动机层。两者叠加形成完整的五层框架
+- **关联**：`PROJECT.md §8.0` / `feedback_ai_smell_patterns.md` 模式 15 / `.cursor/rules/writing-rules.md`
+
+---
+
+### [2026-04-19] SkillsMP — Agent Skills Marketplace（skillsmp.com）
+- **触发来源**：Tzeng Yuxio 在鸭哥推文评论区贴的 https://skillsmp.com
+- **是什么**：Agent skills 的市场平台（没展开看，只知道是 "Agent Skills Marketplace" 定位）
+- **对 AXL / KPAX 有没有用**：**track**（待扫）。**和 KPAX 平台商业模式（主产品免费 + skill marketplace 变现）直接撞赛道**。必须独立扫描：
+  1. 他们上架什么粒度的 skill？
+  2. 定价机制（按次 / 订阅 / 分成）？
+  3. 有没有创作者侧的工具链（上架 / 审核 / 分润）？
+  4. 用户侧怎么发现和使用 skill？
+  5. 流量 / 活跃度水平？
+- **对 Ken 个人有没有用**：作为 KPAX skill marketplace PRD 的竞品参照
+- **动作**：**track**（需要专门一次访问 skillsmp.com 做详细拆解，下次 Ken 有时间再动）
+- **理由**：名字直接撞到 KPAX 核心商业模式，不可忽视
+- **关联**：`projects/knowledge-graph/backend/app/routers/kpax_api_spec.md §13`（KPAX 平台商业模式）/ `notes/next.md`（待加：@cc 扫描 skillsmp.com）
+
+---
+
+### [2026-04-19] tzengyuxio/skills — "去 AI 味 / 去翻译腔" 开源 skill 集
+- **触发来源**：鸭哥推文评论区 https://github.com/tzengyuxio/skills （28 stars）
+- **是什么**：Claude Code 和兼容 AI coding agent 的 custom skills 集合，含分开的"去 AI 味（讲人话）"和"去翻译腔"两个 skill
+- **对 AXL / KPAX 有没有用**：**track**。可以看他们具体怎么实现"去 AI 味"的 prompt 工程，作为 AXL moderator prompt 优化的参考。可能也能抄部分模式清单到 `feedback_ai_smell_patterns.md`
+- **对 Ken 个人有没有用**：直接可用的 Claude Code skill
+- **动作**：**track**（下次扫一眼 README 决定要不要 adopt 单条）
+- **理由**：开源实现就在手边，28 stars 说明有基本质量
+- **关联**：`feedback_ai_smell_patterns.md` / `PROJECT.md §8.0`
+
+---
+
 ### [2026-04-17] EvoMap / Evolver — 自进化 agent 框架（GEP 协议 + 10 步循环）
 - **触发来源**：@GoSailGlobal https://x.com/GoSailGlobal/status/2044358918185562180?s=20 （Ken 2026-04-17 转）
 - **是什么**：开源 Node.js agent 自进化框架。核心概念：

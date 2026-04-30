@@ -1,12 +1,12 @@
-# Agent X Lab
+# AgentXLab
 
-> Academic research should be exciting. We're making it that way.
+> Research should be exciting. We're making it that way.
 
-> 学术研究本应令人兴奋。我们正在让它变成那样。
+> 研究本应令人兴奋。我们正在让它变成那样。
 
-Agent X Lab is an AI-powered interdisciplinary research platform. Pick any combination of disciplines, see how they connect through real publication data, discover the gaps no one has explored, and let AI agents from different fields debate your research questions.
+**AgentXLab is a platform for researching anything through scientific methodology and interdisciplinary perspectives.** Pick any combination of disciplines, see how they connect through real publication data, discover the gaps no one has explored, and let AI agents from different fields debate your research questions.
 
-Agent X Lab 是一个 AI 驱动的跨学科研究平台。任意组合学科，看它们如何通过真实论文数据互相关联，发现无人涉足的研究空白，让来自不同领域的 AI 智能体围绕你的问题展开辩论。
+**AgentXLab 是通过科学方法论和跨学科视角研究万事万物的平台。** 任意组合学科，看它们如何通过真实论文数据互相关联，发现无人涉足的研究空白，让来自不同领域的 AI 智能体围绕你的问题展开辩论。
 
 Built on 240M+ academic works from OpenAlex. Chinese and English. Open to everyone.
 

@@ -30,12 +30,12 @@
 
 ## 1. 一屏摘要
 
-**一句话**：这是一个双产品项目。**AXL** 是学术底座，跑多学科 AI 辩论引擎。**KPAX** 是通用决策工具，调用 AXL 的能力，帮用户把一件事想透——深度、正确性、全面性。
+**一句话**：**AXL（AgentXLab）是通过科学方法论和跨学科视角研究万事万物的平台。KPAX 是 AXL 的产品入口之一**——复用 AXL 的能力作为学术底座，帮用户把一件事想透（深度 / 正确性 / 全面性）。
 
 | 产品 | 定位 | 代码位置 | 用户 | 状态 |
 |---|---|---|---|---|
-| **AXL**（Agent X Lab） | 跨学科推演底座，开源 | `projects/knowledge-graph/` | 研究者 / KPAX 自己 | 产品 87/100，记忆系统 Phase 2 完成 |
-| **KPAX** | 通用决策工具 | `kpax/` | 10 位朋友先行测试 → 扩大 | 骨架完成（有 5 处 monorepo 违规待 cursor 修），v0 形态设计锁定 |
+| **AXL**（AgentXLab） | 通过科学方法论和跨学科视角研究万事万物的平台，开源 | `projects/knowledge-graph/` | 研究者 / 产品入口（如 KPAX） | 产品 87/100，记忆系统 Phase 2 完成 |
+| **KPAX** | AXL 的产品入口：单次决策问答（复用 AXL 作学术底座）| `kpax/` | 10 位朋友先行测试 → 扩大 | 骨架完成（有 5 处 monorepo 违规待 cursor 修），v0 形态设计锁定 |
 
 **核心信念**：多 agent 跨学科碰撞能产生涌现创造力。这是一个关于 AI 能力上限的研究假设，正在 `experiments/emergence_decomposition/` 里验证。目标是让 AI 真的能创造新东西，而非更快更省地执行已有任务。
 
@@ -51,11 +51,11 @@
 
 ## 2. 产品线状态面板
 
-### 2.1 AXL — 学术底座
+### 2.1 AXL — 研究平台（通过科学方法论和跨学科视角研究万事万物）
 
 | 模块 | 状态 | 证据 |
 |---|---|---|
-| 辩论引擎（7 学科碰撞） | 生产可用 | `debate_engine.py`；2026-04-15 晚修 quick max_tokens (1500→800) + 反重复规则（commit `4b35f1e`）|
+| 辩论引擎（多 agent 碰撞，数量 / 身份 / 模型可配置） | 生产可用 | `debate_engine.py`；2026-04-15 晚修 quick max_tokens (1500→800) + 反重复规则（commit `4b35f1e`）|
 | 记忆系统 Phase 1+2 | 完成 | 31 pytest 通过（metadata schema / re-rank / 会话压缩）|
 | Phase 3（L3+ 七层记忆） | 未启动 | 见 `notes/research.md#seven-layer-memory-design` |
 | 自由参数实验 | Phase 3 前冻结 | 见 `notes/research.md#agent-evolution-free-parameters` |
@@ -63,17 +63,18 @@
 | 结构化 JSON 日志基建 | 已落地 2026-04-17 凌晨 | `app/utils/logging_setup.py` + FastAPI `RequestIdMiddleware` + AGENTS.md 规范 |
 | Judge.py 实现 | 未开始 | 归 cursor（新分工）。依据：`experiments/emergence_decomposition/results/dry_run_20260416_165636/pilot_judge_rubric_v0.1.md` |
 
-### 2.2 KPAX — 通用决策工具
+### 2.2 KPAX — AXL 的产品入口（单次决策问答，复用 AXL 作学术底座）
 
 | 模块 | 状态 |
 |---|---|
 | `axl_client.py` — HTTP 调 AXL | ✅ 骨架（cc 2026-04-15 晚写）|
 | `token_ledger.py` — 代币账本 | ✅ 骨架（guest 种子 50 / 消费 10/25/60 / 分享+20 / 预留 ChainAdapter）|
-| `question_classifier.py` — 题型判别 | ⚠️ 骨架，`_chat_fn` 未接真 LLM（fallback verdict）|
-| `v1_analyze.py` router | ✅ 已挂 FastAPI `/api/v1/analyze` |
-| `services/question_parser.py` / `expert_builder.py` / `report_generator.py` | ❌ **违反硬规则 #6**：monorepo import from `app.services.ai_provider`。待 cursor 按"路 1"改成 HTTP |
-| `routers/analyze.py` / `report.py`（legacy）| ❌ **违反硬规则 #6**：import SessionLocal / Debate / debate_engine。待 cursor 决定重写或弃用 |
-| 前端 | ❌ 未起 |
+| `question_classifier.py` — 题型判别 | ✅ `_chat_fn` 已接 `llm_client.chat_completion`（cursor 2026-04-17）|
+| `llm_client.py` — KPAX 独立 LLM 客户端 | ✅ litellm 薄封装（cursor 2026-04-17 新建，独立于 AXL `ai_provider`）|
+| `v1_analyze.py` router | ✅ 已挂 FastAPI `/api/v1/analyze`，classifier 真实分类 |
+| `services/question_parser.py` / `expert_builder.py` / `report_generator.py` | ✅ 合规（cursor 2026-04-17 切 `kpax_svc.clients.llm_client`）|
+| `routers/analyze.py` / `report.py`（legacy）| ⚠️ **例外登记**：违反硬规则 #6 但按路径 D 冻结至 KPAX v0 PRD 完成日，新功能禁止进。详见 §5.1 规则 #6 例外段 |
+| 前端 | ⚠️ 基于 legacy 5 步流程的 7 文件骨架（`api/client.ts` + `Analyze.tsx` + 5 components），**v0 座谈会形态未起** |
 | v0 形态设计 | ✅ `notes/design.md#kpax-v0-deliberation-room` |
 | v0 知识源架构 | ✅ `notes/research.md#kpax-knowledge-source-architecture`（三条输入线 + v0/v1/v2 phasing）|
 
@@ -102,7 +103,7 @@
 | 改 KPAX 前端 / 形态 | `notes/design.md#kpax-v0-deliberation-room` | （v0 未起）|
 | 改 KPAX 知识源 | `notes/research.md#kpax-knowledge-source-architecture` | KPAX backend `graph_client.py`（待新建）|
 | 改代币规则 | `kpax/backend/kpax_svc/services/token_ledger.py` | 同 |
-| 查"为什么这么做 X" | `notes/journal/YYYY-MM.md`（按日期倒序）| journal 末尾 append |
+| 查"为什么这么做 X" | `notes/journal/project-log-YYYY-MM.md`（按日期倒序）| journal 末尾 append |
 | 查"下一步做什么" | `notes/next.md`（唯一 TODO 板）| 加 / 减 item |
 | 查实验当前 checkpoint | `experiments/config/experiment_registry.json` | 同 |
 | 查代码层变更历史 | `CHANGELOG.md` | commit 后同步 |
@@ -120,7 +121,7 @@
 ### Claude Code（cc）
 1. 本文件 `PROJECT.md`
 2. `notes/next.md` 找 `@cc` owner 任务
-3. `notes/journal/YYYY-MM.md`（最新月）末尾几条，理解当前战略脉络
+3. `notes/journal/project-log-YYYY-MM.md`（最新月）末尾几条，理解当前战略脉络
 
 私有 memory 入口：`C:\Users\ken\.claude\projects\.../memory/MEMORY.md`
 
@@ -141,7 +142,7 @@
 ### Ken
 1. 本文件 `PROJECT.md` §1 一屏摘要 + §2 状态面板
 2. `notes/next.md` 找 `@ken`（要 Ken 拍板 / 评分 / 外部动作）
-3. `notes/journal/YYYY-MM.md`（月度时间线）
+3. `notes/journal/project-log-YYYY-MM.md`（月度时间线）
 
 ---
 
@@ -162,6 +163,15 @@
 5. **成功判据 = 10 朋友 7 说"有帮助"**（v0 测试阶段）。
 
 6. **KPAX ↔ AXL Day 1 走 HTTP**，代码 / DB / 部署全分开。**禁止 monorepo import**——这条是明确的硬规则。
+
+   **例外登记（2026-04-17 by Ken，路径 D）**：以下 2 个文件因 v0 座谈会替代品就位前产品形态与前端 7 文件强耦合，明示豁免存在。**新功能禁止进这 2 文件**；任何增量能力必须进 `kpax_svc/routers/v1_analyze.py` 或未来的 `kpax_svc/routers/v1_session.py`。
+   - `kpax_svc/routers/analyze.py`
+   - `kpax_svc/routers/report.py`
+   - （相关基础设施 `kpax_svc/__init__.py` sys.path hack、`services/context_collector.py` 内存 session store 随同保留至替换日）
+   
+   **替换触发点**：KPAX v0 前端协议 PRD 完成日。由 @cc 出 PRD + AXL 侧 `kpax_router.py` 从 mock 改真（含流式端点 `/axl/v1/debate/stream` + `/axl/v1/debate/{id}/messages`）→ @cursor 在 `v1_session.py` 重建走 HTTP 的 session 流程 → 同步删 legacy + 清 sys.path hack + 本例外登记。
+   
+   **复查负责人**：@cursor（路径 B 迁移），@ken（触发点判断）。详见 `kpax/backend/kpax_svc/legacy_routers_assessment.md` 路径 D 段。
 
 ### 5.2 实验硬规则
 
@@ -274,7 +284,7 @@ Ken 指出：cc 的 text-only 界面对大型项目的可视化太差，人类�
 ```
 notes/
 ├── next.md              # 跨 agent 唯一 TODO 板，所有 agent 开工前必读
-├── journal/YYYY-MM.md   # 时间线：已发生的事 / 决策 / 实验观察。月底换新文件
+├── journal/project-log-YYYY-MM.md   # 项目全记录时间线：决策 / 对话结论 / 实验观察。月底换新文件
 ├── research.md          # 所有研究笔记（2026-04-17 从 notes/research/ 合并到此单一文件，## 节分段）
 ├── design.md            # 所有设计文档（2026-04-17 同）
 └── radar.md             # 外部参考雷达（开源项目 / 推文 / 市场信号）
@@ -285,7 +295,7 @@ notes/
 | 文件 | 记什么 | 不记什么 |
 |---|---|---|
 | `notes/next.md` | 未来要做的事（P0/P1/P2/P3 + owner） | 已做的事 |
-| `notes/journal/YYYY-MM.md` | 已发生的事、决策、对话结论 | 未来计划 / 代码 diff |
+| `notes/journal/project-log-YYYY-MM.md` | 已发生的事、决策、对话结论 | 未来计划 / 代码 diff |
 | `CHANGELOG.md` | 代码层变更（文件、函数、测试） | 非代码决策 |
 | `experiments/config/experiment_registry.json` | 实验状态机 | 行动项 |
 
@@ -297,9 +307,56 @@ notes/
 
 ---
 
-## 8. 写作规则（含 11 条反模式）
+## 8. 写作规则（五层 AI 味框架 + 具体反例）
 
 所有 agent 都要遵守 Ken 的风格。
+
+### 8.0 五层 AI 味框架（2026-04-19 整合：鸭哥 @grapeot 翻译腔分析 + Ken 反复纠正）
+
+AI 味不是单一问题，是五层叠加。从表层往深层：
+
+| 层 | 名称 | 鸭哥覆盖？ | 主要症状 |
+|---|---|---|---|
+| 1 | **句法翻译腔** | ✓ 四套路 | 英文句法骨架 + 中文皮 |
+| 2 | **词汇评价** | 部分 | 充膨大词 / 装腔单字 / 身体感觉 |
+| 3 | **论证结构** | × | 不是 X 是 Y / 对仗 / 三段排比 |
+| 4 | **态度姿态** | × | 迎合 / 自嗨 / 二极管 |
+| 5 | **动机方法** | × | 替 Ken 编战略叙事 / 不问根本问题就开写 |
+
+**层 1：句法翻译腔——鸭哥四套路**（2026-04-19 新增，来自 @grapeot "写作中的AI味是哪儿来的"）
+
+AI 写中文时先用英文句法想清楚，再逐字换中文。结果：每个字都是中文，骨架是英文。
+
+1. **物理动作描述思考**——把 catch/sharp/break 等英文里靠物理生活经验支撑的动词，直译成悬空的中文
+   - ❌ "三条反馈我都接住" / "更锋利的重构" / "context 不崩" / "claim 更硬" / "你比他**狠**的地方"
+   - ✅ "这几条我都收到了" / "换一种更准的讲法" / "上下文不会乱掉" / "这个判断可以说得再重一点" / "你比他**强**的地方"
+   - 黑名单动词：接住、击穿、拆解、收口、承担、撑不住、不崩、不爆、打穿、收紧、扛住、狠、锋利、锐利
+   - 自查：写完圈所有动词，看哪个在中文日常里不会这样用
+
+2. **形容词 + 冒号抢判断**——用形容词先替读者下结论，冒号引出内容
+   - ❌ "逻辑很清晰：" / "问题很直接：" / "更干净：" / "更锋利的重构："
+   - ✅ 直接删形容词那半句，让后面的事实自己说话
+   - 测试：删掉形容词那一节，读者照样理解，读得更顺
+   - 如果非想留形容词，多半是后面没讲清楚，回去补内容
+
+3. **抽象名词做主语 + 形容词收尾**——"X 的 Y 比 Z 更 W"骨架
+   - ❌ "工程上的现实比这些数字难看" / "The reality is uglier than..."
+   - ✅ 让人 / 动作 / 具体对象做主语，让事实自己说话："这些数字只反映了采用面；真往下看各家怎么接，早就对不齐了"
+   - 碰到这个骨架直接重写
+
+4. **有中文译法的英文词混入**——context/state/cache/claim 这类
+   - ❌ "context 不崩、state 可恢复、cache 命中率高" / "claim 更硬"
+   - ✅ 上下文 / 状态 / 缓存 / 断言
+   - 例外：中文圈还没收敛到通用译法的词（prompt / embedding / tokenizer / harness 等）保留英文合理
+
+**句法层修法总则**：别在原句上修修补补，**重写**。先把意思理清楚，用中文本来会怎么说这件事重说一遍（翻译学里叫"归化"）。
+
+**层 2-5 的具体反例清单见下 §8.1**。原 11 条按层归属：
+- 层 1（句法）：#4 中英混合（对应鸭哥套路 4）
+- 层 2（词汇）：#2 装腔单字、#3 形容词单字、#11 身体感觉、#10 emoji
+- 层 3（论证）：#1 "不是 X 是 Y"、#9 "不是而是"、#7 步骤化罗列、#5 表格强迫症
+- 层 4（态度）：#6 长篇认错、#8 不必要确认反问
+- 层 5（动机）：见 §8.2 其他硬规则 + `feedback_no_strategic_narrative.md` + `feedback_ai_smell_patterns.md` 模式 13（二极管）/ 模式 14（PRD 前不答根本问题）
 
 ### 8.1 禁止的具体模式（带反例）
 
@@ -428,13 +485,61 @@ AXL backend 已安装结构化 JSON 日志基建（`projects/knowledge-graph/bac
 
 ---
 
-## 11. 文件命名规则（Ken 2026-04-15 拍板）
+## 11. 命名规则（Ken 2026-04-15 拍板 + 2026-04-24 扩展到条目标题）
+
+### 11.1 文件命名
 
 - **名字本身要说清这是什么**。第三个人看文件名就知道用途，不用打开内容猜。
 - ❌ `radar.md` / `review.md` / `notes.md` —— 抽象代号
 - ✅ `external-references-radar.md` / `kpax-v0-deliberation-room.md` / `wisland-analysis-and-positioning.md` —— 带内容定位
 - **例外**：约定俗成的短名可以（README.md / CHANGELOG.md / AGENTS.md / PROJECT.md / next.md / journal/ / research.md / design.md / radar.md）——2026-04-17 合并整合后这几个短名在项目内语义已经明确
-- 本项目默认用 English kebab-case（和现有 notes/ 下所有文件对齐）
+- 本项目默认用 English kebab-case
+
+### 11.2 条目标题（Ken 2026-04-24 拍板）
+
+**硬规则：日期不能做条目的主标识，必须有内容关键词可被检索。**
+
+Ken 原话：
+> "不要用日期，所有东西都说准确什么内容的，不然你怎么检索"
+
+- ❌ `### 2026-04-24 新条目` / `### 4.24 评估` / `### dry_run_20260416_165636`（只有时间戳）
+- ⚠️ `### [2026-04-24] 修复 bug`（日期 + 模糊描述，勉强）
+- ✅ `### atypica.ai — AI research agent 模拟用户访谈做 PMF 验证`
+- ✅ `### [2026-04-24] AXL 第二次辩论 G+F 修复后评估`（日期作辅助元数据 + 完整内容描述）
+- ✅ `### cp0-mini-3q-success-report`（内容 + 可辅以日期后缀）
+
+**判据**：Ctrl+F 搜条目关键内容能搜到吗？搜"atypica"能找到？搜"如何科学的统治世界"能找到？搜"G+F 修复"能找到？能 → ✓；只能搜日期 → ✗。
+
+**适用范围**：radar.md / journal/*.md / research.md / design.md 里的所有 `## / ###` 条目 + experiments/ 下所有实验目录名。
+
+**已有不合规的不强制改**（改动风险大于收益），但下次引用或更新时顺手修正。
+
+### 11.3 journal 自动留档（Ken 2026-04-24 拍板）
+
+**硬规则：cc 看到以下类型内容时自动写 journal，不等 Ken 说"留档"。**
+
+Ken 原话：
+> "以后就自动化"
+
+**必须自动留档的类型**：
+1. 正式评估稿（如 AXL 多轮辩论质量评估）
+2. P0/P1 bug 根因定位 + 修复验证（如 G+F 修复前后对比）
+3. 外部观点多方对照（如 cc vs GPT vs Codex 同题评估，两份/多份都保留）
+4. 方法论级纠正（如 `feedback_no_moral_posturing.md` 那次 Ken 永久指令）
+5. Ken 对某战略/产品/技术方向的明确拍板
+
+**不需要自动留档**（各自有去处）：
+- 日常代码改动 → CHANGELOG.md
+- 单条外部参考 → radar.md
+- 研究结论更新 → research.md
+- 设计方案修改 → design.md
+- 任务增减 → next.md
+- 普通对话 / 疑问 → 不留
+
+**留档格式**：
+- 标题按 §11.2 条目标题规则（内容关键词 + 可选日期前缀）
+- 多方观点对照时全部保留，不只保留 cc 自己的版本
+- 放在 `notes/journal/project-log-YYYY-MM.md` 对应月份文件里
 
 ---
 
@@ -444,7 +549,7 @@ AXL backend 已安装结构化 JSON 日志基建（`projects/knowledge-graph/bac
 |---|---|---|
 | 2026-04-13 | 辩论引擎从正反方改学科碰撞 | `CHANGELOG.md` 04-13 |
 | 2026-04-14 | 记忆系统 Phase 1+2 完成（31 pytest）| `CHANGELOG.md` 04-14 |
-| 2026-04-15 | 7 基础学科定版（Ken）| `notes/journal/2026-04.md` 04-15 |
+| 2026-04-15 | 7 基础学科定版（Ken）| `notes/journal/project-log-2026-04.md` 04-15 |
 | 2026-04-15 | KPAX 六条硬规则 | `notes/next.md` 顶部 + 本文件 §5.1 |
 | 2026-04-15 晚 | 冗长重复修复，quick max_tokens (1500,1000)→(800,600)，单场 $1.65→$0.91 | `CHANGELOG.md` 04-15 晚 + mini_dry_run_report |
 | 2026-04-15 晚 | 降本裁剪方案全作废（mini run 证实不需要）| mini_dry_run_report §4 |
@@ -456,12 +561,12 @@ AXL backend 已安装结构化 JSON 日志基建（`projects/knowledge-graph/bac
 | 2026-04-16 晚 | 20 场 scaleup 完成，mean $0.99 / CV 17% | `experiments/.../scaleup_report.md` |
 | 2026-04-16 晚 | AXL 结构化 JSON 日志基建 + request_id middleware | `projects/knowledge-graph/backend/app/utils/logging_setup.py` |
 | 2026-04-16 晚 | Pilot judge rubric v0.1 落地（AXL 递归 dogfooding 自设计）| `experiments/.../pilot_judge_rubric_v0.1.md` |
-| 2026-04-16 晚 | KPAX backend survey：5 处 monorepo 违规 | `notes/journal/2026-04.md` 04-16 深夜 |
-| 2026-04-17 凌晨 | 新分工生效：cc 战略 / cursor 开发 / codex review / ken 终审 | 本文件 §6 + `notes/journal/2026-04.md` 04-17 |
+| 2026-04-16 晚 | KPAX backend survey：5 处 monorepo 违规 | `notes/journal/project-log-2026-04.md` 04-16 深夜 |
+| 2026-04-17 凌晨 | 新分工生效：cc 战略 / cursor 开发 / codex review / ken 终审 | 本文件 §6 + `notes/journal/project-log-2026-04.md` 04-17 |
 | 2026-04-17 凌晨 | Lucas 量化闭环问题识别（5 层 A→E 路径）| `notes/research.md#quantification-gap` |
 | 2026-04-17 凌晨 | 文件合并整合：research/ + ideas/ + design/ 合一；AGENTS.md 并入 PROJECT.md | 本 commit |
 
-历史决策详见 `notes/journal/YYYY-MM.md` 按日期倒序。
+历史决策详见 `notes/journal/project-log-YYYY-MM.md` 按日期倒序。
 
 ---
 
@@ -470,7 +575,7 @@ AXL backend 已安装结构化 JSON 日志基建（`projects/knowledge-graph/bac
 | 文件 | 更新频率 | 谁改 |
 |---|---|---|
 | `notes/next.md` | 每次开工前 / 完工后 | 任意 agent |
-| `notes/journal/YYYY-MM.md` | 每次做完要事 / 每次重要对话 | 任意 agent。**月底换新文件**，旧文件归档 |
+| `notes/journal/project-log-YYYY-MM.md` | 每次做完要事 / 每次重要对话 | 任意 agent。**月底换新文件**，旧文件归档 |
 | `CHANGELOG.md` | 每次代码 commit | commit 者 |
 | `experiments/config/experiment_registry.json` | 实验状态变化 | 实验 owner |
 | `projects/knowledge-graph/PROGRESS.md` | AXL 产品评分变动 | Ken 手动 |

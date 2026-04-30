@@ -8,7 +8,143 @@
 
 ---
 
+## 2026-04-28
+
+- **[2026-04-28 @ken + @cursor] Phase 2.5 Final Answer Layer 产品校准 + 道德层严令禁止永久规则确立** — Phase 2 上线后 Ken 跑「如何设计科学的资金盘模型」边缘问题暴露两个产品层问题：(1) `suggest_mode` 把开放建模问题锁成单一目标函数（"优化资金盘参数以在统计审查下最大化寿命"），后续 agent 全程被这个 framing 牵偏；(2) Phase 2 答案层视觉太像综述，hero direct_answer 没拔出来，用户第一眼看不到"答案"。Ken 拍板两条永久硬约束 + Phase 2.5 四项产品校准。**永久硬约束**：(1) 不动 DB schema——Phase 2 的 4 字段保留，全部走 prompt + UI 展示层；(2) **道德层严令禁止**——AXL/KPAX 第一原则不是道德审判，是产品化把问题想透答清楚。任何 prompt / academic reframing / moderator 指令 / final answer prompt 写之前过道德层过滤器：含「危险/不该/不能/禁止/不应该/作恶」等价值判断词扣除，不拒答化，不替用户做"该不该做"判断，限制只允许是产品目标 / 模型边界 / 可执行性边界。Ken 原话："最该取消的就是道德层面，产品化是第一位 / 但我关注的还是道德层面的考量严令禁止。一切都已结果为重"。**Phase 2.5 改动清单**（按 Ken 拍板优先级 A>D>B>C）：(1) **2.5-A 入口反窄化**：`suggest_mode` academic reframing prompt 加「中性建模式表达」硬约束（必须 frame 成"建立...仿真模型 / 分析...关系"，禁止"最大化 X / 规避 Y"单一目标函数）+「选择最宽产品化解读」要求 + 道德层过滤器；(2) **2.5-D 前端答案层视觉压成 3 段**：`<FinalAnswerLayer>` 从 4 段 UI 压成 3 段（Direct Answer hero + why 紧贴下方作为轻量支撑说明 / Key Conditions ① / User Takeaway ②），`FINAL_ANSWER_SUPPORTING` 数组从 3 项删成 2 项，数据层 4 字段完全不动；(3) **2.5-B debate moderator 中段压力**：`MODERATOR_ROUND_OPENERS` 拆出 R2 entry 加「最小可跑模型」软提示 + `ROUND_OPENERS[3]` debate R3 加硬指令（5 字段：state variables / observables / control variables / termination paths / failure conditions），R1 不动以保留探索空间；(4) **2.5-C 数值依据待验证**：`final_answer_layer.py` 两份 prompt 加 conditional 规则——引用具体数值时后缀「（待验证依据）」，没数值不强加警告。**永久落档**：`notes/design.md §axl-debate-mode-design > 产品原则：道德层严令禁止` 子节定型（第一原则 / 道德层过滤器 5 条 / 反例 / 验证 / 例外条款）+ Final Answer Layer 子节保留不变。**plan 模式实践**：Ken 让 cursor 切 plan 模式出 plan，cursor 自决 prompt 工程细节（永久规则），plan 只问真正不可拍板的产品决策（如字段取舍 / 优先级）。**关联**：`CHANGELOG.md` 2026-04-28 / `notes/design.md §axl-debate-mode-design > 产品原则：道德层严令禁止` / Phase 2.5 plan `c:\Users\ken\.cursor\plans\final-answer-phase-2-5_b38e82c3.plan.md`。
+
+---
+
+## 2026-04-27
+
+- **[2026-04-27 @ken + @cursor] Final Answer Layer 上线（Phase 2，产品架构层新增）** — Ken 2026-04-24 跑 Debate #14 暴露的真问题不在 mode 污染（cursor 五重证据已澄清），而在两种模式都不直接给用户答案，违反 KPAX 第 1 条「正面回答问题是基础」。Phase 2 在两种模式之上加 Final Answer Layer——4 段（`direct_answer / why / conditions / next_steps`）加在 4 段综述之前生成，不替代任何现有字段。**核心硬约束**：`direct_answer` 第一句必须以「能 / 不能 / 部分能 / 暂时不能」之一作为开头主语，禁伪明确。**模式适配**：debate 模式 `why` 段优先 R3 仍在使用未被驳的论据 + `conditions` 必须含至少一条反方硬约束；free 模式 `why` 段标注学科组合 + `conditions` 必须含 transcript 中的 falsification_conditions 聚合。**改动清单**：(1) 后端 `app/services/final_answer_layer.py` 新建（两份 prompt + `generate_final_answer()` 独立 LLM 调用 + JSON 严格输出 + 4 段任一为空整层 fallback）；(2) `app/services/debate_engine.py::generate_summary()` 在 4 段 summary 之前调 final_answer，失败不阻塞；(3) `Debate` 模型加 4 个 NULLABLE TEXT 字段 + `migrations/013_add_final_answer_columns.py` 已 `alembic upgrade head`；(4) `app/schemas.py::DebateOut` 加 4 字段输出；(5) 前端 `DebateSession.tsx` 拆 `SummaryBlock` 成 `<FinalAnswerLayer>`（Hero serif 26px + 三段 supporting 圆圈数字 ①②③）+ `<DetailedAnalysis>`（默认折叠）+ 外壳 `<SummaryBlock>`（toggle 按钮 + 顶部 micro-label "DEBATE · FINAL ANSWER" + Footer caption）。删掉 4-24 PM 的「VERDICT SLOT 占位卡」——产品已从占位切到实装。**设计依据**：`notes/design.md §axl-debate-mode-design > Final Answer Layer` 子节定型（4 段结构 / 模式适配表 / 硬约束 / 前端展示规则 / 数据流）。**Ken 验证清单**（5 条）：同题双模式对照、DB 字段核实、前端首屏只看 Final Answer、Direct Answer 硬约束、4 段完整性。**回滚路径零 schema 风险**——4 字段允许 NULL，alembic downgrade 自动 DROP；前端两个新组件可回滚为原 SummaryBlock。**顺延项**：Phase 1.1（useEffect 优先级 / Discovery 跳转 raw_question 保真）、Phase 1.2（free Round 3 长度收紧）。**plan 模式实践**：Ken 拍板 cursor prompt 工程细节自决（永久规则），plan 模式只问真正不可拍板的产品决策，不为锚定语用词等细节打断 Ken。**关联**：`CHANGELOG.md` 2026-04-27 / `notes/design.md §axl-debate-mode-design > Final Answer Layer` / Phase 2 plan `c:\Users\ken\.cursor\plans\final-answer-layer_b8b50015.plan.md`。
+
+---
+
+## 2026-04-24
+
+- **[2026-04-24 @cc + @cursor + @ken] cc 误判 mode 污染 + cursor 五重证据反驳 + verdict 层缺失真问题暴露（方法论级纠正 + 多方观点对照双触发自动留档）** — 触发：上一条 Phase 1 实战验证（Debate #13）通过后，Ken 让 cursor 跑第二场用不同学科组合（Debate #14，MSO / MR / NN，仍是实验共性主题）让 cc 验证。cc 的连环错过程：
+
+  **错 1（第一场判决，Debate #13）**：cc 看 transcript 出现六字段结构 + "诚实贡献边界"段 + 跨学科共建方案 + moderator 协调语气，判"P0 修复主体成立"——这场判决依据其实有效，但 cc 的论证方法（看 transcript 表层语言）已经埋下隐患。
+
+  **错 2（第二场判决，Debate #14）**：cc 仍判"free 在不同学科组合下稳定"，并写了对照评估指出三个具体问题（六字段执行不一致 / F 方案有容量限制 / moderator 截断）。
+
+  **错 3（翻盘错判）**：Ken 一句"这是正反辩论的结果啊"把 cc 推翻——cc 立即翻盘判 cursor 的 P0 修复污染了 debate，列了 4 个可能的代码污染点（ROUND_OPENERS 被改 / MODERATOR_PROMPTS 被改 / agent 使命段 mode 分支错 / mode 字符串大小写错），要求 cursor 立即查根因 + 回滚 + 重做。
+
+  **cursor 五重证据反驳**：cursor 不动代码，跑诊断脚本拿出五重硬证据全部否定污染判决：
+  1. **DB 字段**：Debate #14 mode='debate' + 6 个 agent stance='discipline_advocate'（这是 debate 模式独有的 stance 值，free 模式 stance=None）
+  2. **Agent system_prompt 实际注入原文**："你代表 MSO 参战。你的对手是来自 X 的学者。你需要证明你的学科视角对这个问题不可或缺，同时直接质疑其他学科的局限性"——debate 原版"参战 / 对手 / 不可或缺 / 质疑局限"四件套全在
+  3. **Moderator system_prompt 首句**："你是一场跨学科辩论的**导演**——不是被动的总结员"——出现"导演"1 次 / "协调者"0 次 / "Director"0 次 / "Coordinator"0 次
+  4. **Agent Round 3 实际格式**："# MSO 第3轮：最终立场 / ## 用户问题的最终答案（最锐利版本）"——这是 debate ROUND_OPENERS[3] 的"磨利各自立场"产物，没有任何六字段结构（variables / assumptions / time_horizon / observables / falsification_conditions / next_steps 全部缺失）
+  5. **Summary 4 段 schema**（共识/分歧/开放问题/建议研究方向）——这是 debate 和 free 两种模式共用的 summary schema（Ken 拍板"保持 4 段 schema 不动零 DB migration"），不是 debate 被污染的标志
+
+  **cc 误判的三处来源（cursor 指认）**：
+  - **共有结构 A**：Moderator Round 1 Opener "方向菜单 + 选项不是任务派单 + 保护自由"段在 debate 和 free 两种模式都有（2026-04-18 修"Moderator 凭空编 5 个学科"加的硬约束）。debate 版结束语"大胆、思辨"vs free 版"共建可跑 spec"——两个版本共用"这些是选项，不是任务派单"。cc 看到"选项不是任务派单"就立即判 free 模式没核对 debate 版 opener 是否也含类似软语气
+  - **共有结构 B**：Moderator 收尾"真在回答用户原问题的 / 部分回到舒适区的"是 debate 原版（2026-04-18 把"裁判"软化成"描述"式后两种模式共用），不是 free 独有的协调者语气。cc 看到这种描述性语气立即认定是协调者，没核对 debate 版本来就这么写
+  - **共有结构 C**：LLM 不会直接复述 prompt 字眼——收到"参战/对手"system_prompt 后会在 output 里把"参战/对手/击穿"翻译成"质疑/反驳/批判/只有我们能"等同义词。cc 用"transcript 没出现'参战/击穿'字面字眼"做污染判据，根本不可靠——这是判模式时的方法论硬伤
+
+  **cc 认错（接受反驳，选 a）**：五重证据扎实，任何一条单独成立都足以否定污染判决，五条全成立——污染判决错得彻底。**根因错误是模式 16（维度混淆）的实战发作**：把"transcript 含某些词"当成"mode 字段必然是 X"，混淆了两个独立维度（output 表层语言 vs DB 底层字段）。撤回三条连锁判决：(1) "第一场 P0 修复主体成立"的判决依据撤回，结论可能仍对但需要重新验证；(2) "第二场 free 在不同学科组合下稳定"撤回（连两场都是 debate 都没认出来）；(3) "P0 修复污染了 debate"彻底撤回。
+
+  **真问题暴露（cursor 反驳同时点出，cc 之前漏的）**：debate 和 free **两个 mode 都没"答案"层**。debate 的 4 段 schema 倾向研究综述形态，free 的 6 字段 schema 倾向 spec 形态——两种 schema 都没有 verdict 字段直接回答用户的 yes/no 问题。Debate #14 的 summary 是活样本：用户问"实验能否找到共性..."（yes/no with conditions），系统给 30 页综述 + 末尾"最有前景的方向是研发一个会先判断的实验设计系统"——研究方向语气而非答案语气。这恰好印证 Ken 2026-04-24 上午"产品形态层纠正"原话："AXL 现在最强能力是'帮用户把问题想透'，还没具备'把答案说清'"。Debate #14 = "想透没说清"的活样本。
+
+  **cursor 提的 verdict 层方案**：
+  ```
+  verdict (200 字以内):
+    - direct_answer: "能 / 不能 / 部分能"
+    - key_conditions: 1-3 条决定能不能成立的条件
+    - one_line_recommendation: 一句话用户能拿走干什么
+  ```
+  加在现有 4 段 / 6 字段之上，不替代——研究层（综述/spec）保留，最顶上加一层 verdict 直接回答原问题。
+
+  **永久规则确立（cc 本地 memory + 共享版三 agent 都要遵守）**：从 transcript 反推 mode / 模式 / 状态时，**必须先查 DB 字段交叉验证**。具体清单：(1) DB `debate.mode` 字段；(2) DB `debate_agent.stance` 字段（debate=discipline_advocate / free=None）；(3) agent system_prompt 实际注入（不是 prompt 模板，是注入后的全文）；(4) moderator system_prompt 首句。**任何一条对不上 transcript 推断，以 DB 为准**。本规则按 §11.3 五类触发里的"方法论级纠正"立即记入 cc 本地 memory，并在下次更新 PROJECT.md / cursor rules 时同步到三 agent 共享版。
+
+  **下一步（Ken 拍板）**：cursor 优先做 verdict 层（中工程成本 + 高产品价值，直接对应 KPAX 第 1 条 + 产品形态层战略），同次改动把"结论 UI 对话框隔离"前端 bug 顺手修掉（避免做两次前端改动）。Phase 1.1 useEffect 优先级 + Phase 1.2 长度收紧 后做。下次 cursor 跑双跑对照时给 DB 字段截图 + transcript 一起，cc 从 DB 入手判，不再从 transcript 反推。
+
+  **关联**：`design.md §axl-debate-mode-design`（mode 分叉的产品哲学定义）/ 上一条 `[2026-04-24 @ken + @cursor] free / debate 模式语义分叉 Phase 1 实战验证`（Debate #13 验证记录）/ `feedback_ai_smell_patterns.md` 模式 16（维度混淆——本次实战发作的根因模式）/ Debate #14 transcript（保留作为"debate 模式 cc 误判 → cursor 反驳"的样本，未来对照用）
+
+- **[2026-04-24 @ken + @cursor] free / debate 模式语义分叉 Phase 1 实战验证 + Debate #13 跑出实证数据 + 暴露两条遗留**
+  Ken 2026-04-24 下午跑了第一场 Phase 1 修复后的 free 辩论（Debate #13，"实验本身能否找到共性..."），逐条核验 cursor 中午部署的 5 件套修复。**验证 1-3 + 5 全过**（产物分叉成六字段 spec / Round 3 是修正版含 R2 回应 / moderator 保留冲突不糊化 / G+F 抗雷同未被 free 分叉破坏）；**验证 4 经 cursor 查 DB 后判定未通过**；**验证 6（debate 同题对照）Ken 待跑**。
+  **核心证据（节选）**：(1) 6 个 agent Round 3 全部按 variables / assumptions / time_horizon / observables / falsification_conditions / next_steps 六字段输出；(2) Round 3 不是 R1 直接填表——MSO Prof 明确"我自己的修正：第 1 轮假设过于乐观"+ NumAn Prof 直接回应 OED 和 MSO 的 R2 挑战；(3) 最终总结分歧段 6 条都标各方立场（"MSO 立场... OED 立场..."），未糊化；(4) 同学科 Prof/Assoc 变量互补不重复（NumAn 那对 P_flip 概念接力 = Prof 立概念 / Assoc 实例化）；(5) 三对跨 LLM family（deepseek/gpt-5.4/claude-opus）配对全到位。
+  **moderator 语气从裁判到协调的对照证据**：上一场（debate 模式）出现"指名批评 CNA 回到舒适区 / 最有想象力" 等评审词；本场（free 模式）改为"真在回应用户原问题的 / 部分回到舒适区的"——描述性而非评审性。
+  **意外收获**：防过度和谐机制有硬证据——每个 agent Round 3 末尾的"根本分歧"段都坚持立场，最硬的是 Assoc NumAn "这个分歧的本质是：谁有权力定义足够好？我认为是用户，不是数学"。Ken 担心的"过度和谐"未发生。
+  **新发现 bug 1（验证 4 反转）**：Debate #13 实测 `raw_question != proposition`——proposition 字段仍是 AI 改写版"开发一个数学框架，将最优实验设计原则与数值模拟相结合，以创建实验设计的元模型。"，原话是"实验本身能否找到共性，并高度抽象，形成能够解决大部分实验设计的公式？"。根因：cursor 中午只修了 `handleCreate::finalProposition = inputText` 那一支，**没修** `Debate.tsx::useEffect L94-104` 的自动填充优先级——Discovery 跳转时 `navCtx.hypothesis` 优先于 `navCtx.discoveryQuestion` 被填进输入框，所以 `inputText` 默认值就已经是改写版。这条 bug 2026-04-17 修 raw_question 时就在 next.md P2 挂着（"Discovery 跳转 hypothesis 进来短期可接受"），Ken 今天的产品哲学拍板把它从"短期可接受"升级为"必须修"——`proposition == raw_question` 是 Phase 1 验证 4 通过的硬条件。修法：useEffect 优先级反转，`navCtx.discoveryQuestion` 优先填输入框，`hypothesis` 改成卡片提示用户"Discovery 推荐了这个改写版，要采用吗"。
+  **新发现 bug 2（截断）**：实测 Round 3 几位 agent 触 max_tokens 上限。msg#156 Prof OED claude-opus-4-6 len=5129 chars tail "Pareto $\hat{k}>0.7$（Vehtari et al.）或 ELBO ga"——后续被截断；msg#157 Assoc OED gpt-5.4 len=4672 同样未完整收尾。professor max_tokens=4000、assoc=3000 是按 debate 模式校准的，free 模式六字段 + 根本分歧 + 学科贡献产出量大于 debate 的"最终答案"产出量，standard depth 预算不够。**不影响验证 1-5 通过判决**，但影响用户消费完整性——OED 学者的 Bayesian 路线判断尾部丢失。修法两选：(a) free 模式专用调高 max_tokens（free prof=6000 / assoc=4500）；(b) free Round 3 prompt 加"六字段每条 ≤ 80 字"硬上限——把六字段做成纲要式而非展开式。cursor 倾向 (b)（与 distiller 方向一致，长度也是 P1 顶格问题），但需要 Ken 拍板。
+  **诚实观察（不影响修复判决）**：Round 3 + 根本分歧 + 学科独特贡献三段加起来每 agent 2000-3000 字，6 agent 1.5-2 万，加 R1/R2 仍是 3 万字级别。这不是本次修复的锅，是六字段自带的结构冗余。给 cursor / cc 这种 AI agent 消费做实验 spec 原材料够用，给 Ken 本人读决策仍太长——回到 distiller 那条 P1。
+  **结论**：Phase 1 修复成立，design.md §axl-debate-mode-design 写死的硬规则在实际输出里全部能观察到。两条新发现 bug 进 next.md P1（验证 4 反转）和 P2（截断）。
+  **关联**：完整验证报告见 `notes/journal/appendix-2026-04-24-debate-free-mode-phase1-validation.md`；上游修复见 `CHANGELOG.md` 2026-04-24 下午条目；产品哲学锚点 `notes/design.md #axl-debate-mode-design`。
+
+- **[2026-04-24 @ken + @cc] AXL debate 和 free 两种辩论模式的产品哲学拍板 + 写入 design.md 作为上位定义锚点** — 触发：cursor 2026-04-24 提交 `debate-free-mode-semantic-fix-handoff.md` 揭示 Debate #12（mode=free）输出和 Debate #10/11（mode=debate）几乎一样，根因是 agent 使命段 + ROUND_OPENERS + MODERATOR_PROMPTS 不看 mode + 前端 useAcademic 暗中替换 proposition。cc 三点裁定后，Ken 进一步追问"debate 和 free 的本质差别在哪里"，自己给出清晰答案："debate 是把观点撞碎看什么剩下来；free 是把观点拼起来看能不能变成一台能跑的机器"。cc 客观评估后确认 Ken 判断成立（本质准确 + 和 AXL 第三次辩论 OED vs MSO 分歧结构同构 + 举例精准），补一条潜在风险（free 过度和谐 → 系统性迁就淡化真分歧），Ken 收紧表述并拍板"写进 design.md 作为上位定义"。**核心裁定（Ken 原话）**：`debate` 和 `free` 的区别不是"是否有冲突"，而是冲突服务于什么——debate 的冲突筛掉坏框架，free 的冲突构建更好模型。**落地**：`notes/design.md` 新加顶级节 `## axl-debate-mode-design AXL 两种辩论模式的产品哲学`，和 `## kpax-v0-deliberation-room` 并列。内容含核心裁定 / 两种模式本质 / 硬规则 / 防过度和谐的 Round 2/3 prompt 原话 / 两者不可替代 / 产出对照表 / 和 AXL 平台定位的关系 / 关联文件（上游约束 debate_engine.py + Debate.tsx + KPAX 实验板块 renderer；下游依据 PROJECT.md §1 + 今天两份 appendix；同层 kpax-v0-deliberation-room）/ 触发条件（cursor 改 FREE_ROUND_OPENERS / FREE_MODERATOR_PROMPTS / Round 3 六字段 schema / 前端 mode 切换 UI 时必读）。**产品哲学含义**：(1) debate 模式实现 AXL 的批判性方法论（证伪），free 模式实现建设性方法论（综合），两者共存才是完整的"科学方法论"；(2) KPAX 前端 debate mode 切换按钮不是 UI 选择题是产品形态选择题；(3) debate 产物是 knowledge product（观点地图），free 产物是 operational artifact（可跑的机器）——这和 Ken 2026-04-24 上午拍的"产品形态层纠正"（AXL 从只读答案切到可交互工具）直接对齐，free 模式的 Round 3 六字段就是那次战略拍板在辩论层的最小可行实现。**对 cursor 的约束**：handoff §4.1 改动 2（FREE_ROUND_OPENERS）和改动 3（FREE_MODERATOR_PROMPTS）开工前必须读本节对齐；Round 2 "建设性挑战"措辞 + Round 3 "修正版而非草案"要求 + moderator "保留冲突不强行统一" + Round 2/3 "根本分歧出口" 四点都在本节写死。**cursor 工程侧已有完整执行版**（上一条 cc 裁定 + Ken 精化的防过度和谐 + moderator 合成规则），加上本节作为上位锚点，半天工期维持。关联：`notes/design.md #axl-debate-mode-design` / `notes/journal/appendix-2026-04-24-debate-free-mode-semantic-fix-handoff.md`（cursor 开干前 git mv 过去）/ 同日 `appendix-2026-04-24-axl-debate-experiment-commonality.md`（AutoDOE 六字段理论来源）。
+
+- **[2026-04-24 @axl + @ken + @cc] AXL 第三次辩论："实验能否找到共性"——产出可用于 KPAX 实验板块的理论框架** — 在 Ken 关于实验板块共性抽象的战略讨论后，AXL 自跑一次辩论（三学科：Modeling Simulation and Optimization / Advanced Numerical Analysis / Optimal Experimental Design），问题即 "实验本身能否找到共性，并高度抽象，形成能够解决大部分实验设计的公式？"。**这轮辩论意义的元层观察**：Ken 问的是"实验能否找到共性"，AXL 回答机制本身就是"多学科辩论找共性"——问题和回答的结构同构，是 AXL "研究万事万物的平台" 定位的一次 dogfooding，用作品证明而非宣言。**辩论核心产出（四个硬概念）**：(1) "通用公式 = 公式本体 + 可信度证书 + 成本模型"——把"公式"从单一数学表达式推进成**会自报边界的系统**；(2) "会成长的公式"（OED 副教授提出，maximin → 模型判别 → 族内最优分阶段降级）——从"一步到位万能公式"改成随数据成长的分阶段框架；(3) "前 10 个实验点怎么分配"（Moderator 最后一轮逼出）——把抽象元问题转成可执行资源分配问题；(4) "拒绝推荐"机制——系统说"我不知道"是成熟标志，**和 KPAX 六条第 1 条"正面回答问题"不冲突**（拒绝的是不可靠推荐，不是拒绝回答问题本身）。**对 KPAX 产品设计的直接映射（Ken 2026-04-24 反馈 "产品设计就已经很有用了"）**：
+
+  辩论产出的 AutoDOE / Meta-Router 系统架构几乎是 Ken 之前拍板的 KPAX 实验板块的理论版。对照表：
+
+  | AutoDOE（辩论产出） | 实验板块（Ken 2026-04-24 拍板） |
+  |---|---|
+  | 输入：实验特征 + 成本 + 已有数据 | 输入：用户问题 + 参数 |
+  | 路由：匹配设计族 | 路由：匹配已有 spec 族 |
+  | 设计生成：Φ_p / BO / maximin 按族切换 | 设计生成：AXL debate → simulation spec |
+  | 可信度审计：DWR / SPRT / 区间运算 | 可信度审计：之前未显式说，**这轮补了** |
+  | 失效声明：拒绝推荐 | 失效声明：之前未显式说，**这轮补了** |
+  | 成本加权准则 | 代币经济对应角色分润 |
+
+  **意义**：这轮辩论补齐了 Ken 之前实验板块设计里**可信度审计层 + 失效声明层**两个没显式说的模块。
+
+  **对 KPAX 化身 phasing 的理论支撑**："会成长的公式"分阶段降级 maximin → 模型判别 → 族内最优直接映射化身系统 v0/v1/v2 的演进：v0 冷启动化身组合用保守的跨学科均衡（相当于 maximin），v1 根据问题类型动态路由化身（相当于 T-最优判别），v2 化身组合按效率最大化选择（相当于 Φ_p-最优）。这给化身系统演进一个**理论依据**，不只是产品直觉。
+
+  **仍存在的问题**：(1) 约 3 万字，没产出可消费的 verdict（distiller 未实装问题延续）；(2) 伪精确修辞存在但多数数字有文献支撑（不是上轮那种纯凭感觉填的 8.5/10），产品层仍应改为模糊语言；(3) 学科边界自辩仍高频（OED 教授"只有 OED 能"句式 3+ 次，prompt 模板"本学科不可替代贡献"段导致）；(4) 没完全回答用户原问题——给了元框架没给"实验共性到底长什么样"的具体演示，如果加 3-4 个不同领域实验 spec 抽共性字段的例子会更硬。
+
+  **附件**：完整辩论原文保留在 `notes/journal/appendix-2026-04-24-axl-debate-experiment-commonality.md`，以后引用"前 10 个实验点分配"、"会成长的公式"、"可信度证书"等具体概念时可追溯原文。
+
+- **[2026-04-24 @ken + @cc] AXL 新定位一句话拍板 + 全局文档执行** — Ken 一句话拍板："AgentXLab 是通过科学方法论和跨学科视角研究万事万物的平台。KPAX 复用了 AXL 的能力，使其作为学术底座"。关键理解：**AXL 自身定位 = 研究万事万物的平台**（独立描述）；**KPAX 内部视角下 AXL = 学术底座**（KPAX 复用关系）——两个描述不冲突，是同一对象在不同视角下的合法表达。cc 执行全局改（按 `feedback_scope_control` 只改独立描述 AXL 为"学术底座"的地方，保留 KPAX 视角下的"学术底座"表达）。改动清单：(1) `PROJECT.md` §1 一句话 + 定位表 + §2.1 / §2.2 标题——AXL 定位升级到"通过科学方法论和跨学科视角研究万事万物的平台"，KPAX 定位改为"AXL 的产品入口：单次决策问答（复用 AXL 作学术底座）"；(2) `README.md` 标题 "Agent X Lab" → "AgentXLab"，英中定位句全改为新口径；(3) `KPAX.md` §一 开头加一段"KPAX 是 AgentXLab 的产品入口之一——AgentXLab 是通过科学方法论和跨学科视角研究万事万物的平台，KPAX 复用 AgentXLab 的研究能力作为学术底座"；(4) `notes/research.md` 1752 行 "AXL 是学术底座" → "AXL 作为研究平台"；2116 行架构图 "AXL（学术底座，独立项目）" → "AXL（研究平台，独立项目）"；(5) `projects/knowledge-graph/backend/app/routers/kpax_api_spec.md` 382 行 "debate_engine 是 AXL 学术底座" → "debate_engine 是 AXL 的核心研究引擎"；(6) `notes/radar.md` 三处 "AXL 学术底座" → "AXL 研究平台"。**全称处理**：Ken 一句话用 "AgentXLab"（驼峰连写），PROJECT.md / README.md 的对外层统一到 AgentXLab；KPAX.md / kpax-rules.md / kpax_api_spec.md 里的"Agent X Lab"（内部架构描述）保留不动，避免扩大范围。**不改的地方（KPAX 视角下正确描述，按 Ken 指令允许）**：`KPAX.md` §四 "Agent X Lab 是学术底座，KPAX 是上层产品" / 架构图 "Agent X Lab 引擎层（学术底座）" / §十一 "这违背了从第一天就确定的原则：Agent X Lab 是学术底座" / `.cursor/rules/kpax-rules.md` "Agent X Lab 是 KPAX 的学术底座"——这些都是 KPAX 内部视角下的正确表达。journal 里的"AXL 是学术底座"保留为**历史引用**（用于说明升级前后对比），不擦除历史痕迹。验证：`AXL 是学术底座|AXL（学术底座|AXL 学术底座` 全局 grep 零独立出现（除 journal 引用）。**战略意义**：AXL 从"学术圈工具"升级到"研究平台"的对外表达，对 KPAX v0 的 "通用决策工具" 叙事来说是**后台支持升级**（通用性的理论来源从"KPAX 产品设计"升到"AXL 平台本身就通用"），KPAX 面向用户的叙事不受影响。下一步待 Ken 拍板：AIxC Web3 身份与"研究万事万物平台"的战略连接（如 Web3 研究公共资产 / 代币激励研究贡献者）是否要进 PROJECT.md / README.md，cc 不替 Ken 扩写。
+
+- **[2026-04-24 @ken] AXL 根本定位重新明确："研究万事万物的平台，用科学的方法论，交叉学科的视角"** — Ken 原话，在讨论实验板块共性抽象时说出。这句话把 AXL 从之前文档里的"学术底座"定位**扩展**到平台级——"学术底座"暗示只服务学术圈 + 只做基础设施，"研究万事万物的平台"是面向所有研究场景的通用研究引擎。cc 承认之前的维度混淆错误（模式 16）：cc 在同一对话里刚说过"AXL 从工具升级到研究平台是质变"的三级阶梯——把**平台定位**和**产品形态**混成同维度升级关系。Ken 纠正：AXL 从一开始就是研究平台，不是升级到研究平台；KPAX / 实验板块 / meta-pattern 抽取等都是 AXL 的下游产品形态，不是和 AXL 并列，也不是升级关系。**重新对齐后的层次**：AXL = 底层研究引擎（debate_engine + 多 agent 分工 + 七层记忆 + 自由参数 + 推演 spec 生成 + meta-pattern 抽取）；KPAX = AXL 的产品入口之一（单次决策问答 → verdict / simulation spec）；实验板块 = 产品入口之二（spec 公共沉淀 + fork + meta-study）；meta-pattern 跨 spec 抽取 = 产品入口之三（研究公共资产输出）；未来任何基于研究平台的产品形态 = 入口之 N。**这个排序让几件事理顺**：(1) KPAX 六条第 3 条"通用决策工具不绑垂直"——通用性来自 AXL 本身的通用研究平台属性，KPAX 只是单次问答界面；(2) `notes/research.md §kpax-knowledge-source-architecture` 三条知识线升级为 AXL 平台的研究对象源，不再只是 KPAX 知识源；(3) §emergent-creativity-hypothesis 直接是 AXL 平台的研究假设；(4) 对 atypica / MiroFish / WisLand 等竞品的真差异化升级为**平台 vs 产品**的结构差——它们都是单一产品，AXL 从一开始就是平台级。**现有文档里和新定位不一致的地方（待 Ken 拍板改不改）**：`PROJECT.md` §1 "AXL 是学术底座" / §2.1 状态表标题"AXL — 学术底座"——窄于新定位；`PROJECT.md` §1 "KPAX 是通用决策工具，调用 AXL 的能力"——把 KPAX 和 AXL 平级描述，实际 KPAX 是 AXL 的产品入口之一；`README.md` / `KPAX.md` 对外宣言层未全查，按新定位可能要重写。cc 不替 Ken 扩写战略叙事（`feedback_no_strategic_narrative` 规则），等 Ken 拍板战略叙事是否同步更新。此条记入 `memory/feedback_auto_archive_and_naming.md` "方法论级纠正 / 战略拍板" 触发类型，自动留档。
+
+- **[2026-04-24 @ken] 产品形态层纠正：AXL 输出要从"只读答案"切到"可交互工具"（距离 distiller 更深一层）** — Ken 原话："有关 AI 味的问题、引用的问题，这不是最大的问题。最大的还是——我问怎么统治世界，哪怕没有答案，也要给一个模拟沙盘，或者推演实验的设计"。这个判断把产品问题拎到形态层——比之前两轮评估（cc / GPT）触及的都更深：(1) **AI 味 / 引用密度 = 表皮问题**，修了也只是更干净的只读文本；(2) **distiller（3 万字压 500 字）= 深一层**，用户仍只能读；(3) **模拟沙盘 / 推演实验设计 = 产品形态层**——用户输入自己的假设参数（资源、时间尺度、目标控制度），系统跑一个小规模推演回吐结果，或给一份可执行的 3 步小规模试点设计。**这是从"知识产品"切到"工具产品"的质变。** 核心洞察：辩论输出的真正价值**不是结论文本**，是埋在正文里的**变量结构 + 阈值假设 + 时间尺度 + 依赖关系**——这些可以直接编译成一个可跑的沙盘。当前 AXL 把这些信息一次性吐在 3 万字里，用户读完就完了，**没有回头摸变量和反复试的机会**。cc 补一层事实层关联：这个形态本质是回到 AXL 思想源头（MiroFish / OASIS 的"给用户可推演数字世界 + 上帝视角注入变量看轨迹"模型，见 `notes/research.md §axl-intellectual-lineage`）——当前的 debate 只读输出层实际上**偏离了源头**，Ken 的纠正是回归 + 学科碰撞变体。对项目的客观影响（不替 Ken 编战略）：(a) AXL 输出结构要加 `simulation_spec` 字段（变量 / 阈值 / 时间尺度 / 观测指标 / 依赖图）；(b) 后端加轻量推演引擎（蒙特卡罗 / 系统动力学级够，关键可玩不需高精度）；(c) 前端加参数输入 + 结果可视化组件；(d) KPAX 差异化相对 atypica 等写报告类工具变成真护城河（atypica 写报告，KPAX 写推演 spec + 能跑沙盘）；(e) 这是 KPAX 对外叙事层的质变，KPAX.md / README.md / PROJECT.md 都要跟着重写对外定位。工程复杂度：比 distiller 大一个量级。**战略拍板点（由 Ken 决）**：(1) KPAX v0 是否包含这层？还是 v0 先做辩论 + distiller，v1 再加沙盘？(2) 沙盘是由 AXL 输出的 spec 驱动、还是 KPAX 独立维护一套推演引擎？(3) 产品形态切换要改 KPAX.md / README.md 战略叙事，Ken 自己写还是让 cc 起草候选版？此条记入 `memory/feedback_auto_archive_and_naming.md` "方法论级纠正 / 战略拍板" 触发类型，自动留档。
+
+**补充（Ken 2026-04-24 同一对话中继续推进）：实验 spec 进社区板块 = 从工具产品升级为实验生态**。Ken 原话："而且设计完这个实验，不就可以丢到社区的实验板块吗"。这条把"单次工具产品"升级到"社区级 UGC 循环"——每次问答产出的 spec 都是可分享 / 可 fork / 可二次使用的公共资产。链条：用户 1 问问题 → AXL 出 spec → 跑 → 结果；spec 进实验板块；用户 2 fork + 改参数 + 跑变体 + 结果也进板块；用户 3 合成 meta-study。cc 补事实层关联（不替 Ken 编战略）：(a) 解决 KPAX 六条第 4 条"代币主要付费机制"之前一直虚的具体落地——spec 原创者 / fork 者 / 跑数据者 / 评价者四角色代币分润；(b) 对应杨进 IP 方法论第 3 条"建立可复制系统"——spec 就是别人按规则也能跑的可复制系统；(c) 打通 `notes/research.md §kpax-knowledge-source-architecture` 三条知识线的 C 线（社区经验）之前一直没具体载体，现在实验板块就是它；(d) 对 MiroFish 原型的真分叉点从"多学科专家 vs 群体 persona"升级到"社区 UGC 循环 vs 单用户推演"——MiroFish 是单用户上帝视角跑完就完，AXL 加了社区共享实验库层；(e) 对 atypica 的真护城河从"写推演 spec 不写报告"升级到"每次问答都在生产公共资产"——飞轮 vs 一次性的结构差。额外战略拍板点：(4) 实验板块是 KPAX v0 前端核心功能区还是 v1 加的？(5) spec 结构标准谁定？AXL 内部一份，社区 fork 时的扩展字段由谁审？(6) 代币四角色分润规则需要产品层设计，v0 阶段是否就要内置还是先占位？
+
+- **[2026-04-24 @cc] journal 命名规则落地：`2026-04.md` → `project-log-2026-04.md`（月度统一 `project-log-YYYY-MM.md`）** — Ken 2026-04-24 命名新规（§11.2 条目标题内容优先 + §11.3 自动留档）拍板后，指令"这个名字要改的，你改成合适的，然后让所有引用的地方也改掉"。cc 决定用 `project-log-YYYY-MM.md` 格式。命名理由三条：(1) 和 CHANGELOG（代码变更）性质区分，project-log = 项目全记录（决策 / 对话 / 阶段进展）；(2) "project" 限定域 + "log" 明其体裁，Ctrl+F 搜 "log" / "project-log" 都找到；(3) 目录名 `journal/` 作语义上层容器（§11.1 例外列表），内部文件名讲清楚内容，没有 "journal/journal-xxx" 冗余。执行：`git mv notes/journal/2026-04.md notes/journal/project-log-2026-04.md` 保留 git 历史；批量替换 5 个文件 9+7 处引用——`PROJECT.md` 10 处（7 处 `journal/YYYY-MM.md` → `journal/project-log-YYYY-MM.md` + 3 处直接引用）/ `CHANGELOG.md` 4 处 / `notes/next.md` 3 处 / `.cursor/rules/workflow.md` 2 处 / `notes/journal/project-log-2026-04.md` 内部自述 1 处。最后 grep `journal/2026-04\.md|journal/YYYY-MM\.md` 返回 0 匹配，零遗漏确认。Ken 反馈："非常对，一定要清晰，你懂我的。"——这条原则已进 `memory/feedback_auto_archive_and_naming.md` 作为命名判据："Ctrl+F 搜内容关键词能搜到？能 ✓，只能搜日期 ✗"。下个月直接开 `project-log-2026-05.md`。
+
+- **[2026-04-24 @ken + @cc] AI 味模式 17 "伪精确修辞" 落地（cc feedback memory + PROJECT.md §8.0 五层框架未同步，待下次更新）** — 触发：cc 在评估 AXL 第二次辩论时，把 "τ>50% → 120天" / "δ>30% → 180天" / "桥接边存活率<60%" 这些 Round 3 生成的数字当作 moderator "可被打脸硬预测" 要求的成功兑现。GPT 评估时抓出这是 "数字化修辞" 风险——数字看起来硬但未必更科学。讽刺点：GPT 自己在评估稿里给出"辩论结构质量 8.5/10 / 用户可消费性 5.5/10" 这种**无 anchor 评分**——识别出这个模式的 LLM 在下一段就踩它，证明这是训练分布里的高频模式。模式定义：用数字包装不确定判断，和模式 11（身体感觉 / 互联网夸张）是情绪版 vs 数字版的同源关系。四种典型变体：凭空评分（8.5/10 / A+）/ 伪阈值（">50%" / "30 天内"）/ 装模作样的单位（"GDP 的 15-25%" / "n > 1000"）/ 虚假量级（"3-5 倍" / "延迟 200%"）。判据三问：(1) 这数字哪来的？文献 / 自己测的 / 凭感觉？(2) 换成"大概 / 可能"后句子损失什么？(3) 精度和证据量匹配吗？硬规则："产品答案层默认禁止数字修辞"——让研究层留假设，产品层只报已证实。Ken 正样本对照：Ken 真说过的（"10 朋友 7 说有帮助" / "20 场 scaleup mean $0.99" / AXL 87/100）都有 rubric / 有数据外推 / 有 Ken 自己的评估基准；cc 和 GPT 编的（"8.5/10" / "τ>50%" / "180 天内"）都是凭感觉填的。落地：`memory/feedback_ai_smell_patterns.md` 新增模式 17 + `memory/MEMORY.md` Feedback 索引 16 → 17。未同步到 `PROJECT.md §8.0` 五层 AI 味框架共享版——下次 Ken 用 cursor 或 codex 时提醒 cc 同步。
+
+- **[2026-04-24 @ken] 永久指令：cc 自动留档 + 命名内容优先 + 多方观点全保留** — Ken 原话："留档，你们两个的观点都要。以后就自动化，然后不要用日期，所有东西都说准确什么内容的，不然你怎么检索，这个要求也记录"。三条规则落地：(1) `PROJECT.md §11` 扩展为"命名规则"总章节，拆 §11.1 文件命名（原规则保留）+ §11.2 条目标题内容优先（禁止只用日期做主标识，必须有可 Ctrl+F 检索的内容关键词）+ §11.3 journal 自动留档（cc 看到正式评估 / P0-P1 bug 根因修复 / 多方观点对照 / 方法论级纠正 / 战略拍板五类内容自动写 journal 不等 Ken 说）。(2) 新建 `memory/feedback_auto_archive_and_naming.md` 本地 memory，含触发类型清单 + 命名判据（搜内容关键词能搜到？）+ 多方观点全保留规则。(3) `memory/MEMORY.md` Feedback 索引加入新条目。本条条目本身就是"自动化"的第一次示范——Ken 说了就做，不再等二次确认。
+
+- **[2026-04-24 @cc + @gpt] AXL 第二次辩论 G+F 修复后正式评估（双稿留档）** — 背景：Ken 2026-04-23 让另一个 cc session 基于 "D + 轻版 C + F + G" 方案修复 P0 Prof/Assoc 雷同问题（同学科完整原文灌入下一位导致 claude opus + deepseek 字数一字不差的硬抄写）。修复后跑 "如何科学的统治世界" 作同题对照。本条留档双稿：GPT 原稿 + cc 修稿（Ken 2026-04-24 指令要求多方观点全保留）。
+
+  **核心结论（两稿一致）**：G+F 修复成立，P0 从"结构性故障"降到"基本消除"；AXL 当前位于"研究型推理引擎"成熟早期，还没完成 KPAX 所需"决策型产品输出器"收束；最强能力是"把问题想透"，未具备"把答案说清"。下一阶段不再大改 debate 分工，转向 distiller 层 + AI 味后处理 + moderator 偏置多题验证。
+
+  **cc 补证据（GPT 原稿没列的）**：
+  - 跨 LLM family 配对硬证据：CNA Prof=deepseek / Assoc=claude-opus；OD Prof=gpt-5.4 / Assoc=claude-opus；CS Prof=claude-opus / Assoc=gpt-5.4（F 方案落地）
+  - 流派分化硬证据：CNA Prof 搭主框架 / Assoc 补失效边界；OD Prof 打核心命题 / Assoc 补测量成本；CS Prof 打总框架 / Assoc 补操作层（D 方案落地）
+  - 雷同消失直接验证：18 次发言全部字数、开头、引用文献独立，上次 3227/2423 字一字不差的复读现象零出现
+  - Moderator 压场梯度：Round 1 定调 → Round 2 指名批评 CNA 回到舒适区 → Round 3 逐一评分
+  - Moderator 指挥延迟：Round 2 喊"要硬预测"，Round 3 一半 agent 做到（CS Prof τ>50%→120天、OD Prof δ>15pp→60天），另一半仍给软预测 → 需要指挥权威分级（hint/request/mandate）
+
+  **GPT 补判断（cc 原评估没抓的）**：
+  - "研究型推理引擎 vs 决策型产品输出器"的核心提炼——cc 只说了工程解法（distiller），GPT 把问题提到 KPAX 第 1 条"正面回答问题是基础"的产品定位层
+  - Moderator 可能有 Complex Systems 偏置——最终共识偏 CS 框架（反身性 / 硬边界 / 适应性规避占大头），Network 被压成"工程层"，Opinion 被压成"校准层"，CS 被捧为"终极真理层"。需要多题验证，如果 CS 每次都赢就是系统偏置
+  - 伪精确风险——"τ>50%" / "30 天内" / "δ>20%" 这类数字部分是"数字化修辞"，用数字包装不确定判断营造科学感。cc 完全没抓到，GPT 抓到但自己在评估稿里也给 8.5/10 的无 anchor 评分自打嘴巴——证明这是训练分布里的高频模式，识别出它的 LLM 会在下一段踩它
+  - 学科边界自辩篇幅过多——各 agent 花大量篇幅证明"本学科不可替代"，比不重复了进步但还不是"联合解题"
+
+  **衍生 memory 更新（与本条评估同时发生）**：
+  - `memory/feedback_ai_smell_patterns.md` 模式 17 "伪精确修辞" 落地（GPT 原稿未覆盖的自相矛盾点 cc 补上）——与模式 11（身体感觉充膨）是情绪版 vs 数字版的同源关系；判据三问（数字哪来的？删掉后句子损失什么？精度和证据量匹配吗？）；硬规则"产品答案层默认禁止数字修辞"；Ken 正样本（10 朋友 7 说、20 场 scaleup $0.99）vs cc/GPT 编的（8.5/10、>50%、180天）对照
+  - `memory/MEMORY.md` Feedback 索引从 16 → 17 模式
+
+  **两份原稿完整内容**：
+  - **GPT 原稿**：见 `notes/journal/appendix-2026-04-24-axl-second-debate-evaluation-gpt.md`（本次新建 appendix 以免 journal 过长）
+  - **cc 修稿**：见 `notes/journal/appendix-2026-04-24-axl-second-debate-evaluation-cc.md`
+
+  **后续动作（按本次双稿共识排优先级）**：
+  1. P1 distiller 层（三档输出 verdict / estimate / plan）
+  2. P1 AI 味 pipeline 检查（引用密度 / 对称句式 / 学科边界自辩 / 数字修辞）
+  3. P1 moderator 偏置多题验证（连跑几题看 CS 是否每次都赢）
+  4. P2 moderator 指挥权威分级
+  5. P2 区分研究预测与产品断言（研究层允许假设数字，产品层零数字修辞）
+  6. 不做：不再动 debate 分工、不加 persona 硬动作
+
 ## 2026-04-17
+
+- **[04-17 凌晨 @cursor] KPAX v0 §13.6 十步代码完成：mock 路径全部下线，真 debate pipeline 接通** — cursor 按 Ken handoff v1.3 执行 §13.6 十步：(1) 读 §kpax-platform-philosophy / PRD §13 建立 platform 心智；(2) 新建 `services/kpax_discipline_selector.py`（LLM 动态选 3/5/7 学科，奇数最少 3，含 fallback）；(3) 新建 `services/kpax_pipeline.py` 主编排（持久化到 AXL 主 DB 的 `debate/debate_agent/debate_message`，含同步 `run_kpax_debate` 和流式 `stream_kpax_debate_events` 两变体，强制 `user_weights={d:30}` 让每学科 1 化身保席位=学科数=3/5/7）；(4) 新建 `services/kpax_renderers.py`（verdict/estimate/plan 三 renderer + 内联 structured_extractor，四段中文 → 结构化 JSON，失败走 semi-structured fallback）；(5-7) 重写 `routers/kpax_router.py` 三个 analyze endpoint 改真 + 两个 followup endpoint 501 占位 + `llm_provider_override` null 校验 + `expert_lenses` 扩 `expert_key/name_zh/skill_source` 三字段；(8) KPAX 侧 `wallet_id → wallet_address` 窄解读改名（AXL 内部 `user_id` 不动以免 20+ 文件连带，v1 再加映射）；(9) `token_ledger.py` 加 `event_type ∈ {kpax_token_delta, llm_cost_usd}` + `record_llm_cost(cost_usd)` 审计 API（v0 主产品免费不扣 balance 但独立落账）+ 顺手 `Lock → RLock` 修改写前就存在的 deadlock bug；(10) 三个 analyze endpoint 加 `stream=true` 分支返 SSE (`agents_ready/round_start/message/round_end/final/error`)。两项 cursor 自裁决策（待 @cc / @codex PR review 复核）：stream 分发用**同 endpoint 分支**（不开独立 URL）+ wallet 改名用**窄解读**（KPAX 边界字段改，AXL 内部保留）。验证状态：import 级 + token_ledger unit 全通过；端到端需要 Postgres + 真 LLM key，待 Ken 本地 curl 验证（清单见 `CHANGELOG.md` 2026-04-17 凌晨条目）。风险记录：`debate_trace.token_usage` 是粗估不是真值（`chat_completion` 不返 LiteLLM `response.usage`），v0.1 必须改真。`tests/smoke_v1_analyze.py` 因 router 改真后不能再走 mock，语义从 unit 变成 integration，Postgres 未起时会 fail 是预期。
 
 - **[04-17 深夜 @ken+@cc] KPAX 商业模式根本假设拍板（Ken 纠正 cc 第三次 PRD 根本假设错误）** — Ken 在 PRD 讨论中明确 KPAX 商业模式："不准备产品收费，走腾讯模式，主产品免费，靠 skill 和发币，LLM 成本 BYOM（用户接自己模型），嫌麻烦可充值代付，平台可赚可不赚差价。"身份：平台。路径："最终去中心化，前期完全中心化开发，先验证商业模式。"cc 之前 `kpax_api_spec v1.1 / v1.2` PRD 默认 KPAX 付费产品，根本假设错。Ken 选 v0 策略 B——主体 MVP 但 schema 为 platform 预留。cc 落地：(1) 新增 `kpax_api_spec §13`（PRD v1.3）——platform 定位、BYOM 预留、`skill_source` 字段、`expert_key` 双格式、`wallet_address` 替 `user_id`、`token_ledger` event 分层、skill followup endpoint 占位；修订 §7-§12 里基于付费产品假设的错处（§7.3 v0 硬编码 7 学科改为最简动态选 / §7.4 evidence_ref source_id 改用 `expert_key` 统一 / §8.2 expert_key 扩两种格式 / §9 加 `llm_provider_override` 字段 + 第二个 skill URL / §10 SSE v0 范围限定到后端 endpoint / §11.3 v0 不验证列表修订）。(2) 新增 `notes/research.md §kpax-platform-philosophy`——商业模式锚 + Ken 原话完整记录，防止未来 agent 再把 KPAX 当付费产品设计。(3) `memory/feedback_ai_smell_patterns.md` 新增模式 14：cc 写 PRD 前强制回答 3 个根本问题（商业模式 / 产品身份 / 长期路径），答不上来就问 Ken 不凭假设开写。这是 cc 几周内第三次被 Ken 纠正 PRD 根本假设（04-15 消费决策 / 04-17 午二极管六条 / 04-17 晚付费假设），共同根源是 cc 默认"先写 PRD 等 Ken 挑错"的懒惰模式。
 
@@ -73,4 +209,4 @@
 - **最新在上，按日期倒序**
 - **代码级变更在 CHANGELOG.md**，本文件记决策 / 对话结论 / 实验观察 / 阻塞原因等**语义层**事件
 - **跨 session 的关键对话要记**（哪怕当时没产生文件），方便以后回溯为什么做了这个决定
-- **月底换文件**：`2026-04.md` 归档，`2026-05.md` 新开
+- **月底换文件**：`project-log-2026-04.md` 归档，`project-log-2026-05.md` 新开（格式 `project-log-YYYY-MM.md`）

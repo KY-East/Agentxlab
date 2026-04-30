@@ -5,6 +5,7 @@
 **阅读顺序（新人进项目推荐）**：
 
 ```
+0. 思想渊源 (axl-intellectual-lineage)                 — OASIS → MiroFish → AXL 分叉
 1. 涌现创造力假设 (emergent-creativity-hypothesis)     — 理论起点：我们在验证什么
 2. 外部对位 (wisland-analysis-and-positioning)         — 为什么不走效率赛道
 3. 自由参数 (agent-evolution-free-parameters)          — 护城河
@@ -24,6 +25,99 @@
 6. 跨文件引用：`notes/design.md`、`notes/next.md`、`CHANGELOG.md` 等
 
 **历史**：2026-04-17 前这些内容位于 `notes/research/*.md` + `notes/ideas/*.md`（共 7 个独立文件 + 2 个 INDEX.md）。合并原因：Ken 2026-04-17 指出 "文件越少越好，合并同类项，记录和战略类更是"。合并 commit 保留原 7 文件的独立 git 历史（通过 git mv + concat，可用 `git log --follow` 追溯）。
+
+---
+
+
+## axl-intellectual-lineage AXL 思想渊源：OASIS → MiroFish → AXL 分叉
+
+> **补记缘由**：2026-04-20 Ken 在 atypica.ai radar 讨论里指出 "mirofish 是 axl 最早的想法来源，多 agent 辩论的 oasis 架构"。cc 当时搜 repo 找不到任何相关记录，确认这条关键历史脉络在 `notes/research/` → `notes/research.md` 合并时没进文档。本节据本地 `C:\Users\ken\OneDrive\Desktop\MiroFish-main` README 和 Ken 口述补上客观事实层。**Ken 的主观思想演进过程不在这里编写**——那部分如果重要，由 Ken 自己口述后补入 `notes/journal/`。
+
+### 四者关系
+
+```
+CAMEL-AI 的 OASIS
+   └─→ MiroFish（盛大集团基于 OASIS 做的群体智能预测引擎）
+         ├─→ atypica.ai（用户 persona 模拟，做市场研究 / PMF 验证）
+         └─→ AXL（多学科专家模拟，做跨学科碰撞 / 创造力涌现实验）
+```
+
+**同底座，三个不同应用分叉**。
+
+### 层 0：OASIS（底层框架）
+
+- **名字**：Open Agent Social Interaction Simulations
+- **出处**：CAMEL-AI 团队开源（github.com/camel-ai/oasis）
+- **定位**：多 agent 社会交互模拟的开源框架
+- **角色**：MiroFish 明确声明其仿真引擎 "is powered by OASIS"
+
+### 层 1：MiroFish（第一层应用）
+
+- **出处**：github.com/666ghj/MiroFish（盛大集团孵化）
+- **中文定位**：简洁通用的群体智能引擎，预测万物
+- **英文定位**：A Simple and Universal Swarm Intelligence Engine, Predicting Anything
+- **核心机制**：
+  1. 从真实世界提取 seed（新闻 / 政策 / 金融信号 / 小说）
+  2. 自动构建高保真平行数字世界（GraphRAG）
+  3. 千个独立人格 + 长期记忆 + 行为逻辑的 agent 自由交互，社会演化
+  4. 用户可从"上帝视角"注入变量推演未来
+  5. ReportAgent 带工具集出报告
+  6. 用户可和任意 agent 深度交互
+- **工作流 5 步**：
+  1. Graph Building（seed 提取 + 个体/集体记忆注入 + GraphRAG 构建）
+  2. Environment Setup（实体关系提取 + persona 生成 + agent 配置注入）
+  3. Simulation（双平台并行仿真 + 需求自动解析 + 动态时间记忆更新）
+  4. Report Generation（ReportAgent 深度交互环境）
+  5. Deep Interaction（和任何 agent 聊天 + 和 ReportAgent 互动）
+- **技术栈**：Node.js + Python（≥3.11 ≤3.12）+ Docker；LLM 默认推荐阿里百炼 qwen-plus；记忆层用 Zep Cloud
+- **宣传应用场景**：
+  - 宏观层：决策者的排演实验室（政策 / 公关零风险测试）
+  - 微观层：个人创意 sandbox（小说续写 / 幻想场景）
+- **代表 demo**：武大舆情模拟、红楼梦失传结局推演
+
+### 层 2a：atypica.ai（应用分叉 A：用户研究）
+
+- **应用场景**：模拟真实用户人群 → 市场研究 / PMF 验证
+- **产品语言**：AI research system（"像研究团队规划研究"）
+- **资产**：100w+ 社媒合成 persona + 10w+ 深度访谈 persona
+- **商业化切口**：创作者 / 营销人 / 产品团队（出海产品验证尤其强）
+- **详见** `notes/radar.md` atypica.ai 条目
+
+### 层 2b：AXL（应用分叉 B：学科碰撞）
+
+- **应用场景**：模拟多学科专家 → 跨学科碰撞 / 创造力涌现实验
+- **研究目标**：验证"多 agent 跨学科碰撞能否产生涌现创造力"这一假设
+- **与 MiroFish 的结构对应**（只列客观对应，不编 Ken 心路）：
+
+| MiroFish 概念 | AXL 对应 | 异同 |
+|---|---|---|
+| seed 提取（新闻 / 政策）| 用户问题 / 实验 benchmark 题 | 相同：从真实世界起点 |
+| 千个 persona agent | 多学科专家 agent（当前 7 学科）| **范围收窄**：AXL 精度在专家领域，MiroFish 覆盖在普通人群体 |
+| GraphRAG 构建数字世界 | 未做（AXL 不需要还原社会环境）| AXL 省掉了"世界"层，直接让专家对话 |
+| agent 自由交互社会演化 | 多轮辩论 + moderator 压场 | **相同**：都是 agent 间非独白 |
+| 长期记忆 | 七层记忆系统（Phase 2 已落地）| AXL 独立设计，参考 MiroFish + 2025 SOTA |
+| 上帝视角注入变量 | 实验 config + 参数消融 | **相同思路**：控制变量做 controlled experiment |
+| ReportAgent | moderator / kpax_pipeline | AXL 的 moderator 做结构化收束 |
+| Deep Interaction | KPAX 座谈会形态（v0 设计中）| **相同**：用户可和任一 agent 继续对话 |
+
+### 为什么 AXL 不是 MiroFish 的 fork
+
+- MiroFish 的评估目标：预测未来（在 seed 给定世界下，群体社会如何演化）
+- AXL 的评估目标：涌现创造力（多学科碰撞能否产生单 agent 产生不了的新角度）
+- 目标不同导致 fitness function / re-rank 策略 / 记忆结构 / agent 选型**全部需要独立设计**
+- 因此 AXL 没有共享 MiroFish 的代码，只借鉴了**"多 agent 社会演化 + 长记忆 + ReportAgent 收束 + 用户深度交互"这套产品骨架**
+
+### 和 atypica 的关系：同源不是竞争
+
+- atypica 跑通了这套思想在**产品层 + 商业层**的可行性 —— 对 AXL 是第三方验证信号
+- 功能正交：atypica 做用户研究，AXL 做学科碰撞。不抢赛道
+- 可对标之处（见 `notes/radar.md` atypica 条目）：产品定位语言、澄清-优先流程、persona 数据规模
+
+### 启示清单（给未来的 agent）
+
+1. **定性是"启发"，不是"fork / 抄袭"**（Ken 2026-04-20 明确）：AXL 从 MiroFish / OASIS 得到的是**多 agent 社会演化 + 长记忆 + ReportAgent 收束 + 用户深度交互这套产品骨架的启发**。没有共享代码、没有 fork、目标不同、实现独立。对外宣传文档（`README.md` / `KPAX.md`）**不加** "based on OASIS" 这类 credit——启发不是抄袭，没必要做这种虚伪的谦虚。
+2. **护城河不在 idea 层**：MiroFish 和 atypica 已经各自吃下一块应用市场。AXL 的价值不在"更早提出多 agent"，在"把多 agent 在**学科碰撞 + 创造力涌现**这个特定场景下跑出可量化的数据曲线"
+3. **技术选型对照点**：Zep Cloud 记忆（MiroFish 用）、阿里百炼 qwen-plus（MiroFish 默认 LLM）、GraphRAG（MiroFish 用）—— 这些技术选型每次涉及 AXL 同类决策时可做对照
 
 ---
 
@@ -1655,7 +1749,7 @@ Reflection 是一个**压缩环节**。把 L2 原始对话压缩成"高层洞察
 
 ## 1. 为什么不能只吃论文
 
-AXL 是学术底座，多学科 agent 辩论时默认吃学术论文（arXiv / OpenAlex / Semantic Scholar）。这对**学术问题**够用——agent 在讨论"Anthropic 宪法 AI 路线能否成为主流范式"时，学术论文是对的证据源。
+AXL 作为研究平台，多学科 agent 辩论时默认吃学术论文（arXiv / OpenAlex / Semantic Scholar）。这对**学术问题**够用——agent 在讨论"Anthropic 宪法 AI 路线能否成为主流范式"时，学术论文是对的证据源。
 
 但 KPAX 是**通用决策工具**，用户问题远超学术范畴：
 - "我 28 岁月薪 2 万该不该辞职创业" —— 论文有相关研究但**不够**。需要真实创业者的经验（Reddit r/startups / 知乎创业话题 / YC 创业者访谈）
@@ -2019,7 +2113,7 @@ Lucas 的观察本质是：**rubric 只是定义了"尺子"，但还没真去量
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ AXL（学术底座，独立项目）                                      │
+│ AXL（研究平台，独立项目）                                      │
 │  - debate_engine（多 agent 辩论编排）                          │
 │  - generate_agents / reverse_discovery（动态组 agent）         │
 │  - 学科知识：Zep + OpenAlex + 4516 topic 图谱                  │

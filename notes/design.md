@@ -25,11 +25,11 @@
 
 ## 1. 核心理念：为什么不是聊天框，不是卡片
 
-**聊天框是 2023–2025 年整个 LLM 生态的默认窠臼**。用户脑子里已经框死"AI = 输入框 + 一段流式文字"。KPAX 的真实价值（15 分钟 / 7 专家 / 碰撞 / 结构化判决）套进聊天框 = 赛车开机动车道。
+**聊天框是 2023–2025 年整个 LLM 生态的默认窠臼**。用户脑子里已经框死"AI = 输入框 + 一段流式文字"。KPAX 的真实价值（15 分钟 / 每场 3/5/7 位化身按问题组合发言（奇数便于决断，最少 3） / 碰撞 / 结构化判决）套进聊天框 = 赛车开机动车道。
 
 **卡片也是 AI 默认审美**——更好看的 JSON，仍然是"机器把信息塞进格子"。
 
-**KPAX 要做的是"智囊团"**——用户的真实体感应该是"我召集了一个由 7 位学者组成的顾问团，在书房/会议厅里为我的问题真的吵起来"。
+**KPAX 要做的是"智囊团"**——用户的真实体感应该是"我按这个问题召集了 3/5/7 位化身（学者 / 真人 / 野生专家按需混编，最少 3 位），在时间博物馆的某个厅里为我的问题真的吵起来"（化身体系详见 `notes/research.md §human-skill-distillation-layer`；场景 7 座永驻 + 动态前景规则见 §2 产品侧 UI 策略）。
 
 这个形态：
 - **过程可见**：用户能看到他付费的 token 在被如何花（7 个人真的在讨论，不是一段文字秒回）
@@ -82,11 +82,40 @@
 
 **基础布局**：
 - 圆桌（象征平等，无主座）
-- 7 张风格化座椅（每张略微差异反映学科人格）
+- 7 张风格化座椅（**固定，不因出席人数变化**，每张略微差异反映角色人格。本场出席的化身 3/5/7 位落座发言，其余椅子空着或由未召唤化身占位在边上）
 - 各自的"第二位置"：书架 / 望远镜 / 白板 / 沙盘 / 窗台 / 沙发 / 办公桌（给非发言者一个有意义的去处）
 - 可切换场景主题（未来）：书房 / 中式茶室 / 海边凉亭 / 实验室 / ...
 
 **v0 只做一个场景**：现代感的书房，木质 + 真皮 + 书架 + 大窗户，暖光。
+
+---
+
+### 3.1 时间博物馆（Hall of Time）：场景的上位容器（Ken 2026-04-17 拍板）
+
+**原"维多利亚书房"的定位降级**：它不再是 KPAX 唯一的视觉语言，而是"时间博物馆"这个上位容器里的**一个入门场景主题**。
+
+**时间博物馆是什么**：一个允许**跨时代化身共存**的空间。柏拉图、王阳明、费曼、巴菲特、Musk、一位 Reddit 野生投资高手、一位当代物理学家，可以在同一场讨论里出现。不同时代的人物穿自己那个时代的服饰，背景是一个隐喻"时间无关"的空间（参考"思想厅 / 博物馆中庭 / 星空圆厅"这类不锚定具体时代的视觉）。
+
+**场景 = 时间博物馆的一个"厅"**：
+- **书房厅**（v0 默认）：维多利亚 / 19 世纪学者风，适合学科化身为主的讨论
+- **现代会议厅**（v1 候选）：当下风格，适合真人化身（Musk / 巴菲特）为主的讨论
+- **东方庭院**（v2 候选）：中式，适合东方思想家（王阳明 / 孔子 / 禅宗）为主的讨论
+- **广场 / 竞技场**（争议人物召唤时）：公开辩论风格，适合立场高度冲突的讨论
+
+**场景切换规则（初版）**：
+- 默认看问题领域推荐场景（商业问题 → 现代会议厅，哲学问题 → 东方庭院，科学问题 → 书房厅）
+- 用户可手动切换
+- 同场讨论里的跨时代化身通过"每人穿自己时代服饰"解决视觉错位（不强行统一风格）
+
+**争议化身的处理（Ken 2026-04-17 定调允许柏拉图 / 希特勒 / Musk 等同台）**：
+- 默认推荐池不含争议人物（避免新用户第一印象不适）
+- 用户可主动搜索召唤
+- 极度敏感化身（希特勒这类）出场前有学术用途声明 + 分级访问
+- 详细工程边界见 `notes/research.md §human-skill-distillation-layer #7 IP / 肖像 / 合法化 / 伦理边界`
+
+**v0 范围内的处理**：**时间博物馆作为产品上位叙事先写进文档和 KPAX.md**，但前端实装仍只做书房厅一个场景；多厅切换 + 跨时代化身混合留到 v1 实装。
+
+**关联**：本小节是 `notes/research.md §human-skill-distillation-layer` 的**视觉 / UI 呈现层**对位。化身技术机制看 research，场景 / 视觉 / 交互看这里。
 
 ---
 
@@ -125,7 +154,7 @@ World Labs 2 天前刚发的 3D Gaussian Splatting 的浏览器级流式渲染�
 
 ### 4.5 后端
 
-- **AXL**（已有）：debate_engine + 7 学科 agent + moderator Opus + memory + free params
+- **AXL**（已有）：debate_engine + 多 agent 编排层（当前 emergence_decomposition 默认 7 学科配置，待验证） + moderator Opus + memory + free params
 - **KPAX**（骨架已有，需要接实际）：
   - `axl_client.py` HTTP 调 AXL（✓）
   - `token_ledger.py` 代币账本（✓）
@@ -378,3 +407,197 @@ L7 是 Ken 相对 WisLand 的核心差异点，不能是黑箱。在 KPAX 前端
 ---
 
 *记录：claude-code，基于 2026-04-15 晚 Ken 与 cc 对话。任何形态修改必须回来改这份文档 + journal 加一条。*
+
+---
+
+## axl-debate-mode-design AXL 两种辩论模式的产品哲学（Ken 2026-04-24 拍板）
+
+> **触发条件（cursor / codex / 未来 agent 必读）**：任何涉及 `FREE_ROUND_OPENERS` / `FREE_MODERATOR_PROMPTS` / Round 3 六字段 schema / KPAX 前端 debate mode 切换 UI / `debate_engine.py` 使命段分叉的改动，开工前必读本节对齐上位定义。没有这个锚点，`free` 模式很容易又被写回 `debate` 模式。
+>
+> **不触发**：纯工程细节（日志格式、数据库 schema、代币账本等）不需要读本节。
+
+### 核心裁定（Ken 2026-04-24）
+
+`debate` 和 `free` 的区别**不是"是否有冲突"**，而是**冲突服务于什么**。
+
+- **`debate` 的冲突服务于筛掉坏框架**：谁站不住，谁假设太弱，谁外推过度。
+- **`free` 的冲突服务于构建更好的模型**：哪些变量能接上，哪些假设不能接，哪些指标能测，哪些分歧必须保留。
+
+所以 `free` 不能写成"友好讨论"——它是**建设性综合 + 保留硬分歧**。否则会变成一群 agent 互相点头，最后产出一份漂亮但没骨头的综述。
+
+### 两种模式的本质
+
+- **`debate` = 破坏性检验（波普尔式）**
+  - 碰撞方式：攻击 / 压力测试 / 争夺解释权
+  - 产物：观点地图、共识、分歧、被打穿的假设、哪个框架更强
+  - 适用场景：用户想听正反方、压力测试自己的想法
+
+- **`free` = 建设性综合（库恩式）**
+  - 碰撞方式：建设性挑战（指出变量缺失、假设漏洞、观测不可靠、失效条件）→ 修正版 → moderator 合成保留冲突
+  - 产物：可推进的推演 spec（variables / assumptions / time_horizon / observables / falsification_conditions / next_steps 六字段）
+  - 适用场景：用户想得到一份能跑的 spec、进 KPAX 实验板块做 fork
+
+### 硬规则（写进所有相关 prompt）
+
+- `free` 也允许强分歧，但**分歧的用途不是赢，而是防止错误合成**
+- `debate` 不要被产品化成 spec 生成器——保留原有压力测试心智
+- `free` 的 moderator 合成时**必须保留冲突，不强行统一**
+- `free` 的 Round 2/3 agent 必须有"根本分歧"出口（防过度和谐）
+
+### 防过度和谐的 Round 2/3 prompt（写进 `FREE_ROUND_OPENERS`）
+
+> 如果你发现其他学科的假设在你学科看来从根本上不成立，不要为了协作而强行接入。请标注为"根本分歧"，说明它为什么不能进入你的模型，并交给 moderator 在合成阶段保留。
+
+语气说明：这条**不是把 `free` 拉回 `debate`**，而是给 `free` 保留"不可合成"的出口——能接的接，不能接的标出来。
+
+### 两者不可替代
+
+- 只有 `free` 会滑向学术综述机器，失去批判力
+- 只有 `debate` 会永远停在观点地图，不产出可执行物
+- KPAX 前端 debate mode 切换按钮不是 UI 选择题，是**产品形态选择题**
+
+### 产出对照
+
+| 维度 | debate 产物 | free 产物 |
+|---|---|---|
+| 形态 | knowledge product（观点地图） | operational artifact（可跑的机器） |
+| 结构 | 共识 / 分歧 / 未解问题 / 被打穿的假设 | variables / assumptions / time_horizon / observables / falsification / next_steps |
+| 用户下一步 | 拿判决做决策参考 | 拿 spec 跑推演 / fork 进实验板块 |
+
+### 和 AXL 整体定位的关系
+
+本节是 AXL "通过科学方法论和跨学科视角研究万事万物的平台"（PROJECT.md §1）在**辩论层形态**的具体化：
+- debate 模式实现 AXL 的**批判性**方法论（证伪）
+- free 模式实现 AXL 的**建设性**方法论（综合）
+- 两者共存才是完整的"科学方法论"
+
+### 关联文件
+
+- **上游**（本节定义约束的东西）：
+  - `projects/knowledge-graph/backend/app/services/debate_engine.py` — `ROUND_OPENERS` / `FREE_ROUND_OPENERS` / `MODERATOR_PROMPTS` / `FREE_MODERATOR_PROMPTS` / agent 使命段 mode 分叉
+  - `kpax/frontend/src/pages/Debate.tsx` — debate mode 切换 UI + `finalProposition` 逻辑
+  - KPAX 实验板块未来的 simulation spec renderer（依赖 free 模式 Round 3 六字段）
+
+- **下游**（本节依据的上位定义）：
+  - `PROJECT.md §1` — AXL 平台定位（科学方法论 + 跨学科视角）
+  - `notes/journal/appendix-2026-04-24-debate-free-mode-semantic-fix-handoff.md` — 本节的触发来源（Debate #12 free/debate 输出雷同 bug）
+  - `notes/journal/appendix-2026-04-24-axl-debate-experiment-commonality.md` — free 模式六字段的理论来源（AXL 第三次辩论产出的 AutoDOE 框架）
+
+- **同层**（产品哲学级别并列定义）：
+  - `##kpax-v0-deliberation-room` — KPAX v0 UI 形态设计
+
+### 产品原则：道德层严令禁止（Ken 2026-04-28 拍板，永久规则）
+
+> **触发条件（cursor / codex / 未来 agent 必读）**：写任何 prompt / academic reframing / moderator 指令 / final answer prompt / 产品文案前都必须先过本节过滤器。本节优先级**高于**任何具体 prompt 工程细节决策。
+
+#### 第一原则
+
+**AXL / KPAX 第一原则不是道德审判，是产品化把问题想透答清楚。**
+
+Ken 2026-04-28 原话：「最该取消的就是道德层面，产品化是第一位」「但我关注的还是道德层面的考量严令禁止。一切都已结果为重」。
+
+#### 道德层过滤器（写 prompt 前必过）
+
+任何 prompt / 入口改写 / moderator 指令 / final answer 字段约束**写之前**逐条检查：
+
+1. **价值判断词扣除**：含「危险 / 不该 / 不能 / 禁止 / 不应该 / 作恶 / dangerous / should-not / must-not / avoid / prevent」等词 → 删
+2. **不替用户做"该不该做"判断**：用户问 X，系统不评价 X 是否值得做、是否合规、是否道德
+3. **不拒答化**：用户问敏感问题（如"如何科学的资金盘模型"），系统不回避不说教，改成中性建模式（"建立...的仿真模型，分析机制 / 变量 / 失效条件 / 边界"）
+4. **限制只允许是产品目标 / 模型边界 / 可执行性边界**：不是价值审判
+5. **不锁定目标函数**：不替用户把开放建模问题压成单一目标函数（如"最大化 X / 规避 Y"）——用户问题如有多种产品化解读路径（机制建模 / 仿真实验 / 审计检测 / 对抗推演 / 决策判断），选最宽解读
+
+#### 反例（Phase 2 / Phase 2.5 实测踩雷）
+
+Ken 实测「如何设计科学的资金盘模型」被 `suggest_mode` 改写成「优化资金盘参数以在统计审查下最大化寿命」——
+
+- 错在哪：把开放建模问题锁成单一目标函数（最大化寿命）+ 隐含道德判断（"规避审查"暗示作恶）
+- 应该是：「建立资金盘机制的仿真模型，分析参与者流入 / 兑付承诺 / 信任传播 / 数据操控 / 审计信号 / 崩盘阈值与寿命分布之间的关系」——中性建模式，不锁目标，不带价值判断词
+
+#### 验证（每次 prompt 改动后）
+
+- grep 改过的 prompt 文件：`grep -E "危险|不该|不能|禁止|不应该|作恶|dangerous|should not|must not"` → 应该 0 hits（除非是引用用户原话）
+- 跑边缘问题（资金盘 / 政治敏感 / 价值争议），观察 academic reframing 是否中性建模式
+
+#### 例外条款
+
+唯一允许的「限制」是**产品目标 / 模型边界 / 可执行性边界**：
+- 「该 spec 在 X 条件下失效」——这是模型边界，OK
+- 「该方案需要 Y 资源支持」——这是可执行性边界，OK
+- 「该问题不在本辩论 N 个学科覆盖范围」——这是产品边界，OK
+- 「该方案不道德」——价值审判，禁止
+- 「该方案有风险，不建议尝试」——价值审判，禁止
+- 「该方案违反 XX」——价值审判，禁止
+
+---
+
+### Final Answer Layer（debate / free 共用，2026-04-27 Phase 2 Ken 拍板）
+
+> **触发条件（cursor / codex / 未来 agent 必读）**：任何涉及 `services/final_answer_layer.py` / `MODERATOR_FINAL_ANSWER_PROMPT_*` / 前端 `<FinalAnswerLayer>` / `<DetailedAnalysis>` / 折叠逻辑 / Final Answer 4 字段 schema 的改动，开工前必读本节。
+
+#### 为什么有这层
+
+debate 和 free 两种模式**都不直接给用户答案**——debate 给 4 段研究综述（共识/分歧/开放问题/研究方向），free 给六字段 spec（variables/assumptions/.../next_steps），用户问"X 能不能"系统都不直接说"能/不能"。
+
+Ken 2026-04-24 原话："**正反辩论模式连个答案都没给我啊，是我都不知道有效不有效**"。这违反 KPAX 第 1 条「正面回答问题是基础」。
+
+Final Answer Layer 是 **AXL 从「想透」到「说清」的最小可行产品形态**——加在所有现有 schema 之上的一个直接回答层。
+
+#### 4 段结构（debate / free 共用）
+
+1. **direct_answer**: 「能 / 不能 / 部分能 / 暂时不能」开头的判断 + 1 句限定
+2. **why**: 1-3 条核心理由（每条一句话）
+3. **conditions**: 成立条件 + 失效条件
+4. **next_steps**: 用户拿这个答案立即可执行的下一步
+
+#### 硬约束
+
+- **`direct_answer` 第一句必须以「能 / 不能 / 部分能 / 暂时不能」之一作为开头主语**，后面跟 1 句以内的限定补充，全段不超过 2 行——禁止「在某种意义上能但...」这种条件分支充斥的伪明确
+- **4 段必须全部产出**，缺一段算未完成（LLM 失败时整层 fallback 为 NULL，不阻塞 4 段综述）
+- **加在 4 段综述之前生成**，不替代任何现有字段（`summary_consensus / summary_disagreements / summary_open_questions / summary_directions` 全部保留）
+
+#### 模式适配（4 段结构相同，moderator prompt 不同）
+
+| | debate 模式 | free 模式 |
+|---|---|---|
+| direct_answer 来源 | 经过压力测试**仍站得住**的判断 | **多学科共建后**形成的可推进判断 |
+| why 段约束 | R3 仍在被使用、未被反方在 R3 内重新质疑掉的论据 | 跨学科融合，标注每条来自哪个学科组合 |
+| conditions 段约束 | 至少包含一条**反方提出的硬约束** | 包含 transcript 中的 `falsification_conditions` 聚合 + 任何标记的"根本分歧" |
+| next_steps 段约束 | 立即可执行的下一步动作（清单/实验/判据） | 立即可跑的 spec 测试或观察清单 |
+
+#### 前端展示规则
+
+- **用户进辩论详情页只看 Final Answer Layer 4 段**（Hero `direct_answer` 用 serif 26px 大字 + 左侧 amber 2px 边框；三段 supporting 用左 rail 圆圈①②③ + 右 markdown）
+- **下方"详细分析（4 段综述）"默认折叠**，点 toggle 按钮才展开
+- **agent transcripts** 永远在更深一层折叠（产品层不需要默认展示）
+- Final Answer 缺席时，DetailedAnalysis 默认展开兜底（用户至少能看到 4 段综述）
+
+#### 数据流
+
+```
+generate_summary() 入口
+   ↓
+generate_final_answer()  ← 独立 LLM 调用，按 mode 选 prompt
+   ↓
+   ├── 成功 → 写 4 个新字段 (summary_direct_answer / summary_why / summary_conditions / summary_next_steps)
+   └── 失败 → logger.warning，4 字段保持 NULL，继续主流程
+   ↓
+原 4 段综述生成（不变）
+   ↓
+debate.status = "completed"
+```
+
+#### 关联文件
+
+- `backend/app/services/final_answer_layer.py` — Final Answer Layer 主模块
+- `backend/app/services/debate_engine.py::generate_summary()` — 主调用点
+- `backend/migrations/versions/013_add_final_answer_columns.py` — DB 字段迁移
+- `frontend/src/pages/DebateSession.tsx::FinalAnswerLayer / DetailedAnalysis / SummaryBlock` — 三层 UI 组件
+- `notes/journal/project-log-2026-04.md` 2026-04-27 条目 — Phase 2 上线记录
+
+---
+
+*Final Answer Layer 子节记录：cursor，基于 2026-04-27 Ken 拍板的 Phase 2 指令书。*
+
+---
+
+*记录：claude-code，基于 2026-04-24 Ken 与 cc 对话。后续任何 `debate` / `free` 模式改动必须回来改这份文档 + journal 加一条。*

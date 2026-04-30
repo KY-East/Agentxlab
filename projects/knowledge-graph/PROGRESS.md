@@ -1,6 +1,6 @@
 # Agent X Lab — 开发进度
 
-> 最后更新: 2026-04-14
+> 最后更新: 2026-04-15
 
 ## 产品完成度评估
 
@@ -12,7 +12,7 @@
 |------|------|------|
 | 功能完成度 | **87/100** | 图谱/探索/辩论/论文/社区/订阅全链路已通 |
 | 产品完成度 | **72/100** | 核心体验连贯，但 i18n 硬编码多、状态覆盖不全 |
-| 生产就绪度 | **48/100** | 3张表+15字段缺 migration、零测试、.env.example 不全 |
+| 生产就绪度 | **48/100** | 3张表+15字段缺 migration、后端已有记忆相关 pytest（31）、E2E/前端仍薄、.env.example 不全 |
 
 ### 已完成 (~62 分)
 
@@ -35,7 +35,7 @@
 |--------|------|----------|------|
 | P0 | DB 迁移补全 | 3 | Subscription/PaymentRecord/TranslationCache/User 字段无 migration |
 | P0 | .env.example 完善 | 1 | 缺 20+ 配置项，新环境无法启动 |
-| P0 | 核心路径测试 | 8 | 前后端测试 = 0，认证/支付/辩论/论坛需覆盖 |
+| P0 | 核心路径测试 | 8 | 后端记忆模块已有 pytest；认证/支付/辩论/论坛 E2E 与前端仍缺 |
 | P0 | Stripe 实际接入 | 2 | Dashboard 配置 + webhook + 真实 key |
 | P1 | 全局错误处理 | 4 | Error Boundary + loading skeleton + empty state + SSE 重连 |
 | P1 | 前端代码清理 | 2 | 死代码 hook + 硬编码英文 + i18n 补全 |
@@ -811,7 +811,7 @@
 - [ ] `Subscription`/`PaymentRecord` 不在 `models/__init__.py` 导出，Alembic autogenerate 看不到
 - [ ] `.env.example` 仅覆盖 5/26 个环境变量
 - [ ] JWT secret 硬编码默认值 "change-me-in-production"
-- [ ] 零测试覆盖
+- [ ] 核心路径测试仍不足（后端记忆模块有 pytest；认证/支付/辩论/论坛 E2E 未覆盖）
 
 ### P1 — 产品体验
 - [ ] `DiscoveryPanel` 几乎全硬编码中文（~15处）
