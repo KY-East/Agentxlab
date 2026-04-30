@@ -39,3 +39,12 @@ Thumbs.db
 *.sln
 *.sw?
 *.local
+
+# Agent tool local state (not project code)
+.agents/
+.claude/
+skills/
+skills-lock.json
+
+# Cursor IDE utility scripts (not project code)
+restore_cursor_chats.py
