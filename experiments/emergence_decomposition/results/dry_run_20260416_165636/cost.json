@@ -1,0 +1,15 @@
+[
+  {
+    "question_id": "meta_01",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "TimeoutError: exceeded 2000s hard cap",
+    "duration_s": 2000.0,
+    "llm_calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "cost_usd": 0.0,
+    "model_breakdown": {}
+  }
+]

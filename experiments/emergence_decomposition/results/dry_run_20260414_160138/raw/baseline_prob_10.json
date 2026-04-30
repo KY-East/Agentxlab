@@ -1,0 +1,22 @@
+{
+  "metrics": {
+    "question_id": "prob_10",
+    "debate_id": 12,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 8.78,
+    "llm_calls": 1,
+    "prompt_tokens": 138,
+    "completion_tokens": 67,
+    "total_tokens": 205,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 205,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  "transcript": {}
+}

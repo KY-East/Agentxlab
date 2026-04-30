@@ -1,0 +1,192 @@
+[
+  {
+    "question_id": "cmp_06",
+    "debate_id": 5,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 9.06,
+    "llm_calls": 1,
+    "prompt_tokens": 133,
+    "completion_tokens": 62,
+    "total_tokens": 195,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 195,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "cmp_04",
+    "debate_id": 6,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AnthropicException - {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"x-api-key header is required\"},\"request_id\":\"req_011Ca4W7stDu2A7n63zZG34j\"}",
+    "duration_s": 295.5,
+    "llm_calls": 11,
+    "prompt_tokens": 15208,
+    "completion_tokens": 8340,
+    "total_tokens": 23548,
+    "cost_usd": 0.0045,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 11,
+        "total_tokens": 23548,
+        "cost_usd": 0.0044
+      }
+    }
+  },
+  {
+    "question_id": "dec_10",
+    "debate_id": 7,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 35.36,
+    "llm_calls": 3,
+    "prompt_tokens": 1229,
+    "completion_tokens": 910,
+    "total_tokens": 2139,
+    "cost_usd": 0.0004,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 3,
+        "total_tokens": 2139,
+        "cost_usd": 0.0004
+      }
+    }
+  },
+  {
+    "question_id": "dec_02",
+    "debate_id": 8,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 91.77,
+    "llm_calls": 5,
+    "prompt_tokens": 3540,
+    "completion_tokens": 2545,
+    "total_tokens": 6085,
+    "cost_usd": 0.0012,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 5,
+        "total_tokens": 6085,
+        "cost_usd": 0.0012
+      }
+    }
+  },
+  {
+    "question_id": "prob_05",
+    "debate_id": 9,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 9.02,
+    "llm_calls": 1,
+    "prompt_tokens": 128,
+    "completion_tokens": 53,
+    "total_tokens": 181,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 181,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "eval_06",
+    "debate_id": 10,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AnthropicException - {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"x-api-key header is required\"},\"request_id\":\"req_011Ca4WLsifdbLxbPR9WxYRa\"}",
+    "duration_s": 40.09,
+    "llm_calls": 3,
+    "prompt_tokens": 1277,
+    "completion_tokens": 1010,
+    "total_tokens": 2287,
+    "cost_usd": 0.0005,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 3,
+        "total_tokens": 2287,
+        "cost_usd": 0.0005
+      }
+    }
+  },
+  {
+    "question_id": "cmp_07",
+    "debate_id": 11,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AnthropicException - {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"x-api-key header is required\"},\"request_id\":\"req_011Ca4WPSBM96S8yQwn99US6\"}",
+    "duration_s": 34.72,
+    "llm_calls": 3,
+    "prompt_tokens": 1207,
+    "completion_tokens": 891,
+    "total_tokens": 2098,
+    "cost_usd": 0.0004,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 3,
+        "total_tokens": 2098,
+        "cost_usd": 0.0003
+      }
+    }
+  },
+  {
+    "question_id": "prob_10",
+    "debate_id": 12,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 8.78,
+    "llm_calls": 1,
+    "prompt_tokens": 138,
+    "completion_tokens": 67,
+    "total_tokens": 205,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 205,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "cmp_10",
+    "debate_id": 13,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AuthenticationError: OpenAIException - The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+    "duration_s": 37.02,
+    "llm_calls": 3,
+    "prompt_tokens": 1208,
+    "completion_tokens": 1064,
+    "total_tokens": 2272,
+    "cost_usd": 0.0005,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 3,
+        "total_tokens": 2272,
+        "cost_usd": 0.0005
+      }
+    }
+  },
+  {
+    "question_id": "dec_07",
+    "debate_id": 14,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AnthropicException - {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"x-api-key header is required\"},\"request_id\":\"req_011Ca4WVVyxa7t5AFmMXkvhB\"}",
+    "duration_s": 36.53,
+    "llm_calls": 3,
+    "prompt_tokens": 1268,
+    "completion_tokens": 1078,
+    "total_tokens": 2346,
+    "cost_usd": 0.0005,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 3,
+        "total_tokens": 2346,
+        "cost_usd": 0.0005
+      }
+    }
+  }
+]

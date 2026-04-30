@@ -1,0 +1,22 @@
+{
+  "metrics": {
+    "question_id": "eval_06",
+    "debate_id": 10,
+    "success": false,
+    "fail_reason": "AuthenticationError: litellm.AuthenticationError: AnthropicException - {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"x-api-key header is required\"},\"request_id\":\"req_011Ca4XCGWyrGm9Nt7XtFxF8\"}",
+    "duration_s": 9.87,
+    "llm_calls": 1,
+    "prompt_tokens": 131,
+    "completion_tokens": 67,
+    "total_tokens": 198,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 198,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  "transcript": {}
+}

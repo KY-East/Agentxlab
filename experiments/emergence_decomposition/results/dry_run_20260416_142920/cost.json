@@ -1,0 +1,147 @@
+[
+  {
+    "question_id": "str_03",
+    "debate_id": 5,
+    "success": true,
+    "fail_reason": null,
+    "duration_s": 1153.2,
+    "llm_calls": 54,
+    "prompt_tokens": 304165,
+    "completion_tokens": 37379,
+    "total_tokens": 341544,
+    "cost_usd": 1.2859,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 33,
+        "total_tokens": 96442,
+        "cost_usd": 0.0259
+      },
+      "gpt-5.4": {
+        "calls": 12,
+        "total_tokens": 104621,
+        "cost_usd": 0.3815
+      },
+      "anthropic/claude-opus-4-6": {
+        "calls": 9,
+        "total_tokens": 140481,
+        "cost_usd": 0.8784
+      }
+    }
+  },
+  {
+    "question_id": "str_04",
+    "debate_id": 6,
+    "success": true,
+    "fail_reason": null,
+    "duration_s": 1158.28,
+    "llm_calls": 54,
+    "prompt_tokens": 303277,
+    "completion_tokens": 37343,
+    "total_tokens": 340620,
+    "cost_usd": 1.1222,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 39,
+        "total_tokens": 144368,
+        "cost_usd": 0.0392
+      },
+      "anthropic/claude-opus-4-6": {
+        "calls": 9,
+        "total_tokens": 137639,
+        "cost_usd": 0.8762
+      },
+      "gpt-5.4": {
+        "calls": 6,
+        "total_tokens": 58613,
+        "cost_usd": 0.2066
+      }
+    }
+  },
+  {
+    "question_id": "str_07",
+    "debate_id": 7,
+    "success": true,
+    "fail_reason": null,
+    "duration_s": 1066.47,
+    "llm_calls": 54,
+    "prompt_tokens": 290842,
+    "completion_tokens": 37303,
+    "total_tokens": 328145,
+    "cost_usd": 0.7913,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 39,
+        "total_tokens": 174729,
+        "cost_usd": 0.0483
+      },
+      "gpt-5.4": {
+        "calls": 9,
+        "total_tokens": 81095,
+        "cost_usd": 0.2853
+      },
+      "anthropic/claude-opus-4-6": {
+        "calls": 6,
+        "total_tokens": 72321,
+        "cost_usd": 0.4576
+      }
+    }
+  },
+  {
+    "question_id": "eval_04",
+    "debate_id": 8,
+    "success": true,
+    "fail_reason": null,
+    "duration_s": 1028.86,
+    "llm_calls": 54,
+    "prompt_tokens": 294310,
+    "completion_tokens": 36848,
+    "total_tokens": 331158,
+    "cost_usd": 0.9879,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 36,
+        "total_tokens": 118345,
+        "cost_usd": 0.0327
+      },
+      "gpt-5.4": {
+        "calls": 12,
+        "total_tokens": 131025,
+        "cost_usd": 0.4627
+      },
+      "anthropic/claude-opus-4-6": {
+        "calls": 6,
+        "total_tokens": 81788,
+        "cost_usd": 0.4929
+      }
+    }
+  },
+  {
+    "question_id": "eval_09",
+    "debate_id": 9,
+    "success": true,
+    "fail_reason": null,
+    "duration_s": 1123.86,
+    "llm_calls": 54,
+    "prompt_tokens": 294391,
+    "completion_tokens": 38014,
+    "total_tokens": 332405,
+    "cost_usd": 0.9446,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 39,
+        "total_tokens": 153092,
+        "cost_usd": 0.0422
+      },
+      "anthropic/claude-opus-4-6": {
+        "calls": 9,
+        "total_tokens": 95128,
+        "cost_usd": 0.6076
+      },
+      "gpt-5.4": {
+        "calls": 6,
+        "total_tokens": 84185,
+        "cost_usd": 0.2947
+      }
+    }
+  }
+]

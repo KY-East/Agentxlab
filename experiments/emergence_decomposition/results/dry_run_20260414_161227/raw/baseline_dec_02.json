@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "question_id": "dec_02",
+    "debate_id": 8,
+    "success": false,
+    "fail_reason": "BadGatewayError: litellm.BadGatewayError: AnthropicException BadGatewayError - <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>cloudflare</center>\r\n</body>\r\n</html>\r\n",
+    "duration_s": 133.59,
+    "llm_calls": 5,
+    "prompt_tokens": 5382,
+    "completion_tokens": 4027,
+    "total_tokens": 9409,
+    "cost_usd": 0.0019,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 4,
+        "total_tokens": 7407,
+        "cost_usd": 0.0014
+      },
+      "gpt-5.4": {
+        "calls": 1,
+        "total_tokens": 2002,
+        "cost_usd": 0.0005
+      }
+    }
+  },
+  "transcript": {}
+}

@@ -1,0 +1,32 @@
+{"ts": "2026-04-16T15:38:33.956198+00:00", "event": "run_start", "n": 40}
+{"ts": "2026-04-16T15:38:33.956198+00:00", "event": "debate_start", "i": 1, "qid": "cmp_06"}
+{"ts": "2026-04-16T16:01:26.316106+00:00", "event": "debate_done", "i": 1, "qid": "cmp_06", "success": true, "duration_s": 1371.94, "total_tokens": 342598, "cost_usd": 1.006, "fail_reason": null}
+{"ts": "2026-04-16T16:02:31.312508+00:00", "event": "debate_start", "i": 2, "qid": "cmp_04"}
+{"ts": "2026-04-16T16:25:12.209118+00:00", "event": "debate_done", "i": 2, "qid": "cmp_04", "success": true, "duration_s": 1360.89, "total_tokens": 322177, "cost_usd": 0.6534, "fail_reason": null}
+{"ts": "2026-04-16T16:26:17.220074+00:00", "event": "debate_start", "i": 3, "qid": "dec_10"}
+{"ts": "2026-04-16T16:48:02.996104+00:00", "event": "debate_done", "i": 3, "qid": "dec_10", "success": true, "duration_s": 1305.77, "total_tokens": 333229, "cost_usd": 0.9395, "fail_reason": null}
+{"ts": "2026-04-16T16:49:08.006512+00:00", "event": "debate_start", "i": 4, "qid": "dec_02"}
+{"ts": "2026-04-16T17:13:03.903878+00:00", "event": "debate_done", "i": 4, "qid": "dec_02", "success": true, "duration_s": 1435.9, "total_tokens": 359555, "cost_usd": 1.1137, "fail_reason": null}
+{"ts": "2026-04-16T17:14:08.911577+00:00", "event": "debate_start", "i": 5, "qid": "prob_05"}
+{"ts": "2026-04-16T17:35:22.054793+00:00", "event": "debate_done", "i": 5, "qid": "prob_05", "success": true, "duration_s": 1273.14, "total_tokens": 331159, "cost_usd": 1.0119, "fail_reason": null}
+{"ts": "2026-04-16T17:36:27.058122+00:00", "event": "debate_start", "i": 6, "qid": "eval_06"}
+{"ts": "2026-04-16T17:57:49.601625+00:00", "event": "debate_done", "i": 6, "qid": "eval_06", "success": true, "duration_s": 1282.54, "total_tokens": 335676, "cost_usd": 1.1077, "fail_reason": null}
+{"ts": "2026-04-16T17:58:54.616982+00:00", "event": "debate_start", "i": 7, "qid": "cmp_07"}
+{"ts": "2026-04-16T18:19:43.930989+00:00", "event": "debate_done", "i": 7, "qid": "cmp_07", "success": true, "duration_s": 1249.31, "total_tokens": 324521, "cost_usd": 0.8398, "fail_reason": null}
+{"ts": "2026-04-16T18:20:48.946440+00:00", "event": "debate_start", "i": 8, "qid": "prob_10"}
+{"ts": "2026-04-16T18:40:38.735694+00:00", "event": "debate_done", "i": 8, "qid": "prob_10", "success": true, "duration_s": 1189.79, "total_tokens": 325088, "cost_usd": 0.9742, "fail_reason": null}
+{"ts": "2026-04-16T18:41:43.736845+00:00", "event": "debate_start", "i": 9, "qid": "cmp_10"}
+{"ts": "2026-04-16T19:02:20.902184+00:00", "event": "debate_done", "i": 9, "qid": "cmp_10", "success": true, "duration_s": 1237.16, "total_tokens": 339716, "cost_usd": 0.9338, "fail_reason": null}
+{"ts": "2026-04-16T19:03:25.910919+00:00", "event": "debate_start", "i": 10, "qid": "dec_07"}
+{"ts": "2026-04-16T19:23:09.355471+00:00", "event": "debate_done", "i": 10, "qid": "dec_07", "success": true, "duration_s": 1183.44, "total_tokens": 323068, "cost_usd": 0.7764, "fail_reason": null}
+{"ts": "2026-04-16T19:24:14.362367+00:00", "event": "debate_start", "i": 11, "qid": "str_02"}
+{"ts": "2026-04-16T19:43:32.810088+00:00", "event": "debate_done", "i": 11, "qid": "str_02", "success": true, "duration_s": 1158.45, "total_tokens": 343748, "cost_usd": 1.2524, "fail_reason": null}
+{"ts": "2026-04-16T19:44:37.814223+00:00", "event": "debate_start", "i": 12, "qid": "cmp_02"}
+{"ts": "2026-04-16T20:03:36.200305+00:00", "event": "debate_done", "i": 12, "qid": "cmp_02", "success": true, "duration_s": 1138.38, "total_tokens": 329485, "cost_usd": 1.1128, "fail_reason": null}
+{"ts": "2026-04-16T20:04:41.201060+00:00", "event": "debate_start", "i": 13, "qid": "dec_03"}
+{"ts": "2026-04-16T20:23:52.804891+00:00", "event": "debate_done", "i": 13, "qid": "dec_03", "success": true, "duration_s": 1151.6, "total_tokens": 320892, "cost_usd": 0.7475, "fail_reason": null}
+{"ts": "2026-04-16T20:24:57.812488+00:00", "event": "debate_start", "i": 14, "qid": "prob_04"}
+{"ts": "2026-04-16T20:41:35.956487+00:00", "event": "debate_done", "i": 14, "qid": "prob_04", "success": true, "duration_s": 998.14, "total_tokens": 328468, "cost_usd": 1.1086, "fail_reason": null}
+{"ts": "2026-04-16T20:42:40.955464+00:00", "event": "debate_start", "i": 15, "qid": "str_10"}
+{"ts": "2026-04-16T20:59:43.654767+00:00", "event": "debate_done", "i": 15, "qid": "str_10", "success": true, "duration_s": 1022.7, "total_tokens": 329092, "cost_usd": 1.0826, "fail_reason": null}
+{"ts": "2026-04-16T21:00:48.662988+00:00", "event": "debate_start", "i": 16, "qid": "str_09"}

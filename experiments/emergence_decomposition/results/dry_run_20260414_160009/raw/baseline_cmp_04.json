@@ -1,0 +1,22 @@
+{
+  "metrics": {
+    "question_id": "cmp_04",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.92,
+    "llm_calls": 1,
+    "prompt_tokens": 140,
+    "completion_tokens": 67,
+    "total_tokens": 207,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 207,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  "transcript": {}
+}

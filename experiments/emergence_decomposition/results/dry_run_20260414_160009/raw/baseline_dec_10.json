@@ -1,0 +1,22 @@
+{
+  "metrics": {
+    "question_id": "dec_10",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 3.26,
+    "llm_calls": 1,
+    "prompt_tokens": 131,
+    "completion_tokens": 57,
+    "total_tokens": 188,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 188,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  "transcript": {}
+}

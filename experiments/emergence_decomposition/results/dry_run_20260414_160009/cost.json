@@ -1,0 +1,192 @@
+[
+  {
+    "question_id": "cmp_06",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 3.05,
+    "llm_calls": 1,
+    "prompt_tokens": 133,
+    "completion_tokens": 53,
+    "total_tokens": 186,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 186,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "cmp_04",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.92,
+    "llm_calls": 1,
+    "prompt_tokens": 140,
+    "completion_tokens": 67,
+    "total_tokens": 207,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 207,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "dec_10",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 3.26,
+    "llm_calls": 1,
+    "prompt_tokens": 131,
+    "completion_tokens": 57,
+    "total_tokens": 188,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 188,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "dec_02",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 3.01,
+    "llm_calls": 1,
+    "prompt_tokens": 131,
+    "completion_tokens": 67,
+    "total_tokens": 198,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 198,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "prob_05",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.84,
+    "llm_calls": 1,
+    "prompt_tokens": 128,
+    "completion_tokens": 53,
+    "total_tokens": 181,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 181,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "eval_06",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.45,
+    "llm_calls": 1,
+    "prompt_tokens": 131,
+    "completion_tokens": 67,
+    "total_tokens": 198,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 198,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "cmp_07",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.78,
+    "llm_calls": 1,
+    "prompt_tokens": 138,
+    "completion_tokens": 67,
+    "total_tokens": 205,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 205,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "prob_10",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.67,
+    "llm_calls": 1,
+    "prompt_tokens": 138,
+    "completion_tokens": 67,
+    "total_tokens": 205,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 205,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "cmp_10",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.21,
+    "llm_calls": 1,
+    "prompt_tokens": 130,
+    "completion_tokens": 53,
+    "total_tokens": 183,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 183,
+        "cost_usd": 0.0
+      }
+    }
+  },
+  {
+    "question_id": "dec_07",
+    "debate_id": null,
+    "success": false,
+    "fail_reason": "NameError: name 'names' is not defined",
+    "duration_s": 2.59,
+    "llm_calls": 1,
+    "prompt_tokens": 142,
+    "completion_tokens": 67,
+    "total_tokens": 209,
+    "cost_usd": 0.0,
+    "model_breakdown": {
+      "deepseek/deepseek-chat": {
+        "calls": 1,
+        "total_tokens": 209,
+        "cost_usd": 0.0
+      }
+    }
+  }
+]
