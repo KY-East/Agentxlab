@@ -379,7 +379,7 @@
 - **`app/services/kpax_pipeline.py`** — 主编排层。对每个 endpoint 串 "disciplines 选择 → agents 生成 → 轮次 run → structured render"，并处理持久化（§8）。
 - **`app/services/kpax_renderers.py`** — 结构化渲染器。`render_verdict` / `render_estimate` / `render_plan` 三个函数，各自调 moderator LLM（Claude Opus 4.6）一次，喂对应的 JSON schema prompt，产出对应 Response 结构。
 
-**不做**：不改 `debate_engine.py` 本体（硬规则：debate_engine 是 AXL 学术底座，不被 KPAX 产品 schema 绑架）。
+**不做**：不改 `debate_engine.py` 本体（硬规则：debate_engine 是 AXL 的核心研究引擎，不被 KPAX 产品 schema 绑架）。
 
 ### 7.2 moderator summary → structured Response 的映射策略
 
